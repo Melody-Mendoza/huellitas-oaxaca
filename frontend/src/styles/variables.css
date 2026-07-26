@@ -1,0 +1,19 @@
+:root{
+
+    --primary:#4CAF50;
+    --secondary:#8BC34A;
+    --accent:#FFC107;
+
+    --background:#F7F9F7;
+    --surface:#FFFFFF;
+
+    --text:#2E2E2E;
+    --text-light:#666666;
+
+    --danger:#E53935;
+
+    --radius:12px;
+
+    --shadow:0 5px 18px rgba(0,0,0,.08);
+
+}
