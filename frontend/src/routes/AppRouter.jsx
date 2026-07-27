@@ -12,6 +12,15 @@ import DetalleMascota from "../pages/DetalleMascota/DetalleMascota";
 import Donaciones from "../pages/Donaciones/Donaciones";
 import Solicitud from "../pages/Solicitud/Solicitud";
 import NotFound from "../pages/NotFound/NotFound";
+import Perfil from "../pages/Perfil/Perfil";
+
+import Adopcion from "../pages/Adopcion/Adopcion";
+import Historias from "../pages/Historias/Historias";
+import Nosotros from "../pages/Nosotros/Nosotros";
+
+import Privacidad from "../pages/Privacidad/Privacidad";
+import Terminos from "../pages/Terminos/Terminos";
+import Contacto from "../pages/Contacto/Contacto";
 
 function AppRouter() {
     return (
@@ -25,6 +34,12 @@ function AppRouter() {
                 <Route path="/mascota/:id" element={<DetalleMascota />} />
                 <Route path="/donaciones" element={<Donaciones />} />
                 <Route path="/solicitud" element={<Solicitud />} />
+                <Route path="/adopcion" element={<Adopcion />} />
+                <Route path="/historias" element={<Historias />} />
+                <Route path="/nosotros" element={<Nosotros />} />
+                <Route path="/privacidad" element={<Privacidad />} />
+                <Route path="/terminos" element={<Terminos />} />
+                <Route path="/contacto" element={<Contacto />} />
                 <Route
                     path="/perfil"
                     element={
