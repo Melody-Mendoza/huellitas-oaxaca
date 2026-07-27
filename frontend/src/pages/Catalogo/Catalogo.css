@@ -1,0 +1,85 @@
+.catalogo{
+    background:#F8F7F2;
+    padding:40px 30px;
+    min-height:100vh;
+}
+
+.catalogo-layout{
+    display:grid;
+    grid-template-columns:260px 1fr;
+    gap:35px;
+    max-width:1400px;
+    margin:auto;
+}
+
+.catalogo-content{
+    display:flex;
+    flex-direction:column;
+}
+
+.catalogo-top{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:35px;
+}
+
+.catalogo-top h1{
+    color:#2F6E4F;
+    font-size:2rem;
+    margin:0;
+}
+
+.catalogo-top p{
+    color:#666;
+    margin-top:5px;
+}
+
+.catalogo-grid{
+    display:grid;
+    align-items:stretch;
+    grid-template-columns:repeat(auto-fit,minmax(270px,1fr));
+    gap:25px;
+}
+
+.pagination{
+    margin-top:40px;
+    display:flex;
+    justify-content:center;
+    gap:10px;
+}
+
+.pagination button{
+    width:40px;
+    height:40px;
+    border:none;
+    border-radius:10px;
+    cursor:pointer;
+    background:#fff;
+    box-shadow:0 3px 10px rgba(0,0,0,.05);
+}
+
+.pagination button.active{
+    background:#2F6E4F;
+    color:white;
+}
+
+.pagination span{
+    display:flex;
+    align-items:center;
+}
+
+@media(max-width:1000px){
+    .catalogo-layout{
+        grid-template-columns:1fr;
+    }
+}
+
+@media(max-width:700px){
+    .catalogo-top{
+        flex-direction:column;
+        align-items:flex-start;
+        gap:20px;
+    }
+
+}

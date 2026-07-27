@@ -1,0 +1,11 @@
+.filter-bar{
+    display:flex;
+    gap:20px;
+    margin-bottom:30px;
+}
+
+.filter-bar select{
+    padding:12px;
+    border-radius:10px;
+    border:1px solid #ccc;
+}

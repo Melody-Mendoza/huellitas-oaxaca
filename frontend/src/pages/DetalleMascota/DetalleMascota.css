@@ -1,0 +1,143 @@
+.detalle {
+    max-width: 1300px;
+    margin: auto;
+    padding: 40px 25px;
+}
+
+.back-link {
+    text-decoration: none;
+    color: #2F6E4F;
+    font-weight: 600;
+}
+
+.detalle-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 30px;
+    margin-top: 25px;
+}
+
+.detalle-info h1 {
+    font-size: 2.6rem;
+    color: #2F6E4F;
+}
+
+.detalle-info p {
+    color: #666;
+}
+
+.title-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.favorite {
+    width: 50px;
+    height: 50px;
+    border: none;
+    border-radius: 50%;
+    background: #F7F7F7;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.favorite:hover {
+    background: #FFECEC;
+    color: #E63946;
+    transform: scale(1.08);
+}
+
+.location {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 25px 0;
+}
+
+.cards-info {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 18px;
+    margin-bottom: 30px;
+}
+
+.description {
+    margin-bottom: 30px;
+}
+
+.description h2 {
+    margin-bottom: 12px;
+    color: #2F6E4F;
+}
+
+.description p {
+    line-height: 1.7;
+}
+
+.personality {
+    margin-bottom: 35px;
+}
+
+.personality h2 {
+    color: #2F6E4F;
+    margin-bottom: 15px;
+}
+
+.tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.tags span {
+    background: #EAF7EE;
+    color: #2F6E4F;
+    padding: 8px 15px;
+    border-radius: 20px;
+    font-size: .9rem;
+    transition: .3s;
+    cursor: default;
+
+}
+
+.tags span:hover {
+    background: #2F6E4F;
+    color: white;
+}
+
+.adopt-btn {
+    width: 100%;
+    border: none;
+    background: #2F6E4F;
+    color: white;
+    padding: 16px;
+    border-radius: 12px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: .3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    text-decoration: none;
+}
+
+.adopt-btn:hover {
+    background: #24563D;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(47, 110, 79, .25);
+}
+
+.favorite.active {
+    background: #FFECEC;
+    color: #E63946;
+}
+
+@media(max-width:900px) {
+    .detalle-grid {
+        grid-template-columns: 1fr;
+    }
+}

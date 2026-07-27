@@ -1,0 +1,114 @@
+.card-mascota{
+    background:#fff;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 6px 18px rgba(0,0,0,.08);
+    transition:.3s;
+    display:flex;
+    flex-direction:column;
+    height:100%;
+}
+
+.card-mascota:hover{
+    transform:translateY(-4px);
+}
+
+.card-image{
+    position:relative;
+}
+
+.card-image img{
+    width:100%;
+    height:220px;
+    object-fit:cover;
+}
+
+.status-badge{
+    position:absolute;
+    top:12px;
+    left:12px;
+    background:#EAF7EE;
+    color:#2F6E4F;
+    padding:5px 12px;
+    border-radius:30px;
+    font-size:.75rem;
+    font-weight:600;
+}
+
+.status-badge.urgent{
+    background:#FEE2E2;
+    color:#B91C1C;
+}
+
+.favorite-btn{
+    position:absolute;
+    top:12px;
+    right:12px;
+    width:38px;
+    height:38px;
+    border:none;
+    border-radius:50%;
+    background:#fff;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    cursor:pointer;
+    transition:.3s;
+}
+
+.favorite-btn:hover{
+    background:#F7F7F7;
+}
+
+.card-body{
+    padding:18px;
+    display:flex;
+flex-direction:column;
+height:100%;
+}
+
+.card-header{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    margin-bottom:12px;
+}
+
+.card-header h3{
+    color:#2F6E4F;
+    font-size:1.2rem;
+}
+
+.age-badge{
+    background:#DDEFD8;
+    color:#2F6E4F;
+    padding:4px 10px;
+    border-radius:15px;
+    font-size:.75rem;
+    font-weight:600;
+}
+
+.info{
+    display:flex;
+    align-items:center;
+    gap:8px;
+    color:#666;
+    margin:8px 0;
+    font-size:.9rem;
+}
+
+.details-btn{
+    display:block;
+    margin-top:auto;
+    text-align:center;
+    background:#2F6E4F;
+    color:#fff;
+    text-decoration:none;
+    padding:12px;
+    border-radius:8px;
+    transition:.3s;
+}
+
+.details-btn:hover{
+    background:#24563D;
+}
