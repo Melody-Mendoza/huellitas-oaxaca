@@ -14,3 +14,7 @@ spring.jpa.open-in-view=false
 
 spring.flyway.enabled=true
 spring.flyway.locations=classpath:db/migration
+
+security.jwt.secret=TU_CLAVE_SECRETA_DE_AL_MENOS_32_CARACTERES
+security.jwt.expiration-minutes=60
+security.jwt.issuer=huellitas-oaxaca-api
