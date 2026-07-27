@@ -9,7 +9,7 @@ import { AuthProvider } from "./context/AuthContext";
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <AuthProvider>
-      <BrowserRouter>
+      <BrowserRouter basename="/huellitas-oaxaca" >
         <Toaster
           position="top-right"
           reverseOrder={false}

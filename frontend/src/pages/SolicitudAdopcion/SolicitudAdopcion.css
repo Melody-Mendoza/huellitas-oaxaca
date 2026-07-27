@@ -1,0 +1,50 @@
+.solicitud {
+    min-height: 100vh;
+    background: #F5F1EA;
+    padding: 80px 20px;
+}
+
+.contenedor-solicitud {
+    max-width: 980px;
+    margin: auto;
+    background: white;
+    border-radius: 22px;
+    padding: 70px;
+    box-shadow: 0 12px 40px rgba(0, 0, 0, .08);
+}
+
+.contenedor-solicitud h1 {
+    text-align: center;
+    font-size: 3rem;
+    color: #294333;
+    margin-bottom: 18px;
+    font-weight: 700;
+}
+
+.contenedor-solicitud p {
+    text-align: center;
+    color: #666;
+    font-size: 1.05rem;
+    line-height: 1.6;
+}
+
+.mensaje-exito {
+    margin-top: 25px;
+    padding: 15px;
+    border-radius: 12px;
+    background: #EAF8EC;
+    color: #2E7D32;
+    text-align: center;
+    font-weight: 600;
+
+}
+
+@media(max-width:768px) {
+    .contenedor-solicitud {
+        padding: 40px 25px;
+    }
+
+    .contenedor-solicitud h1 {
+        font-size: 2rem;
+    }
+}

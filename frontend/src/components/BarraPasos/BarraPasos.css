@@ -1,0 +1,57 @@
+.barra-pasos{
+    width:100%;
+    display:flex;
+    justify-content:space-between;
+    align-items:flex-start;
+    margin-top:40px;
+    margin-bottom:60px;
+}
+
+.paso-item{
+    flex:1;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    position:relative;
+}
+
+.linea{
+    position:absolute;
+    width:100%;
+    height:3px;
+    background:#E2E2E2;
+    top:18px;
+    left:-50%;
+    z-index:0;
+}
+
+.linea.activa{
+    background:#4D6E4C;
+}
+
+.circulo{
+    width:38px;
+    height:38px;
+    border-radius:50%;
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    background:#ECECEC;
+    color:#666;
+    font-weight:700;
+    position:relative;
+    z-index:1;
+}
+
+.circulo.activo{
+    background:#4D6E4C;
+    color:white;
+}
+
+.paso-item span{
+    margin-top:12px;
+    text-align:center;
+    font-size:.88rem;
+    color:#555;
+    line-height:1.3;
+}
