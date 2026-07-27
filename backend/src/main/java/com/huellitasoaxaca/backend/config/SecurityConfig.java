@@ -1,4 +1,4 @@
-package com.huellitasoaxaca.backend.security;
+package com.huellitasoaxaca.backend.config;
 
 import javax.crypto.SecretKey;
 import javax.crypto.spec.SecretKeySpec;
@@ -10,6 +10,7 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,9 +25,12 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
 
+import com.huellitasoaxaca.backend.security.CustomAccessDeniedHandler;
+import com.huellitasoaxaca.backend.security.CustomAuthenticationEntryPoint;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 
 @Configuration
+@EnableMethodSecurity
 public class SecurityConfig 
 {
     @Value("${security.jwt.secret}")
@@ -104,36 +108,45 @@ public class SecurityConfig
     public SecurityFilterChain securityFilterChain(
         HttpSecurity http,
         AuthenticationProvider authenticationProvider,
-        JwtAuthenticationConverter jwtAuthenticationConverter
+        JwtAuthenticationConverter jwtAuthenticationConverter,
+        CustomAuthenticationEntryPoint authenticationEntryPoint,
+        CustomAccessDeniedHandler accessDeniedHandler
     ) 
     throws Exception 
     {
 
         return http
-                .csrf(csrf -> csrf.disable())
-                .sessionManagement(session ->
-                    session.sessionCreationPolicy(
+        .csrf(csrf -> csrf.disable())
+        .sessionManagement(session ->
+                session.sessionCreationPolicy(
                         SessionCreationPolicy.STATELESS
-                    )
                 )
-                .authenticationProvider(authenticationProvider)
-                .authorizeHttpRequests(authorize ->
-                    authorize
+        )
+        .authenticationProvider(authenticationProvider)
+        .authorizeHttpRequests(authorize ->
+                authorize
                         .requestMatchers(
-                "/api/auth/registro",
-                            "/api/auth/login",
-                            "/error"
+                                "/api/auth/registro",
+                                "/api/auth/login",
+                                "/error"
                         ).permitAll()
                         .anyRequest().authenticated()
-                )
-                .oauth2ResourceServer(resourceServer ->
-                    resourceServer.jwt(jwt ->
-                        jwt.jwtAuthenticationConverter(
-                            jwtAuthenticationConverter
+        )
+        .exceptionHandling(exception ->
+                exception
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .accessDeniedHandler(accessDeniedHandler)
+        )
+        .oauth2ResourceServer(resourceServer ->
+                resourceServer
+                        .authenticationEntryPoint(authenticationEntryPoint)
+                        .jwt(jwt ->
+                                jwt.jwtAuthenticationConverter(
+                                        jwtAuthenticationConverter
+                                )
                         )
-                    )
-                )
-                .build();
+        )
+        .build();
     }
 
     private SecretKey crearClaveSecreta() 
