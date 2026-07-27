@@ -21,6 +21,8 @@ import Nosotros from "../pages/Nosotros/Nosotros";
 import Privacidad from "../pages/Privacidad/Privacidad";
 import Terminos from "../pages/Terminos/Terminos";
 import Contacto from "../pages/Contacto/Contacto";
+import RecuperarPassword from "../pages/RecuperarPassword/RecuperarPassword";
+
 
 function AppRouter() {
     return (
@@ -40,6 +42,10 @@ function AppRouter() {
                 <Route path="/privacidad" element={<Privacidad />} />
                 <Route path="/terminos" element={<Terminos />} />
                 <Route path="/contacto" element={<Contacto />} />
+                <Route
+                    path="/recuperar-password"
+                    element={<RecuperarPassword />}
+                />
                 <Route
                     path="/perfil"
                     element={
