@@ -10,7 +10,7 @@ import Register from "../pages/Register/Register";
 import Catalogo from "../pages/Catalogo/Catalogo";
 import DetalleMascota from "../pages/DetalleMascota/DetalleMascota";
 import Donaciones from "../pages/Donaciones/Donaciones";
-import Solicitud from "../pages/Solicitud/Solicitud";
+import SolicitudAdopcion from "../pages/SolicitudAdopcion/SolicitudAdopcion";
 import NotFound from "../pages/NotFound/NotFound";
 import Perfil from "../pages/Perfil/Perfil";
 
@@ -35,7 +35,7 @@ function AppRouter() {
                 <Route path="/catalogo" element={<Catalogo />} />
                 <Route path="/mascota/:id" element={<DetalleMascota />} />
                 <Route path="/donaciones" element={<Donaciones />} />
-                <Route path="/solicitud" element={<Solicitud />} />
+                <Route path="/solicitud" element={<SolicitudAdopcion />} />
                 <Route path="/adopcion" element={<Adopcion />} />
                 <Route path="/historias" element={<Historias />} />
                 <Route path="/nosotros" element={<Nosotros />} />

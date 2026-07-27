@@ -1,0 +1,116 @@
+.datos-personales {
+    width: 100%;
+    border-top: 1px solid #ECECEC;
+    padding-top: 45px;
+}
+
+.datos-personales h2 {
+    color: #2C4233;
+    font-size: 1.25rem;
+    margin-bottom: 35px;
+}
+
+.grid-formulario {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 28px;
+}
+
+.campo {
+    display: flex;
+    flex-direction: column;
+}
+
+.campo label {
+    margin-bottom: 10px;
+    color: #555;
+    font-size: .9rem;
+    font-weight: 600;
+}
+
+.campo input {
+    height: 48px;
+    border: 1px solid #DADADA;
+    border-radius: 10px;
+    padding: 0 16px;
+    outline: none;
+    transition: .3s;
+    font-size: .95rem;
+    background: white;
+}
+
+.campo input:focus {
+    border-color: #4C6B4F;
+    box-shadow: 0 0 0 3px rgba(76, 107, 79, .12);
+}
+
+.acciones {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 45px;
+}
+
+.acciones button {
+    background: #4D6E4C;
+    color: white;
+    border: none;
+    padding: 14px 34px;
+    border-radius: 10px;
+    cursor: pointer;
+    font-size: .95rem;
+    font-weight: 600;
+    transition: .3s;
+}
+
+.acciones button:hover {
+    background: #3E5C3E;
+}
+
+.btn-secundario {
+    background: #E5E5E5 !important;
+    color: #444 !important;
+    margin-right: 15px;
+}
+
+.btn-secundario:hover {
+    background: #D8D8D8 !important;
+}
+
+.campo-completo {
+    grid-column: 1 / -1;
+}
+
+.campo select,
+.campo textarea {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1px solid #DADADA;
+    border-radius: 10px;
+    font-size: .95rem;
+    font-family: inherit;
+    outline: none;
+    resize: none;
+    transition: .3s;
+}
+
+.campo select:focus,
+.campo textarea:focus {
+    border-color: #4C6B4F;
+    box-shadow: 0 0 0 3px rgba(76, 107, 79, .12);
+}
+
+.mensaje-error {
+    display: block;
+    margin-top: 6px;
+    color: #D93025;
+    font-size: .82rem;
+    font-weight: 500;
+}
+
+.campo input:invalid,
+.campo textarea:invalid,
+.campo select:invalid {
+
+    border-color: #D93025;
+
+}
