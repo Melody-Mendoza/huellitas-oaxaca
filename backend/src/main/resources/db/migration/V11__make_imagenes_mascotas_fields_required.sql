@@ -1,0 +1,3 @@
+ALTER TABLE imagenes_mascotas
+    MODIFY COLUMN url VARCHAR(255) NOT NULL,
+    MODIFY COLUMN mascota_id BIGINT NOT NULL;
