@@ -1,0 +1,16 @@
+.info-card{
+    background:#F7F7F7;
+    border-radius:12px;
+    padding:15px;
+}
+
+.info-card span{
+    display:block;
+    color:#777;
+    font-size:.85rem;
+    margin-bottom:5px;
+}
+
+.info-card strong{
+    color:#2F6E4F;
+}

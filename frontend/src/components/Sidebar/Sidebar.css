@@ -1,0 +1,54 @@
+.sidebar{
+    width:250px;
+    background:#fff;
+    padding:25px;
+    border-radius:18px;
+    box-shadow:0 6px 18px rgba(0,0,0,.06);
+    height:fit-content;
+}
+
+.sidebar h3{
+    color:#2F6E4F;
+    margin-bottom:25px;
+}
+
+.filter-group{
+    margin-bottom:30px;
+}
+
+.filter-group h4{
+    margin-bottom:12px;
+    color:#444;
+}
+
+.filter-group label{
+    display:block;
+    margin:10px 0;
+    color:#666;
+    font-size:.9rem;
+    cursor:pointer;
+}
+
+.filter-group input{
+    margin-right:8px;
+}
+
+.chips{
+    display:flex;
+    flex-wrap:wrap;
+    gap:10px;
+}
+
+.chips button{
+    border:1px solid #D9D9D9;
+    background:#fff;
+    border-radius:20px;
+    padding:6px 12px;
+    cursor:pointer;
+}
+
+.chips .active{
+    background:#DDEFD8;
+    color:#2F6E4F;
+    border-color:#2F6E4F;
+}
