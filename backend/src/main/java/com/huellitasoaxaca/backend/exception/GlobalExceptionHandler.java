@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
@@ -76,6 +77,23 @@ public class GlobalExceptionHandler
 
                 return ResponseEntity
                         .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                        .body(respuesta);
+        }
+
+        @ExceptionHandler(AccessDeniedException.class)
+        public ResponseEntity<ErrorResponse> manejarAccesoDenegado(
+                AccessDeniedException exception,
+                HttpServletRequest request
+        ) 
+        {
+                ErrorResponse respuesta = crearError(
+                        HttpStatus.FORBIDDEN,
+                        "No tienes permiso para acceder a este recurso",
+                        request.getRequestURI()
+                );
+
+                return ResponseEntity
+                        .status(HttpStatus.FORBIDDEN)
                         .body(respuesta);
         }
 

@@ -1,10 +1,12 @@
 package com.huellitasoaxaca.backend.repository;
 
-import com.huellitasoaxaca.backend.entity.Refugio;
 import java.util.List;
 import java.util.Optional;
+
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
+
+import com.huellitasoaxaca.backend.entity.Refugio;
 
 
 @Repository
