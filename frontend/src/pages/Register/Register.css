@@ -1,0 +1,129 @@
+.register-page {
+    min-height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background: #F5F7F5;
+    padding: 40px 20px;
+}
+
+.register-card {
+    width: 100%;
+    max-width: 470px;
+    background: #fff;
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, .08);
+}
+
+.register-header {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.register-header h1 {
+    color: #2F6E4F;
+    margin-bottom: 8px;
+}
+
+.register-header p {
+    color: #666;
+}
+
+.register-card h2 {
+    text-align: center;
+    margin-bottom: 25px;
+    color: #333;
+}
+
+.register-card form {
+    display: flex;
+    flex-direction: column;
+}
+
+.register-card label {
+    font-weight: 600;
+    margin-bottom: 8px;
+    color: #333;
+}
+
+.input-group {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 18px;
+    transition: .3s;
+}
+
+.input-group:focus-within {
+    border-color: #2F6E4F;
+}
+
+.input-group input {
+    border: none;
+    outline: none;
+    flex: 1;
+    font-size: 15px;
+    background: transparent;
+}
+
+.eye-btn {
+    border: none;
+    background: none;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+}
+
+.register-button {
+    margin-top: 10px;
+    background: #2F6E4F;
+    color: #fff;
+    border: none;
+    padding: 14px;
+    border-radius: 10px;
+    font-size: 16px;
+    cursor: pointer;
+    transition: .3s;
+}
+
+.register-button:hover {
+    background: #24563D;
+}
+
+.register-button:disabled {
+    opacity: .7;
+    cursor: not-allowed;
+}
+
+.login-link {
+    text-align: center;
+    margin-top: 25px;
+}
+
+.login-link a {
+    margin-left: 6px;
+    color: #2F6E4F;
+    text-decoration: none;
+    font-weight: bold;
+}
+
+.error {
+    color: #D32F2F;
+    font-size: .82rem;
+    margin-top: -12px;
+    margin-bottom: 15px;
+}
+
+.input-error {
+    border: 1px solid #D32F2F;
+}
+
+@media(max-width:480px) {
+    .register-card {
+        padding: 25px;
+    }
+}
