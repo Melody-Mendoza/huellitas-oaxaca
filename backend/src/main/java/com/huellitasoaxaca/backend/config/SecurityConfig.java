@@ -24,9 +24,13 @@ import org.springframework.security.oauth2.jwt.NimbusJwtEncoder;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationConverter;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.oauth2.core.DelegatingOAuth2TokenValidator;
+import org.springframework.security.oauth2.jwt.Jwt;
+import org.springframework.security.oauth2.jwt.JwtValidators;
 
 import com.huellitasoaxaca.backend.security.CustomAccessDeniedHandler;
 import com.huellitasoaxaca.backend.security.CustomAuthenticationEntryPoint;
+import com.huellitasoaxaca.backend.security.TokenRevocadoValidator;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 
 @Configuration
@@ -35,6 +39,8 @@ public class SecurityConfig
 {
     @Value("${security.jwt.secret}")
     private String jwtSecret;
+    @Value("${security.jwt.issuer}")
+    private String jwtIssuer;
 
     @Bean
     public PasswordEncoder passwordEncoder() 
@@ -75,14 +81,27 @@ public class SecurityConfig
     }
 
     @Bean
-    public JwtDecoder jwtDecoder() 
+    public JwtDecoder jwtDecoder(TokenRevocadoValidator tokenRevocadoValidator) 
     {
         SecretKey secretKey = crearClaveSecreta();
 
-        return NimbusJwtDecoder
-            .withSecretKey(secretKey)
-            .macAlgorithm(MacAlgorithm.HS256)
-            .build();
+        NimbusJwtDecoder decoder = NimbusJwtDecoder
+                .withSecretKey(secretKey)
+                .macAlgorithm(MacAlgorithm.HS256)
+                .build();
+
+        var defaultValidators =
+                JwtValidators.createDefaultWithIssuer(jwtIssuer);
+
+        var validators =
+                new DelegatingOAuth2TokenValidator<Jwt>(
+                        defaultValidators,
+                        tokenRevocadoValidator
+                );
+
+        decoder.setJwtValidator(validators);
+
+        return decoder;
     }
 
     @Bean

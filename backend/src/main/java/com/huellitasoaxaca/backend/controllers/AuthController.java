@@ -1,8 +1,11 @@
 package com.huellitasoaxaca.backend.controllers;
 
+import java.util.Map;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -53,5 +56,26 @@ public class AuthController
                 UsuarioResponse response = authService.obtenerUsuarioAutenticado(authentication.getName());
 
                 return ResponseEntity.ok(response);
+        }
+
+        @PostMapping("/logout")
+        public ResponseEntity<Map<String, String>> logout(
+                Authentication authentication
+        ) 
+        {
+                Jwt jwt = (Jwt) authentication.getPrincipal();
+
+                authService.logout(
+                        jwt.getId(),
+                        jwt.getSubject(),
+                        jwt.getExpiresAt()
+                );
+
+                return ResponseEntity.ok(
+                        Map.of(
+                                "mensaje",
+                                "Sesión cerrada correctamente"
+                        )
+                );
         }
 }

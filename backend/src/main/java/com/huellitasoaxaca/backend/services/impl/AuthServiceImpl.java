@@ -1,5 +1,6 @@
 package com.huellitasoaxaca.backend.services.impl;
 
+import java.time.Instant;
 import java.time.LocalDateTime;
 
 import org.springframework.security.authentication.AuthenticationManager;
@@ -23,6 +24,7 @@ import com.huellitasoaxaca.backend.repository.RolRepository;
 import com.huellitasoaxaca.backend.repository.UsuarioRepository;
 import com.huellitasoaxaca.backend.security.JwtService;
 import com.huellitasoaxaca.backend.services.AuthService;
+import com.huellitasoaxaca.backend.services.TokenRevocadoService;
 
 import lombok.RequiredArgsConstructor;
 
@@ -36,6 +38,7 @@ public class AuthServiceImpl implements AuthService
         private final PasswordEncoder passwordEncoder;
         private final AuthenticationManager authenticationManager;
         private final JwtService jwtService;
+        private final TokenRevocadoService tokenRevocadoService;
 
         @Override
         @Transactional
@@ -147,5 +150,20 @@ public class AuthServiceImpl implements AuthService
                 );
 
         return usuarioMapper.toResponse(usuario);
+        }
+
+        @Override
+        @Transactional
+        public void logout(
+                String jti,
+                String correo,
+                Instant fechaExpiracion
+        ) 
+        {
+                tokenRevocadoService.revocar(
+                        jti,
+                        correo,
+                        fechaExpiracion
+                );
         }
 }
