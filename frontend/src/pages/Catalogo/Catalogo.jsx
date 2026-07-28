@@ -11,6 +11,8 @@ function Catalogo() {
 
     const [busqueda, setBusqueda] = useState("");
 
+    const termino = busqueda.toLowerCase();
+
     const mascotas = [
 
         {
@@ -70,8 +72,18 @@ function Catalogo() {
 
     ];
 
+    //const mascotasFiltradas = mascotas.filter((mascota) =>
+      //  mascota.nombre.toLowerCase().includes(busqueda.toLowerCase())
+    //);
+
     const mascotasFiltradas = mascotas.filter((mascota) =>
-        mascota.nombre.toLowerCase().includes(busqueda.toLowerCase())
+
+        mascota.nombre.toLowerCase().includes(termino) ||
+
+        mascota.tamano.toLowerCase().includes(termino) ||
+
+        mascota.estado.toLowerCase().includes(termino)
+
     );
 
     return (
@@ -88,7 +100,7 @@ function Catalogo() {
 
                         <div>
 
-                            <h1>63</h1>
+                            <h1>{mascotasFiltradas.length}</h1>
 
                             <p>Mascotas esperando un hogar</p>
 
