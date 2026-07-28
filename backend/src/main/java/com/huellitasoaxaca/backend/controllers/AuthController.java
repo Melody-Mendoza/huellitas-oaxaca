@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.huellitasoaxaca.backend.dto.request.LoginRequest;
+import com.huellitasoaxaca.backend.dto.request.RecuperarPasswordRequest;
+import com.huellitasoaxaca.backend.dto.request.RestablecerPasswordRequest;
 import com.huellitasoaxaca.backend.dto.request.UsuarioRegistroRequest;
 import com.huellitasoaxaca.backend.dto.response.AuthResponse;
 import com.huellitasoaxaca.backend.dto.response.UsuarioResponse;
@@ -75,6 +77,42 @@ public class AuthController
                         Map.of(
                                 "mensaje",
                                 "Sesión cerrada correctamente"
+                        )
+                );
+        }
+
+        @PostMapping("/recuperar-password")
+        public ResponseEntity<Map<String, String>> recuperarPassword(
+                @Valid @RequestBody RecuperarPasswordRequest request
+        ) 
+        {
+                authService.solicitarRecuperacionPassword(
+                        request.correo()
+                );
+
+                return ResponseEntity.ok(
+                        Map.of(
+                                "mensaje",
+                                "Si el correo está registrado, recibirás instrucciones para restablecer tu contraseña"
+                        )
+                );
+        }
+
+        @PostMapping("/restablecer-password")
+        public ResponseEntity<Map<String, String>> restablecerPassword(
+                @Valid @RequestBody RestablecerPasswordRequest request
+        ) 
+        {
+                authService.restablecerPassword(
+                        request.token(),
+                        request.nuevaPassword(),
+                        request.confirmarPassword()
+                );
+
+                return ResponseEntity.ok(
+                        Map.of(
+                                "mensaje",
+                                "La contraseña se restableció correctamente"
                         )
                 );
         }

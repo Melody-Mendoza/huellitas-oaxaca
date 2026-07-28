@@ -147,6 +147,8 @@ public class SecurityConfig
                         .requestMatchers(
                                 "/api/auth/registro",
                                 "/api/auth/login",
+                                "/api/auth/recuperar-password",
+                                "/api/auth/restablecer-password",
                                 "/error"
                         ).permitAll()
                         .anyRequest().authenticated()

@@ -24,6 +24,7 @@ import com.huellitasoaxaca.backend.repository.RolRepository;
 import com.huellitasoaxaca.backend.repository.UsuarioRepository;
 import com.huellitasoaxaca.backend.security.JwtService;
 import com.huellitasoaxaca.backend.services.AuthService;
+import com.huellitasoaxaca.backend.services.RecuperacionPasswordService;
 import com.huellitasoaxaca.backend.services.TokenRevocadoService;
 
 import lombok.RequiredArgsConstructor;
@@ -39,6 +40,7 @@ public class AuthServiceImpl implements AuthService
         private final AuthenticationManager authenticationManager;
         private final JwtService jwtService;
         private final TokenRevocadoService tokenRevocadoService;
+        private final RecuperacionPasswordService recuperacionPasswordService;
 
         @Override
         @Transactional
@@ -164,6 +166,26 @@ public class AuthServiceImpl implements AuthService
                         jti,
                         correo,
                         fechaExpiracion
+                );
+        }
+
+        @Override
+        public void solicitarRecuperacionPassword(String correo) 
+        {
+                recuperacionPasswordService.solicitarRecuperacion(correo);
+        }
+
+        @Override
+        public void restablecerPassword(
+                String token,
+                String nuevaPassword,
+                String confirmarPassword
+        ) 
+        {
+                recuperacionPasswordService.restablecerPassword(
+                        token,
+                        nuevaPassword,
+                        confirmarPassword
                 );
         }
 }
