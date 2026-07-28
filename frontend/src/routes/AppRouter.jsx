@@ -22,6 +22,7 @@ import Privacidad from "../pages/Privacidad/Privacidad";
 import Terminos from "../pages/Terminos/Terminos";
 import Contacto from "../pages/Contacto/Contacto";
 import RecuperarPassword from "../pages/RecuperarPassword/RecuperarPassword";
+import RestablecerPassword from "../pages/RestablecerPassword/RestablecerPassword";
 
 
 function AppRouter() {
@@ -34,8 +35,17 @@ function AppRouter() {
                 <Route path="/register" element={<Register />} />
                 <Route path="/catalogo" element={<Catalogo />} />
                 <Route path="/mascota/:id" element={<DetalleMascota />} />
-                <Route path="/donaciones" element={<Donaciones />} />
-                <Route path="/solicitud" element={<SolicitudAdopcion />} />
+                <Route path="/donaciones" element={<ProtectedRoute>
+                    <Donaciones />
+                </ProtectedRoute>} />
+                <Route
+                    path="/solicitud"
+                    element={
+                        <ProtectedRoute>
+                            <SolicitudAdopcion />
+                        </ProtectedRoute>
+                    }
+                />
                 <Route path="/adopcion" element={<Adopcion />} />
                 <Route path="/historias" element={<Historias />} />
                 <Route path="/nosotros" element={<Nosotros />} />
@@ -45,6 +55,10 @@ function AppRouter() {
                 <Route
                     path="/recuperar-password"
                     element={<RecuperarPassword />}
+                />
+                <Route
+                    path="/restablecer-password"
+                    element={<RestablecerPassword />}
                 />
                 <Route
                     path="/perfil"
