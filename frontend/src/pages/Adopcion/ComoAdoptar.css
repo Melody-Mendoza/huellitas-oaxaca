@@ -1,0 +1,47 @@
+.steps {
+    max-width: 1100px;
+    margin: 70px auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 25px;
+    padding: 0 20px;
+}
+
+.step {
+    background: white;
+    padding: 30px;
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, .08);
+    text-align: center;
+}
+
+.step h3 {
+    color: #2F6E4F;
+    margin-bottom: 15px;
+}
+
+.adopt-btn {
+    display: block;
+    grid-column: 1/-1;
+    width: 220px;
+    margin: 40px auto 0;
+    padding: 15px;
+    text-align: center;
+    background: #2F6E4F;
+    color: white;
+    text-decoration: none;
+    border-radius: 12px;
+    font-weight: bold;
+}
+
+@media(max-width:900px) {
+    .steps {
+        grid-template-columns: 1fr 1fr;
+    }
+}
+
+@media(max-width:600px) {
+    .steps {
+        grid-template-columns: 1fr;
+    }
+}

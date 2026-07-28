@@ -5,6 +5,9 @@ import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 
+import { signInWithGoogle } from "../../services/googleAuth";
+//import { Chrome } from "lucide-react";
+
 function Login() {
 
     const [showPassword, setShowPassword] = useState(false);
@@ -26,6 +29,29 @@ function Login() {
         console.log(data);
 
         toast.success("Inicio de sesión correcto");
+
+    };
+
+    const handleGoogleLogin = async () => {
+
+        const response = await signInWithGoogle();
+
+        if (response.success) {
+
+            console.log(response.user);
+
+            toast.success(`Bienvenido ${response.user.nombre}`);
+
+
+            // enviar response.user al backend
+            // guardar JWT
+            // navegar al dashboard
+
+        } else {
+
+            toast.error("No fue posible iniciar sesión con Google.");
+
+        }
 
     };
 
@@ -169,6 +195,19 @@ function Login() {
                                 : "Iniciar sesión"
                         }
 
+                    </button>
+
+                    <div className="divider">
+                        <span>o</span>
+                    </div>
+
+                    <button
+                        type="button"
+                        className="google-button"
+                        onClick={handleGoogleLogin}
+                    >
+                        G
+                        Continuar con Google
                     </button>
 
                 </form>

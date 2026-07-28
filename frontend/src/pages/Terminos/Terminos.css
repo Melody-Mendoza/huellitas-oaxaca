@@ -1,0 +1,35 @@
+.policy-container {
+    max-width: 950px;
+    margin: 70px auto;
+    padding: 0 20px;
+}
+
+.policy-card {
+    background: #fff;
+    padding: 45px;
+    border-radius: 18px;
+    box-shadow: 0 10px 25px rgba(0, 0, 0, .08);
+}
+
+.policy-card h2 {
+    color: #2F6E4F;
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.policy-card h2:first-child {
+    margin-top: 0;
+}
+
+.policy-card p {
+    color: #555;
+    line-height: 1.8;
+    text-align: justify;
+}
+
+@media(max-width:768px) {
+    .policy-card {
+        padding: 25px;
+    }
+
+}
