@@ -114,6 +114,23 @@ public class GlobalExceptionHandler
                         .body(respuesta);
         }
 
+        @ExceptionHandler(ReglaNegocioException.class)
+        public ResponseEntity<ErrorResponse> manejarReglaNegocio(
+                ReglaNegocioException exception,
+                HttpServletRequest request
+        )
+        {
+                ErrorResponse respuesta = crearError(
+                        HttpStatus.UNPROCESSABLE_ENTITY,
+                        exception.getMessage(),
+                        request.getRequestURI()
+                );
+
+                return ResponseEntity
+                        .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                        .body(respuesta);
+        }
+
         @ExceptionHandler(Exception.class)
         public ResponseEntity<ErrorResponse> manejarErrorGeneral(
                 Exception exception,
