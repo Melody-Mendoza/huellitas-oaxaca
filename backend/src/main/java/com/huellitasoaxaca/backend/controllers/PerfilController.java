@@ -34,7 +34,7 @@ public class PerfilController
     )
     {
         return ResponseEntity.ok(
-                usuarioService.obtenerPorCorreo(authentication.getName())
+                usuarioService.obtenerActivoPorCorreo(authentication.getName())
         );
     }
 

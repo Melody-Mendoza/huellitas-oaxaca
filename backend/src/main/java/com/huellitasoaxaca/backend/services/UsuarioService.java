@@ -12,7 +12,7 @@ public interface UsuarioService
 
         UsuarioResponse obtenerPorId(Long id);
 
-        UsuarioResponse obtenerPorCorreo(String correo);
+        UsuarioResponse obtenerActivoPorCorreo(String correo);
 
         List<UsuarioResponse> listarActivos();
 
