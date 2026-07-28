@@ -124,6 +124,8 @@ function DetalleMascota() {
 
             </section>
 
+            
+
         );
 
     }
@@ -166,7 +168,14 @@ function DetalleMascota() {
 
                         <button
 
+                            type="button"
                             className={`favorite ${favorito ? "active" : ""}`}
+
+                            aria-label={
+                                favorito
+                                    ? "Quitar de favoritos"
+                                    : "Agregar a favoritos"
+                            }
 
                             onClick={() => setFavorito(!favorito)}
 

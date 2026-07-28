@@ -21,7 +21,7 @@ function CardMascota({ mascota }) {
                     {mascota.estado}
                 </span>
 
-                <button className="favorite-btn">
+                <button type="button" className="favorite-btn">
 
                     <Heart size={18} />
 

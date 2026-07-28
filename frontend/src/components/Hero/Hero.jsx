@@ -31,6 +31,8 @@ function Hero() {
 
                         <input
                             type="text"
+                            name="buscar"
+                            autoComplete="off"
                             placeholder="Buscar por nombre o raza..."
                         />
 
