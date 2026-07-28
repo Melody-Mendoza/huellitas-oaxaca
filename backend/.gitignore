@@ -33,5 +33,9 @@ build/
 .vscode/
 
 
-# Configuración sensible de Spring Boot
+### Configuración sensible de Spring Boot ###
 src/main/resources/application.properties
+
+### Archivos de error de la JVM ###
+hs_err_pid*.log
+replay_pid*.log

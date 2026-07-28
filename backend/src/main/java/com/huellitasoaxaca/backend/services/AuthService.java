@@ -17,5 +17,13 @@ public interface AuthService
         String jti,
         String correo,
         java.time.Instant fechaExpiracion
-);
+    );
+
+    void solicitarRecuperacionPassword(String correo);
+
+    void restablecerPassword(
+            String token,
+            String nuevaPassword,
+            String confirmarPassword
+    );
 }
