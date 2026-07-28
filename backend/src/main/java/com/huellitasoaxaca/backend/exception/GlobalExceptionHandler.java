@@ -6,6 +6,7 @@ import java.util.Map;
 
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.converter.HttpMessageNotReadableException;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
@@ -20,6 +21,21 @@ import jakarta.servlet.http.HttpServletRequest;
 @RestControllerAdvice
 public class GlobalExceptionHandler 
 {
+        @ExceptionHandler(HttpMessageNotReadableException.class)
+        public ResponseEntity<ErrorResponse> manejarCuerpoNoLegible(
+                HttpMessageNotReadableException exception,
+                HttpServletRequest request
+        )
+        {
+                ErrorResponse respuesta = crearError(
+                        HttpStatus.BAD_REQUEST,
+                        "El cuerpo de la solicitud no es válido",
+                        request.getRequestURI()
+                );
+
+                return ResponseEntity.badRequest().body(respuesta);
+        }
+
         @ExceptionHandler(MethodArgumentNotValidException.class)
         public ResponseEntity<ErrorResponse> manejarValidaciones(
                 MethodArgumentNotValidException exception,
