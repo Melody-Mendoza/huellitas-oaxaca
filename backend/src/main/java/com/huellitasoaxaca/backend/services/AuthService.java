@@ -12,4 +12,10 @@ public interface AuthService
     AuthResponse login(LoginRequest request);
 
     UsuarioResponse obtenerUsuarioAutenticado(String correo);
+
+    void logout(
+        String jti,
+        String correo,
+        java.time.Instant fechaExpiracion
+);
 }

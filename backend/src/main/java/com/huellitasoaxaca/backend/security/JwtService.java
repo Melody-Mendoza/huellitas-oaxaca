@@ -3,6 +3,7 @@ package com.huellitasoaxaca.backend.security;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.GrantedAuthority;
@@ -20,47 +21,50 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class JwtService 
 {
-    private final JwtEncoder jwtEncoder;
+        private final JwtEncoder jwtEncoder;
 
-    @Value("${security.jwt.expiration-minutes}")
-    private long expirationMinutes;
+        @Value("${security.jwt.expiration-minutes}")
+        private long expirationMinutes;
 
-    @Value("${security.jwt.issuer}")
-    private String issuer;
+        @Value("${security.jwt.issuer}")
+        private String issuer;
 
-    public String generarToken(UserDetails userDetails) {
-        Instant ahora = Instant.now();
-        Instant expiracion = ahora.plus(
-                expirationMinutes,
-                ChronoUnit.MINUTES
-        );
+        public String generarToken(UserDetails userDetails) {
+                Instant ahora = Instant.now();
+                Instant expiracion = ahora.plus(
+                        expirationMinutes,
+                        ChronoUnit.MINUTES
+                );
 
-        List<String> roles = userDetails.getAuthorities()
-                .stream()
-                .map(GrantedAuthority::getAuthority)
-                .toList();
+                String jti = UUID.randomUUID().toString();
 
-        JwtClaimsSet claims = JwtClaimsSet.builder()
-                .issuer(issuer)
-                .issuedAt(ahora)
-                .expiresAt(expiracion)
-                .subject(userDetails.getUsername())
-                .claim("roles", roles)
-                .build();
+                List<String> roles = userDetails.getAuthorities()
+                        .stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .toList();
 
-        JwsHeader header = JwsHeader
-                .with(MacAlgorithm.HS256)
-                .build();
+                JwtClaimsSet claims = JwtClaimsSet.builder()
+                        .id(jti)
+                        .issuer(issuer)
+                        .issuedAt(ahora)
+                        .expiresAt(expiracion)
+                        .subject(userDetails.getUsername())
+                        .claim("roles", roles)
+                        .build();
 
-        return jwtEncoder
-                .encode(
-                        JwtEncoderParameters.from(header, claims)
-                )
-                .getTokenValue();
-    }
+                JwsHeader header = JwsHeader
+                        .with(MacAlgorithm.HS256)
+                        .build();
 
-    public long obtenerExpiracionEnSegundos() 
-    {
-        return expirationMinutes * 60;
-    }
+                return jwtEncoder
+                        .encode(
+                                JwtEncoderParameters.from(header, claims)
+                        )
+                        .getTokenValue();
+        }
+
+        public long obtenerExpiracionEnSegundos() 
+        {
+                return expirationMinutes * 60;
+        }
 }
