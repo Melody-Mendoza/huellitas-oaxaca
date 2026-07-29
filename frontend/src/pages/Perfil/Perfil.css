@@ -65,6 +65,47 @@
     cursor: not-allowed;
 }
 
+.perfil-page .perfil-password-field {
+    width: 100%;
+    display: grid;
+    align-items: center;
+    margin-bottom: 18px;
+}
+
+.perfil-page .perfil-password-field input {
+    grid-area: 1 / 1;
+    margin-bottom: 0;
+    padding-right: 52px;
+}
+
+.perfil-page .perfil-password-toggle {
+    grid-area: 1 / 1;
+    justify-self: end;
+    z-index: 1;
+    width: 36px;
+    height: 36px;
+    margin-right: 8px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: none;
+    border-radius: 8px;
+    background: transparent;
+    color: #2F6E4F;
+    cursor: pointer;
+    transition: background .2s, color .2s;
+}
+
+.perfil-page .perfil-password-toggle:hover {
+    background: rgba(47, 110, 79, .1);
+}
+
+.perfil-page .perfil-password-toggle:focus-visible {
+    outline: 3px solid rgba(47, 110, 79, .35);
+    outline-offset: 2px;
+}
+
 .perfil-page .error {
     margin-top: -10px;
     margin-bottom: 14px;

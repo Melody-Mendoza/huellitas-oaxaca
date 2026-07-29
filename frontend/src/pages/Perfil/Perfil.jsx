@@ -1,17 +1,21 @@
 import { useEffect, useState } from "react";
 import "./Perfil.css";
+import { Eye, EyeOff } from "lucide-react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 
-const passwordPattern =
-    /^(?=.[A-Z])(?=.\d)(?=.*[^A-Za-z0-9]).+$/;
-
 function Perfil() {
     const { user, updateUser } = useAuth();
     const [profile, setProfile] = useState(user);
     const [loadingProfile, setLoadingProfile] = useState(true);
+    const [showCurrentPassword, setShowCurrentPassword] =
+        useState(false);
+    const [showNewPassword, setShowNewPassword] =
+        useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] =
+        useState(false);
 
     const {
         register: registerProfile,
@@ -167,21 +171,32 @@ function Perfil() {
                 ?? "Contraseña actualizada correctamente"
             );
         } catch (error) {
+            const status = error.response?.status;
+            const responseData = error.response?.data;
+            const message = responseData?.message
+                ?? "No fue posible cambiar la contraseña";
+
             applyServerErrors(error, setPasswordError);
 
-            if (error.response?.status === 422) {
-                setPasswordError("passwordActual", {
+            if (status === 422) {
+                const passwordErrorFields = {
+                    "La contraseña actual es incorrecta":
+                        "passwordActual",
+                    "Las contraseñas nuevas no coinciden":
+                        "confirmarPassword",
+                    "La nueva contraseña debe ser diferente a la actual":
+                        "nuevaPassword"
+                };
+                const field = passwordErrorFields[message];
+
+                setPasswordError(field ?? "root.server", {
                     type: "server",
-                    message: error.response.data?.message
-                        ?? "No fue posible cambiar la contraseña"
+                    message
                 });
             }
 
-            if (error.response?.status !== 401) {
-                toast.error(
-                    error.response?.data?.message
-                    ?? "No fue posible cambiar la contraseña"
-                );
+            if (status !== 401) {
+                toast.error(message);
             }
         }
     };
@@ -215,7 +230,7 @@ function Perfil() {
                     <input
                         id="perfil-rol"
                         type="text"
-                         value={profile?.rol?.nombre ?? ""}
+                        value={profile?.rol?.nombre ?? ""}
                         disabled
                     />
 
@@ -324,15 +339,53 @@ function Perfil() {
                     <label htmlFor="password-actual">
                         Contraseña actual
                     </label>
-                    <input
-                        id="password-actual"
-                        type="password"
-                        autoComplete="current-password"
-                        {...registerPassword("passwordActual", {
-                            required:
-                                "La contraseña actual es obligatoria."
-                        })}
-                    />
+                    <div className="perfil-password-field">
+                        <input
+                            id="password-actual"
+                            type={
+                                showCurrentPassword
+                                    ? "text"
+                                    : "password"
+                            }
+                            autoComplete="current-password"
+                            {...registerPassword(
+                                "passwordActual",
+                                {
+                                    required:
+                                        "La contraseña actual es obligatoria."
+                                }
+                            )}
+                        />
+                        <button
+                            type="button"
+                            className="perfil-password-toggle"
+                            onClick={() => (
+                                setShowCurrentPassword(
+                                    (visible) => !visible
+                                )
+                            )}
+                            aria-label={
+                                showCurrentPassword
+                                    ? "Ocultar contraseña actual"
+                                    : "Mostrar contraseña actual"
+                            }
+                            aria-pressed={showCurrentPassword}
+                        >
+                            {showCurrentPassword
+                                ? (
+                                    <EyeOff
+                                        size={20}
+                                        aria-hidden="true"
+                                    />
+                                )
+                                : (
+                                    <Eye
+                                        size={20}
+                                        aria-hidden="true"
+                                    />
+                                )}
+                        </button>
+                    </div>
                     {passwordErrors.passwordActual && (
                         <p className="error">
                             {passwordErrors.passwordActual.message}
@@ -342,31 +395,78 @@ function Perfil() {
                     <label htmlFor="password-nueva">
                         Nueva contraseña
                     </label>
-                    <input
-                        id="password-nueva"
-                        type="password"
-                        autoComplete="new-password"
-                        {...registerPassword("nuevaPassword", {
-                            required:
-                                "La nueva contraseña es obligatoria.",
-                            minLength: {
-                                value: 8,
-                                message:
-                                    "La nueva contraseña debe tener entre 8 y 14 caracteres."
-                            },
-                            maxLength: {
-                                value: 14,
-                                message:
-                                    "La nueva contraseña debe tener entre 8 y 14 caracteres."
-                            },
-                            pattern: {
-                                value: passwordPattern,
-                                message:
-                                    "La nueva contraseña debe contener una mayúscula, un número y un carácter especial."
+                    <div className="perfil-password-field">
+                        <input
+                            id="password-nueva"
+                            type={
+                                showNewPassword
+                                    ? "text"
+                                    : "password"
                             }
-                        })}
-                    />
-                       {passwordErrors.nuevaPassword && (
+                            autoComplete="new-password"
+                            {...registerPassword(
+                                "nuevaPassword",
+                                {
+                                    required:
+                                        "La nueva contraseña es obligatoria.",
+                                    minLength: {
+                                        value: 8,
+                                        message:
+                                            "La nueva contraseña debe tener entre 8 y 14 caracteres."
+                                    },
+                                    maxLength: {
+                                        value: 14,
+                                        message:
+                                            "La nueva contraseña debe tener entre 8 y 14 caracteres."
+                                    },
+                                    validate: {
+                                        uppercase: (value) => (
+                                            /[A-Z]/.test(value)
+                                            || "La nueva contraseña debe contener una mayúscula."
+                                        ),
+                                        number: (value) => (
+                                            /\d/.test(value)
+                                            || "La nueva contraseña debe contener un número."
+                                        ),
+                                        special: (value) => (
+                                            /[^A-Za-z0-9]/.test(value)
+                                            || "La nueva contraseña debe contener un carácter especial."
+                                        )
+                                    }
+                                }
+                            )}
+                        />
+                        <button
+                            type="button"
+                            className="perfil-password-toggle"
+                            onClick={() => (
+                                setShowNewPassword(
+                                    (visible) => !visible
+                                )
+                            )}
+                            aria-label={
+                                showNewPassword
+                                    ? "Ocultar nueva contraseña"
+                                    : "Mostrar nueva contraseña"
+                            }
+                            aria-pressed={showNewPassword}
+                        >
+                            {showNewPassword
+                                ? (
+                                    <EyeOff
+                                        size={20}
+                                        aria-hidden="true"
+                                    />
+                                )
+                                : (
+                                    <Eye
+                                        size={20}
+                                        aria-hidden="true"
+                                    />
+                                )}
+                        </button>
+                    </div>
+                    {passwordErrors.nuevaPassword && (
                         <p className="error">
                             {passwordErrors.nuevaPassword.message}
                         </p>
@@ -375,25 +475,68 @@ function Perfil() {
                     <label htmlFor="password-confirmar">
                         Confirmar nueva contraseña
                     </label>
-                    <input
-                        id="password-confirmar"
-                        type="password"
-                        autoComplete="new-password"
-                        {...registerPassword(
-                            "confirmarPassword",
-                            {
-                                required:
-                                    "La confirmación de contraseña es obligatoria.",
-                                validate: (value) => (
-                                    value === nuevaPassword
-                                    || "Las contraseñas nuevas no coinciden."
-                                )
+                    <div className="perfil-password-field">
+                        <input
+                            id="password-confirmar"
+                            type={
+                                showConfirmPassword
+                                    ? "text"
+                                    : "password"
                             }
-                        )}
-                    />
+                            autoComplete="new-password"
+                            {...registerPassword(
+                                "confirmarPassword",
+                                {
+                                    required:
+                                        "La confirmación de contraseña es obligatoria.",
+                                    validate: (value) => (
+                                        value === nuevaPassword
+                                        || "Las contraseñas nuevas no coinciden."
+                                    )
+                                }
+                            )}
+                        />
+                        <button
+                            type="button"
+                            className="perfil-password-toggle"
+                            onClick={() => (
+                                setShowConfirmPassword(
+                                    (visible) => !visible
+                                )
+                            )}
+                            aria-label={
+                                showConfirmPassword
+                                    ? "Ocultar confirmación de contraseña"
+                                    : "Mostrar confirmación de contraseña"
+                            }
+                            aria-pressed={showConfirmPassword}
+                        >
+                            {showConfirmPassword
+                                ? (
+                                    <EyeOff
+                                        size={20}
+                                        aria-hidden="true"
+                                    />
+                                )
+                                : (
+                                    <Eye
+                                        size={20}
+                                        aria-hidden="true"
+                                    />
+                                )}
+                        </button>
+                    </div>
                     {passwordErrors.confirmarPassword && (
                         <p className="error">
                             {passwordErrors.confirmarPassword.message}
+                        </p>
+                    )}
+                    {passwordErrors.root?.server && (
+                        <p
+                            className="error"
+                            role="alert"
+                        >
+                            {passwordErrors.root.server.message}
                         </p>
                     )}
 
