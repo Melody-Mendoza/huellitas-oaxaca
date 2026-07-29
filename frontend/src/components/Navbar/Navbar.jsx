@@ -3,28 +3,66 @@ import {
     useRef,
     useState
 } from "react";
-import { Link, useNavigate } from "react-router-dom";
-import { ChevronDown } from "lucide-react";
+
+import {
+    Link,
+    useNavigate
+} from "react-router-dom";
+
+import {
+    ChevronDown,
+    LayoutDashboard
+} from "lucide-react";
+
 import toast from "react-hot-toast";
+
 import logo from "../../assets/logo/logo.png";
 import Avatar from "../Avatar/Avatar";
+
 import { useAuth } from "../../context/AuthContext";
+import {
+    getUserRole,
+    USER_ROLES
+} from "../../utils/constants";
+
 import "./Navbar.css";
 
 function Navbar() {
-    const { user, token, loading, logout } = useAuth();
+    const {
+        user,
+        token,
+        loading,
+        logout
+    } = useAuth();
+
     const navigate = useNavigate();
-    const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+
+    const [
+        isUserMenuOpen,
+        setIsUserMenuOpen
+    ] = useState(false);
+
     const userMenuRef = useRef(null);
     const userMenuTriggerRef = useRef(null);
-    const isAuthenticated = Boolean(token && user);
+
+    const isAuthenticated =
+        Boolean(token && user);
+
+    const userRole =
+        getUserRole(user);
+
+    const isAdmin =
+        userRole === USER_ROLES.ADMIN;
+
     const userName = [
         user?.nombre,
         user?.apellidoPaterno
     ]
         .filter(Boolean)
         .join(" ")
-        .trim() || user?.correo || "Usuario";
+        .trim()
+        || user?.correo
+        || "Usuario";
 
     useEffect(() => {
         if (!isUserMenuOpen) {
@@ -32,7 +70,11 @@ function Navbar() {
         }
 
         const handlePointerDown = (event) => {
-            if (!userMenuRef.current?.contains(event.target)) {
+            if (
+                !userMenuRef.current?.contains(
+                    event.target
+                )
+            ) {
                 setIsUserMenuOpen(false);
             }
         };
@@ -40,6 +82,7 @@ function Navbar() {
         const handleKeyDown = (event) => {
             if (event.key === "Escape") {
                 setIsUserMenuOpen(false);
+
                 userMenuTriggerRef.current?.focus();
             }
         };
@@ -48,13 +91,18 @@ function Navbar() {
             "pointerdown",
             handlePointerDown
         );
-        document.addEventListener("keydown", handleKeyDown);
+
+        document.addEventListener(
+            "keydown",
+            handleKeyDown
+        );
 
         return () => {
             document.removeEventListener(
                 "pointerdown",
                 handlePointerDown
             );
+
             document.removeEventListener(
                 "keydown",
                 handleKeyDown
@@ -62,18 +110,28 @@ function Navbar() {
         };
     }, [isUserMenuOpen]);
 
-    const handleLogout = async () => {
+    const closeUserMenu = () => {
         setIsUserMenuOpen(false);
+    };
+
+    const handleLogout = async () => {
+        closeUserMenu();
 
         try {
             await logout();
-            toast.success("Sesión cerrada correctamente");
+
+            toast.success(
+                "Sesión cerrada correctamente"
+            );
         } catch {
             toast.error(
-                "La sesión se cerró localmente, pero el servidor no respondió"
+                "La sesión se cerró localmente, "
+                + "pero el servidor no respondió"
             );
         } finally {
-            navigate("/", { replace: true });
+            navigate("/", {
+                replace: true
+            });
         }
     };
 
@@ -81,22 +139,44 @@ function Navbar() {
         <header className="navbar">
             <div className="logo">
                 <Link to="/">
-                    <img src={logo} alt="Huellitas Oaxaca" />
+                    <img
+                        src={logo}
+                        alt="Huellitas Oaxaca"
+                    />
                 </Link>
             </div>
 
-            <nav className="menu">
-                <Link to="/">Inicio</Link>
-                <Link to="/catalogo">Mascotas</Link>
-                <Link to="/adopcion">Cómo adoptar</Link>
-                <Link to="/historias">Historias</Link>
-                <Link to="/nosotros">Nosotros</Link>
+            <nav
+                className="menu"
+                aria-label="Navegación principal"
+            >
+                <Link to="/">
+                    Inicio
+                </Link>
+
+                <Link to="/catalogo">
+                    Mascotas
+                </Link>
+
+                <Link to="/adopcion">
+                    Cómo adoptar
+                </Link>
+
+                <Link to="/historias">
+                    Historias
+                </Link>
+
+                <Link to="/nosotros">
+                    Nosotros
+                </Link>
             </nav>
 
             <div className="navbar-actions">
                 {loading ? (
                     <span
-                        className="btn-login navbar-loading"
+                        className={
+                            "btn-login navbar-loading"
+                        }
                         aria-hidden="true"
                     >
                         Cargando
@@ -109,18 +189,32 @@ function Navbar() {
                         <button
                             ref={userMenuTriggerRef}
                             type="button"
-                            className="navbar-user-trigger"
-                            aria-haspopup="true"
-                            aria-expanded={isUserMenuOpen}
+                            className={
+                                "navbar-user-trigger"
+                            }
+                            aria-haspopup="menu"
+                            aria-expanded={
+                                isUserMenuOpen
+                            }
+                            aria-controls={
+                                "navbar-user-menu"
+                            }
                             onClick={() => {
                                 setIsUserMenuOpen(
                                     (isOpen) => !isOpen
                                 );
                             }}
                         >
-                            <Avatar user={user} size={42} />
+                            <Avatar
+                                user={user}
+                                size={42}
+                            />
 
-                            <span className="navbar-user-name">
+                            <span
+                                className={
+                                    "navbar-user-name"
+                                }
+                            >
                                 {userName}
                             </span>
 
@@ -136,19 +230,46 @@ function Navbar() {
                         </button>
 
                         {isUserMenuOpen && (
-                            <div className="navbar-user-menu">
+                            <div
+                                id="navbar-user-menu"
+                                className={
+                                    "navbar-user-menu"
+                                }
+                                role="menu"
+                            >
+                                {isAdmin && (
+                                    <Link
+                                        to="/admin"
+                                        role="menuitem"
+                                        onClick={
+                                            closeUserMenu
+                                        }
+                                    >
+                                        <LayoutDashboard
+                                            size={17}
+                                            aria-hidden="true"
+                                        />
+
+                                        Panel administrativo
+                                    </Link>
+                                )}
+
                                 <Link
                                     to="/perfil"
-                                    onClick={() => {
-                                        setIsUserMenuOpen(false);
-                                    }}
+                                    role="menuitem"
+                                    onClick={
+                                        closeUserMenu
+                                    }
                                 >
                                     Mi perfil
                                 </Link>
 
                                 <button
                                     type="button"
-                                    onClick={handleLogout}
+                                    role="menuitem"
+                                    onClick={
+                                        handleLogout
+                                    }
                                 >
                                     Cerrar sesión
                                 </button>
@@ -156,7 +277,10 @@ function Navbar() {
                         )}
                     </div>
                 ) : (
-                    <Link to="/login" className="btn-login">
+                    <Link
+                        to="/login"
+                        className="btn-login"
+                    >
                         Iniciar sesión
                     </Link>
                 )}

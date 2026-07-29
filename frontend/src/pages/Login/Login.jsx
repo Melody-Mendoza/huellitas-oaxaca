@@ -1,17 +1,45 @@
 import "./Login.css";
-import { Link, useLocation, useNavigate } from "react-router-dom";
-import { Mail, Lock, Eye, EyeOff } from "lucide-react";
+
+import {
+    Link,
+    useLocation,
+    useNavigate
+} from "react-router-dom";
+
+import {
+    Eye,
+    EyeOff,
+    Lock,
+    Mail
+} from "lucide-react";
+
 import { FcGoogle } from "react-icons/fc";
 import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+
 import { useAuth } from "../../context/AuthContext";
+import {
+    getUserRole,
+    USER_ROLES
+} from "../../utils/constants";
 
 function Login() {
-    const [showPassword, setShowPassword] = useState(false);
-    const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
+    const [showPassword, setShowPassword] =
+        useState(false);
+
+    const [
+        isGoogleSubmitting,
+        setIsGoogleSubmitting
+    ] = useState(false);
+
     const isLoginProcessing = useRef(false);
-    const { login, loginWithGoogle } = useAuth();
+
+    const {
+        login,
+        loginWithGoogle
+    } = useAuth();
+
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -19,7 +47,10 @@ function Login() {
         register,
         handleSubmit,
         setError,
-        formState: { errors, isSubmitting }
+        formState: {
+            errors,
+            isSubmitting
+        }
     } = useForm({
         defaultValues: {
             correo: "",
@@ -27,14 +58,37 @@ function Login() {
         }
     });
 
-    const redirectAfterLogin = () => {
-        const requestedLocation = location.state?.from;
-        const destination = requestedLocation
-            ? `${requestedLocation.pathname}${requestedLocation.search}${requestedLocation.hash}`
-            : "/";
+    const redirectAfterLogin = (authResponse) => {
+        const requestedLocation =
+            location.state?.from;
 
-        toast.success("Inicio de sesión correcto");
-        navigate(destination, { replace: true });
+        let destination;
+
+        if (requestedLocation?.pathname) {
+            destination =
+                `${requestedLocation.pathname}`
+                + `${requestedLocation.search ?? ""}`
+                + `${requestedLocation.hash ?? ""}`;
+        } else {
+            const authenticatedUser =
+                authResponse?.usuario;
+
+            const userRole =
+                getUserRole(authenticatedUser);
+
+            destination =
+                userRole === USER_ROLES.ADMIN
+                    ? "/admin"
+                    : "/perfil";
+        }
+
+        toast.success(
+            "Inicio de sesión correcto"
+        );
+
+        navigate(destination, {
+            replace: true
+        });
     };
 
     const onSubmit = async (data) => {
@@ -45,38 +99,49 @@ function Login() {
         isLoginProcessing.current = true;
 
         try {
-            await login({
+            const authResponse = await login({
                 correo: data.correo.trim(),
                 password: data.password
             });
 
-            redirectAfterLogin();
+            redirectAfterLogin(authResponse);
         } catch (error) {
-            const status = error.response?.status;
-            const responseData = error.response?.data;
+            const status =
+                error.response?.status;
 
-            if (status === 400 && responseData?.validationErrors) {
-                Object.entries(responseData.validationErrors).forEach(
-                    ([field, message]) => {
-                        setError(field, {
-                            type: "server",
-                            message
-                        });
-                    }
-                );
+            const responseData =
+                error.response?.data;
+
+            if (
+                status === 400
+                && responseData?.validationErrors
+            ) {
+                Object.entries(
+                    responseData.validationErrors
+                ).forEach(([field, message]) => {
+                    setError(field, {
+                        type: "server",
+                        message
+                    });
+                });
             }
 
             if (status === 401) {
                 setError("password", {
                     type: "server",
-                    message: responseData?.message
+                    message:
+                        responseData?.message
                         ?? "Correo o contraseña incorrectos"
                 });
             }
 
             toast.error(
                 responseData?.message
-                ?? "No fue posible iniciar sesión"
+                ?? (
+                    error.response
+                        ? "No fue posible iniciar sesión"
+                        : "No fue posible conectar con el servidor"
+                )
             );
         } finally {
             isLoginProcessing.current = false;
@@ -92,29 +157,51 @@ function Login() {
         setIsGoogleSubmitting(true);
 
         try {
-            await loginWithGoogle();
-            redirectAfterLogin();
+            const authResponse =
+                await loginWithGoogle();
+
+            if (authResponse) {
+                redirectAfterLogin(authResponse);
+            }
         } catch (error) {
             const quietErrors = [
                 "auth/popup-closed-by-user",
                 "auth/cancelled-popup-request"
             ];
 
-            if (quietErrors.includes(error.code)) {
+            if (
+                quietErrors.includes(error.code)
+            ) {
                 return;
             }
 
             const firebaseMessages = {
-                "auth/popup-blocked": "El navegador bloqueó la ventana de Google. Habilita las ventanas emergentes e inténtalo de nuevo.",
-                "auth/unauthorized-domain": "Este dominio no está autorizado para iniciar sesión con Google.",
-                "auth/configuration-not-found": "La configuración de Google no corresponde al proyecto Firebase.",
-                "auth/invalid-api-key": "La API key configurada para Firebase no es válida.",
-                "auth/operation-not-allowed": "El inicio de sesión con Google no está habilitado.",
-                "auth/network-request-failed": "No se pudo conectar con Google. Revisa tu conexión e inténtalo de nuevo."
+                "auth/popup-blocked":
+                    "El navegador bloqueó la ventana de Google. Habilita las ventanas emergentes e inténtalo de nuevo.",
+
+                "auth/unauthorized-domain":
+                    "Este dominio no está autorizado para iniciar sesión con Google.",
+
+                "auth/configuration-not-found":
+                    "La configuración de Google no corresponde al proyecto Firebase.",
+
+                "auth/invalid-api-key":
+                    "La API key configurada para Firebase no es válida.",
+
+                "auth/operation-not-allowed":
+                    "El inicio de sesión con Google no está habilitado.",
+
+                "auth/network-request-failed":
+                    "No se pudo conectar con Google. Revisa tu conexión e inténtalo de nuevo."
             };
-            const firebaseError = error.code?.startsWith("auth/")
-                ? `${error.message ?? "Error de Firebase"} (${error.code})`
-                : null;
+
+            const firebaseError =
+                error.code?.startsWith("auth/")
+                    ? `${
+                        error.message
+                        ?? "Error de Firebase"
+                    } (${error.code})`
+                    : null;
 
             toast.error(
                 firebaseMessages[error.code]
@@ -132,30 +219,48 @@ function Login() {
         <section className="login-page">
             <div className="login-card">
                 <div className="login-header">
-                    <h1>Huellitas Oaxaca</h1>
-                    <p>Bienvenidos de nuevo</p>
+                    <h1>
+                        Huellitas Oaxaca
+                    </h1>
+
+                    <p>
+                        Bienvenidos de nuevo
+                    </p>
                 </div>
 
-                <h2>Iniciar Sesión</h2>
+                <h2>
+                    Iniciar Sesión
+                </h2>
 
                 <form
-                    onSubmit={(event) => handleSubmit(onSubmit)(event)}
+                    onSubmit={handleSubmit(onSubmit)}
                     noValidate
                 >
-                    <label htmlFor="correo">Correo electrónico</label>
+                    <label htmlFor="correo">
+                        Correo electrónico
+                    </label>
 
                     <div className="input-group">
-                        <Mail size={18} />
+                        <Mail
+                            size={18}
+                            aria-hidden="true"
+                        />
+
                         <input
                             id="correo"
                             type="email"
                             placeholder="tu@correo.com"
                             autoComplete="email"
                             {...register("correo", {
-                                required: "El correo es obligatorio.",
+                                required:
+                                    "El correo es obligatorio.",
+
                                 pattern: {
-                                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                    message: "El correo no tiene un formato válido."
+                                    value:
+                                        /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
+
+                                    message:
+                                        "El correo no tiene un formato válido."
                                 }
                             })}
                         />
@@ -167,29 +272,45 @@ function Login() {
                         </p>
                     )}
 
-                    <label htmlFor="password">Contraseña</label>
+                    <label htmlFor="password">
+                        Contraseña
+                    </label>
 
                     <div className="input-group">
-                        <Lock size={18} />
+                        <Lock
+                            size={18}
+                            aria-hidden="true"
+                        />
+
                         <input
                             id="password"
-                            type={showPassword ? "text" : "password"}
+                            type={
+                                showPassword
+                                    ? "text"
+                                    : "password"
+                            }
                             placeholder="********"
                             autoComplete="current-password"
                             {...register("password", {
-                                required: "La contraseña es obligatoria."
+                                required:
+                                    "La contraseña es obligatoria."
                             })}
                         />
 
                         <button
                             type="button"
                             className="eye-btn"
-                            onClick={() => setShowPassword((visible) => !visible)}
+                            onClick={() => {
+                                setShowPassword(
+                                    (visible) => !visible
+                                );
+                            }}
                             aria-label={
                                 showPassword
                                     ? "Ocultar contraseña"
                                     : "Mostrar contraseña"
                             }
+                            aria-pressed={showPassword}
                         >
                             {showPassword
                                 ? <EyeOff size={18} />
@@ -206,7 +327,10 @@ function Login() {
                     <button
                         type="submit"
                         className="login-button"
-                        disabled={isSubmitting || isGoogleSubmitting}
+                        disabled={
+                            isSubmitting
+                            || isGoogleSubmitting
+                        }
                     >
                         {isSubmitting
                             ? "Ingresando..."
@@ -222,9 +346,16 @@ function Login() {
                     type="button"
                     className="google-button"
                     onClick={handleGoogleLogin}
-                    disabled={isSubmitting || isGoogleSubmitting}
+                    disabled={
+                        isSubmitting
+                        || isGoogleSubmitting
+                    }
                 >
-                    <FcGoogle size={20} aria-hidden="true" />
+                    <FcGoogle
+                        size={20}
+                        aria-hidden="true"
+                    />
+
                     {isGoogleSubmitting
                         ? "Conectando con Google..."
                         : "Continuar con Google"}
@@ -232,6 +363,7 @@ function Login() {
 
                 <p className="register">
                     ¿No tienes cuenta?
+
                     <Link to="/register">
                         Crear una cuenta
                     </Link>

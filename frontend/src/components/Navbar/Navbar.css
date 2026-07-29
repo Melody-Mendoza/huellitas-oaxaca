@@ -164,6 +164,12 @@
     outline-offset: -2px;
 }
 
+.navbar-user-menu a {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
 @media(max-width: 992px) {
     .menu {
         gap: 1rem;
