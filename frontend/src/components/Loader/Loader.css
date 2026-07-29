@@ -3,24 +3,31 @@
     flex-direction: column;
     justify-content: center;
     align-items: center;
+    min-height: 50vh;
     padding: 40px;
 }
 
 .loader {
     width: 45px;
     height: 45px;
-    border-radius: 50%;
     border: 5px solid #ddd;
-    border-top: 5px solid var(--primary);
-    animation: spin .8s linear infinite;
+    border-top-color: var(--primary);
+    border-radius: 50%;
+    animation: spin 0.8s linear infinite;
 }
 
 .loader-container p {
-    margin-top: 15px;
+    margin: 15px 0 0;
 }
 
 @keyframes spin {
     to {
         transform: rotate(360deg);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .loader {
+        animation-duration: 1.6s;
     }
 }

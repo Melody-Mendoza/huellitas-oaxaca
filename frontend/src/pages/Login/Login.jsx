@@ -133,7 +133,7 @@ function Login() {
             <div className="login-card">
                 <div className="login-header">
                     <h1>Huellitas Oaxaca</h1>
-                    <p>Bienvenido de nuevo</p>
+                    <p>Bienvenidos de nuevo</p>
                 </div>
 
                 <h2>Iniciar Sesión</h2>
