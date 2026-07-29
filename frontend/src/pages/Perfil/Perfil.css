@@ -65,6 +65,91 @@
     cursor: not-allowed;
 }
 
+.perfil-page .perfil-photo-section {
+    grid-column: 1 / -1;
+    display: flex;
+    align-items: center;
+    gap: 32px;
+}
+
+.perfil-photo-avatar {
+    box-shadow: 0 8px 24px rgba(47, 110, 79, .16);
+}
+
+.perfil-photo-content {
+    min-width: 0;
+    flex: 1;
+}
+
+.perfil-page .perfil-photo-content h2 {
+    margin-bottom: 8px;
+}
+
+.perfil-photo-content p {
+    margin: 0 0 22px;
+    color: var(--text-light);
+    line-height: 1.5;
+}
+
+.perfil-page .perfil-photo-input {
+    display: none;
+}
+
+.perfil-photo-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+}
+
+.perfil-photo-button {
+    min-height: 44px;
+    padding: 10px 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    border: 1px solid transparent;
+    border-radius: 10px;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition:
+        background .2s,
+        border-color .2s,
+        color .2s,
+        opacity .2s;
+}
+
+.perfil-photo-button-primary {
+    background: #2F6E4F;
+    color: #fff;
+}
+
+.perfil-photo-button-primary:hover:not(:disabled) {
+    background: #24563D;
+}
+
+.perfil-photo-button-danger {
+    border-color: var(--danger);
+    background: transparent;
+    color: var(--danger);
+}
+
+.perfil-photo-button-danger:hover:not(:disabled) {
+    background: var(--danger);
+    color: #fff;
+}
+
+.perfil-photo-button:focus-visible {
+    outline: 3px solid rgba(47, 110, 79, .35);
+    outline-offset: 2px;
+}
+
+.perfil-photo-button:disabled {
+    opacity: .65;
+    cursor: not-allowed;
+}
+
 .perfil-page .perfil-password-field {
     width: 100%;
     display: grid;
@@ -146,6 +231,10 @@
     .perfil-page > h1 {
         grid-column: auto;
     }
+
+    .perfil-page .perfil-photo-section {
+        grid-column: auto;
+    }
 }
 
 @media(max-width: 480px) {
@@ -157,5 +246,19 @@
 
     .perfil-page section {
         padding: 24px 18px;
+    }
+
+    .perfil-page .perfil-photo-section {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+
+    .perfil-photo-actions {
+        flex-direction: column;
+    }
+
+    .perfil-photo-button {
+        width: 100%;
     }
 }

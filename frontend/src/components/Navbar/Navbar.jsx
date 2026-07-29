@@ -1,17 +1,70 @@
+import {
+    useEffect,
+    useRef,
+    useState
+} from "react";
 import { Link, useNavigate } from "react-router-dom";
-import logo from "../../assets/logo/logo.png";
-
+import { ChevronDown } from "lucide-react";
 import toast from "react-hot-toast";
+import logo from "../../assets/logo/logo.png";
+import Avatar from "../Avatar/Avatar";
 import { useAuth } from "../../context/AuthContext";
-
 import "./Navbar.css";
 
 function Navbar() {
     const { user, token, loading, logout } = useAuth();
     const navigate = useNavigate();
+    const [isUserMenuOpen, setIsUserMenuOpen] = useState(false);
+    const userMenuRef = useRef(null);
+    const userMenuTriggerRef = useRef(null);
     const isAuthenticated = Boolean(token && user);
+    const userName = [
+        user?.nombre,
+        user?.apellidoPaterno
+    ]
+        .filter(Boolean)
+        .join(" ")
+        .trim() || user?.correo || "Usuario";
+
+    useEffect(() => {
+        if (!isUserMenuOpen) {
+            return undefined;
+        }
+
+        const handlePointerDown = (event) => {
+            if (!userMenuRef.current?.contains(event.target)) {
+                setIsUserMenuOpen(false);
+            }
+        };
+
+        const handleKeyDown = (event) => {
+            if (event.key === "Escape") {
+                setIsUserMenuOpen(false);
+                userMenuTriggerRef.current?.focus();
+            }
+        };
+
+        document.addEventListener(
+            "pointerdown",
+            handlePointerDown
+        );
+        document.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            document.removeEventListener(
+                "pointerdown",
+                handlePointerDown
+            );
+            document.removeEventListener(
+                "keydown",
+                handleKeyDown
+            );
+        };
+    }, [isUserMenuOpen]);
 
     const handleLogout = async () => {
+        setIsUserMenuOpen(false);
+
         try {
             await logout();
             toast.success("Sesión cerrada correctamente");
@@ -40,45 +93,74 @@ function Navbar() {
                 <Link to="/nosotros">Nosotros</Link>
             </nav>
 
-            
-            {loading ? (
-                <span
-                    className="btn-login navbar-loading"
-                    aria-hidden="true"
-                    style={{ visibility: "hidden" }}
-                >
-                    Cargando
-                </span>
-            ) : isAuthenticated ? (
-                <div
-                    style={{
-                        display: "flex",
-                        alignItems: "center",
-                        gap: "0.75rem"
-                    }}
-                >
-                    <Link to="/perfil" className="btn-login">
-                        Mi perfil
-                    </Link>
-
-                    <button
-                        type="button"
-                        className="btn-login"
-                        onClick={handleLogout}
-                        style={{
-                            border: "none",
-                            cursor: "pointer",
-                            font: "inherit"
-                        }}
+            <div className="navbar-actions">
+                {loading ? (
+                    <span
+                        className="btn-login navbar-loading"
+                        aria-hidden="true"
                     >
-                        Cerrar sesión
-                    </button>
-                </div>
-            ) : (
-                <Link to="/login" className="btn-login">
-                    Iniciar sesión
-                </Link>
-            )}
+                        Cargando
+                    </span>
+                ) : isAuthenticated ? (
+                    <div
+                        ref={userMenuRef}
+                        className="navbar-user"
+                    >
+                        <button
+                            ref={userMenuTriggerRef}
+                            type="button"
+                            className="navbar-user-trigger"
+                            aria-haspopup="true"
+                            aria-expanded={isUserMenuOpen}
+                            onClick={() => {
+                                setIsUserMenuOpen(
+                                    (isOpen) => !isOpen
+                                );
+                            }}
+                        >
+                            <Avatar user={user} size={42} />
+
+                            <span className="navbar-user-name">
+                                {userName}
+                            </span>
+
+                            <ChevronDown
+                                className={
+                                    isUserMenuOpen
+                                        ? "navbar-user-chevron is-open"
+                                        : "navbar-user-chevron"
+                                }
+                                size={18}
+                                aria-hidden="true"
+                            />
+                        </button>
+
+                        {isUserMenuOpen && (
+                            <div className="navbar-user-menu">
+                                <Link
+                                    to="/perfil"
+                                    onClick={() => {
+                                        setIsUserMenuOpen(false);
+                                    }}
+                                >
+                                    Mi perfil
+                                </Link>
+
+                                <button
+                                    type="button"
+                                    onClick={handleLogout}
+                                >
+                                    Cerrar sesión
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                ) : (
+                    <Link to="/login" className="btn-login">
+                        Iniciar sesión
+                    </Link>
+                )}
+            </div>
         </header>
     );
 }

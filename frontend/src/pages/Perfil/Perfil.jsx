@@ -1,21 +1,29 @@
-import { useEffect, useState } from "react";
-import "./Perfil.css";
-import { Eye, EyeOff } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import {
+    Camera,
+    Eye,
+    EyeOff,
+    Trash2
+} from "lucide-react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
+import Avatar from "../../components/Avatar/Avatar";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
+import "./Perfil.css";
 
 function Perfil() {
     const { user, updateUser } = useAuth();
     const [profile, setProfile] = useState(user);
     const [loadingProfile, setLoadingProfile] = useState(true);
+    const [isUpdatingPhoto, setIsUpdatingPhoto] = useState(false);
     const [showCurrentPassword, setShowCurrentPassword] =
         useState(false);
     const [showNewPassword, setShowNewPassword] =
         useState(false);
     const [showConfirmPassword, setShowConfirmPassword] =
         useState(false);
+    const photoInputRef = useRef(null);
 
     const {
         register: registerProfile,
@@ -116,6 +124,88 @@ function Perfil() {
         );
     };
 
+    const handlePhotoChange = async (event) => {
+        const archivo = event.target.files?.[0];
+
+        event.target.value = "";
+
+        if (!archivo) {
+            return;
+        }
+
+        if (!["image/jpeg", "image/png"].includes(archivo.type)) {
+            toast.error("Selecciona una imagen JPG o PNG");
+            return;
+        }
+
+        const maxPhotoSize = 5 * 1024 * 1024;
+
+        if (archivo.size > maxPhotoSize) {
+            toast.error(
+                "La fotografía no debe superar los 5 MiB"
+            );
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append("foto", archivo);
+
+        try {
+            setIsUpdatingPhoto(true);
+
+            const response = await api.patch(
+                "/perfil/foto",
+                formData
+            );
+
+            setProfile(response.data);
+            updateUser(response.data);
+            toast.success(
+                "Fotografía actualizada correctamente"
+            );
+        } catch (error) {
+            if (error.response?.status !== 401) {
+                toast.error(
+                    error.response?.data?.message
+                    ?? "No fue posible actualizar la fotografía"
+                );
+            }
+        } finally {
+            setIsUpdatingPhoto(false);
+        }
+    };
+
+    const handleDeletePhoto = async () => {
+        const confirmed = window.confirm(
+            "¿Deseas eliminar tu fotografía de perfil?"
+        );
+
+        if (!confirmed) {
+            return;
+        }
+
+        try {
+            setIsUpdatingPhoto(true);
+
+            const response = await api.delete("/perfil/foto");
+
+            setProfile(response.data);
+            updateUser(response.data);
+            toast.success(
+                "Fotografía eliminada correctamente"
+            );
+        } catch (error) {
+            if (error.response?.status !== 401) {
+                toast.error(
+                    error.response?.data?.message
+                    ?? "No fue posible eliminar la fotografía"
+                );
+            }
+        } finally {
+            setIsUpdatingPhoto(false);
+        }
+    };
+
     const onProfileSubmit = async (data) => {
         const payload = {
             nombre: data.nombre.trim(),
@@ -208,6 +298,74 @@ function Perfil() {
     return (
         <main className="perfil-page">
             <h1>Mi perfil</h1>
+
+            <section className="perfil-photo-section">
+                <Avatar
+                    user={profile}
+                    size={144}
+                    className="perfil-photo-avatar"
+                />
+
+                <div className="perfil-photo-content">
+                    <h2>Fotografía de perfil</h2>
+                    <p>
+                        Usa una imagen JPG o PNG de hasta 5 MiB.
+                        La fotografía aparecerá en tu perfil y en
+                        la barra de navegación.
+                    </p>
+
+                    <input
+                        ref={photoInputRef}
+                        className="perfil-photo-input"
+                        type="file"
+                        accept=".jpg,.jpeg,.png,image/jpeg,image/png"
+                        onChange={handlePhotoChange}
+                        disabled={isUpdatingPhoto}
+                    />
+
+                    <div className="perfil-photo-actions">
+                        <button
+                            type="button"
+                            className={
+                                "perfil-photo-button "
+                                + "perfil-photo-button-primary"
+                            }
+                            onClick={() => {
+                                photoInputRef.current?.click();
+                            }}
+                            disabled={isUpdatingPhoto}
+                        >
+                            <Camera
+                                size={19}
+                                aria-hidden="true"
+                            />
+                            {isUpdatingPhoto
+                                ? "Procesando..."
+                                : profile?.fotoPerfil
+                                    ? "Reemplazar fotografía"
+                                    : "Subir fotografía"}
+                        </button>
+
+                        {profile?.fotoPerfil && (
+                            <button
+                                type="button"
+                                className={
+                                    "perfil-photo-button "
+                                    + "perfil-photo-button-danger"
+                                }
+                                onClick={handleDeletePhoto}
+                                disabled={isUpdatingPhoto}
+                            >
+                                <Trash2
+                                    size={19}
+                                    aria-hidden="true"
+                                />
+                                Eliminar fotografía
+                            </button>
+                        )}
+                    </div>
+                </div>
+            </section>
 
             <section>
                 <h2>Datos personales</h2>
