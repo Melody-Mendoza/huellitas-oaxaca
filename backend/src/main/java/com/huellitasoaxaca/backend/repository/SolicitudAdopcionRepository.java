@@ -27,6 +27,12 @@ public interface SolicitudAdopcionRepository extends JpaRepository<SolicitudAdop
             Long mascotaId
     );
 
+    boolean existsByUsuarioIdAndMascotaIdAndEstadoIn(
+            Long usuarioId,
+            Long mascotaId,
+            List<EstadoSolicitud> estados
+    );
+
     Optional<SolicitudAdopcion> findByIdAndUsuarioId(
             Long id,
             Long usuarioId
