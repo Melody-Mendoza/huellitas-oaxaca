@@ -10,6 +10,7 @@ public record UsuarioResponse(
     String correo,
     String telefono,
     String fotoPerfil,
+    boolean tienePasswordLocal,
     Boolean activo,
     LocalDateTime fechaRegistro,
     RolResponse rol
