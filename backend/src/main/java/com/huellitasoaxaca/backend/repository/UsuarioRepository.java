@@ -52,5 +52,24 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long>
             @Param("correo") String correo
     );
 
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @EntityGraph(attributePaths = "rol")
+    @Query("""
+            SELECT usuario
+            FROM Usuario usuario
+            WHERE usuario.id = :id
+            """)
+    Optional<Usuario> findByIdParaActualizar(@Param("id") Long id);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @Query("""
+            SELECT usuario
+            FROM Usuario usuario
+            WHERE usuario.activo = true
+              AND usuario.rol.nombre = 'ADMIN'
+            ORDER BY usuario.id
+            """)
+    List<Usuario> findAdministradoresActivosParaActualizar();
+
     List<Usuario> findByActivoTrue();
 }

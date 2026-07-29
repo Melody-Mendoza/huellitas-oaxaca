@@ -26,5 +26,7 @@ tests {
     expect(res.body.correo).to.be.a("string").and.not.empty;
     expect(res.body.rol.nombre).to.be.a("string").and.not.empty;
     expect(res.body).to.not.have.property("password");
+    expect(res.body).to.not.have.property("firebaseUid");
+    expect(res.body.tienePasswordLocal).to.equal(true);
   });
 }

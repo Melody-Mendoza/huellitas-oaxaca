@@ -26,5 +26,8 @@ tests {
   test("devuelve el perfil autenticado", function() {
     expect(res.body.correo).to.equal(bru.getVar("correoPrueba"));
     expect(res.body.rol.nombre).to.equal("USUARIO");
+    expect(res.body.tienePasswordLocal).to.equal(true);
+    expect(res.body).to.not.have.property("password");
+    expect(res.body).to.not.have.property("firebaseUid");
   });
 }

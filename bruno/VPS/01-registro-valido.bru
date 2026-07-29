@@ -32,6 +32,8 @@ tests {
   });
   test("no expone contraseña", function() {
     expect(res.body).to.not.have.property("password");
+    expect(res.body).to.not.have.property("firebaseUid");
+    expect(res.body.tienePasswordLocal).to.equal(true);
   });
 }
 

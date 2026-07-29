@@ -15,7 +15,7 @@ headers {
 }
 
 auth:bearer {
-  token: {{authToken}}
+  token: {{adminToken}}
 }
 
 tests {
@@ -25,5 +25,7 @@ tests {
   test("devuelve usuario sin contraseña", function() {
     expect(res.body.id).to.exist;
     expect(res.body).to.not.have.property("password");
+    expect(res.body).to.not.have.property("firebaseUid");
+    expect(res.body.tienePasswordLocal).to.be.a("boolean");
   });
 }

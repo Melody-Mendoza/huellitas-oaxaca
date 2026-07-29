@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -47,11 +48,16 @@ public class UsuarioController
     @PatchMapping("/{id}/estado")
     public ResponseEntity<UsuarioResponse> cambiarEstado(
             @PathVariable Long id,
-            @Valid @RequestBody UsuarioEstadoRequest request
+            @Valid @RequestBody UsuarioEstadoRequest request,
+            Authentication authentication
     )
     {
         return ResponseEntity.ok(
-                usuarioService.cambiarEstado(id, request.activo())
+                usuarioService.cambiarEstado(
+                        id,
+                        request.activo(),
+                        authentication.getName()
+                )
         );
     }
 }

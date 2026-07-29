@@ -194,7 +194,7 @@ public class UsuarioServiceImpl implements UsuarioService
                 if (usuario.getPassword() == null)
                 {
                         throw new ReglaNegocioException(
-                                "No fue posible cambiar la contraseña"
+                                "Esta cuenta no tiene una contraseña local"
                         );
                 }
 
@@ -228,10 +228,42 @@ public class UsuarioServiceImpl implements UsuarioService
         @Transactional
         public UsuarioResponse cambiarEstado(
                 Long id,
-                Boolean activo
+                Boolean activo,
+                String correoAdministrador
         )
         {
-                Usuario usuario = buscarEntidadPorId(id);
+                Usuario usuario = usuarioRepository
+                        .findByIdParaActualizar(id)
+                        .orElseThrow(() ->
+                                new RecursoNoEncontradoException(
+                                        "No se encontró el usuario con ID " + id
+                                )
+                        );
+
+                if (Boolean.FALSE.equals(activo))
+                {
+                        if (usuario.getCorreo().equalsIgnoreCase(
+                                correoAdministrador
+                        ))
+                        {
+                                throw new ReglaNegocioException(
+                                        "No puedes desactivar tu propia cuenta"
+                                );
+                        }
+
+                        if (Boolean.TRUE.equals(usuario.getActivo())
+                                && "ADMIN".equals(
+                                        usuario.getRol().getNombre()
+                                )
+                                && usuarioRepository
+                                        .findAdministradoresActivosParaActualizar()
+                                        .size() <= 1)
+                        {
+                                throw new ReglaNegocioException(
+                                        "Debe existir al menos un administrador activo"
+                                );
+                        }
+                }
 
                 usuario.setActivo(activo);
 

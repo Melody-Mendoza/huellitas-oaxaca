@@ -15,7 +15,7 @@ headers {
 }
 
 auth:bearer {
-  token: {{authToken}}
+  token: {{adminToken}}
 }
 
 tests {
@@ -27,6 +27,8 @@ tests {
     res.body.forEach(function(usuario) {
       expect(usuario.activo).to.equal(true);
       expect(usuario).to.not.have.property("password");
+      expect(usuario).to.not.have.property("firebaseUid");
+      expect(usuario.tienePasswordLocal).to.be.a("boolean");
     });
   });
 }

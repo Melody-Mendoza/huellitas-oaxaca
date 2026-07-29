@@ -38,4 +38,10 @@ tests {
     expect(res.body.token).to.be.a("string").and.not.empty;
     expect(res.body.expiresIn).to.equal(3600);
   });
+
+  test("devuelve contrato de cuenta local seguro", function() {
+    expect(res.body.usuario.tienePasswordLocal).to.equal(true);
+    expect(res.body.usuario).to.not.have.property("password");
+    expect(res.body.usuario).to.not.have.property("firebaseUid");
+  });
 }
