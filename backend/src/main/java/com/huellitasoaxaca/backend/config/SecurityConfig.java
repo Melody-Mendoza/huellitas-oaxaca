@@ -31,6 +31,7 @@ import org.springframework.security.oauth2.jwt.JwtValidators;
 import com.huellitasoaxaca.backend.security.CustomAccessDeniedHandler;
 import com.huellitasoaxaca.backend.security.CustomAuthenticationEntryPoint;
 import com.huellitasoaxaca.backend.security.TokenRevocadoValidator;
+import com.huellitasoaxaca.backend.security.UsuarioActivoValidator;
 import com.nimbusds.jose.jwk.source.ImmutableSecret;
 
 @Configuration
@@ -81,7 +82,10 @@ public class SecurityConfig
     }
 
     @Bean
-    public JwtDecoder jwtDecoder(TokenRevocadoValidator tokenRevocadoValidator) 
+    public JwtDecoder jwtDecoder(
+        TokenRevocadoValidator tokenRevocadoValidator,
+        UsuarioActivoValidator usuarioActivoValidator
+    )
     {
         SecretKey secretKey = crearClaveSecreta();
 
@@ -96,7 +100,8 @@ public class SecurityConfig
         var validators =
                 new DelegatingOAuth2TokenValidator<Jwt>(
                         defaultValidators,
-                        tokenRevocadoValidator
+                        tokenRevocadoValidator,
+                        usuarioActivoValidator
                 );
 
         decoder.setJwtValidator(validators);

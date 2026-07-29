@@ -44,9 +44,9 @@ public class UsuarioServiceImpl implements UsuarioService
         }
 
         @Override
-        public UsuarioResponse obtenerPorCorreo(String correo)
+        public UsuarioResponse obtenerActivoPorCorreo(String correo)
         {
-                Usuario usuario = usuarioRepository.findByCorreo(
+                Usuario usuario = usuarioRepository.findByCorreoAndActivoTrue(
                                 correo.trim().toLowerCase()
                         )
                         .orElseThrow(() ->
