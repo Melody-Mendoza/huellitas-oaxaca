@@ -37,7 +37,7 @@ public class TokenRecuperacionPassword
             unique = true,
             length = 100
     )
-    private String token;
+    private String tokenHash;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "usuario_id", nullable = false)
