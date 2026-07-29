@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.method.annotation.MethodArgumentTypeMismatchException;
 import org.springframework.web.multipart.MaxUploadSizeExceededException;
 import org.springframework.web.multipart.support.MissingServletRequestPartException;
 import org.springframework.web.servlet.resource.NoResourceFoundException;
@@ -24,6 +25,37 @@ import jakarta.servlet.http.HttpServletRequest;
 @RestControllerAdvice
 public class GlobalExceptionHandler 
 {
+        @ExceptionHandler(ParametroInvalidoException.class)
+        public ResponseEntity<ErrorResponse> manejarParametroInvalido(
+                ParametroInvalidoException exception,
+                HttpServletRequest request
+        )
+        {
+                ErrorResponse respuesta = crearError(
+                        HttpStatus.BAD_REQUEST,
+                        exception.getMessage(),
+                        request.getRequestURI()
+                );
+
+                return ResponseEntity.badRequest().body(respuesta);
+        }
+
+        @ExceptionHandler(MethodArgumentTypeMismatchException.class)
+        public ResponseEntity<ErrorResponse> manejarTipoParametroInvalido(
+                MethodArgumentTypeMismatchException exception,
+                HttpServletRequest request
+        )
+        {
+                ErrorResponse respuesta = crearError(
+                        HttpStatus.BAD_REQUEST,
+                        "El parámetro '" + exception.getName()
+                                + "' no tiene un valor válido",
+                        request.getRequestURI()
+                );
+
+                return ResponseEntity.badRequest().body(respuesta);
+        }
+
         @ExceptionHandler(HttpMessageNotReadableException.class)
         public ResponseEntity<ErrorResponse> manejarCuerpoNoLegible(
                 HttpMessageNotReadableException exception,

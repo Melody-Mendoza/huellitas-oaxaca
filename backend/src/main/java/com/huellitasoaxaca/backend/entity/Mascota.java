@@ -60,9 +60,6 @@ public class Mascota {
     @Column(name = "tamano", length = 20)
     private TamanoMascota tamano;
 
-    @Column(name = "color", length = 80)
-    private String color;
-
     @Column(name = "descripcion", columnDefinition = "TEXT")
     private String descripcion;
 

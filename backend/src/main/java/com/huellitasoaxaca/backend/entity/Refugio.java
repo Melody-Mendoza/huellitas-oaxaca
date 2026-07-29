@@ -44,9 +44,6 @@ public class Refugio
     @Column(name = "correo", length = 150)
     private String correo;
 
-    @Column(name = "sitio_web", length = 255)
-    private String sitioWeb;
-
     @Column(name = "activo", nullable = false)
     private Boolean activo;
 

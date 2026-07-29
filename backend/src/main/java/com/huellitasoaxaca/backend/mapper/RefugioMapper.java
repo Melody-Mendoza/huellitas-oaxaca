@@ -25,7 +25,6 @@ public class RefugioMapper
                 refugio.getDireccion(),
                 refugio.getTelefono(),
                 refugio.getCorreo(),
-                refugio.getSitioWeb(),
                 refugio.getActivo(),
                 responsable != null ? responsable.getId() : null,
                 obtenerNombreResponsable(responsable)

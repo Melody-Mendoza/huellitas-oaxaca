@@ -152,7 +152,8 @@ public class SecurityConfig
                 authorize
                         .requestMatchers(
                                 HttpMethod.GET,
-                                "/media/perfiles/**"
+                                "/media/perfiles/**",
+                                "/api/mascotas"
                         ).permitAll()
                         .requestMatchers(
                                 HttpMethod.HEAD,

@@ -17,7 +17,6 @@ public record MascotaResponse(
     Integer edad,
     BigDecimal peso,
     TamanoMascota tamano,
-    String color,
     String descripcion,
     EstadoMascota estado,
     LocalDate fechaIngreso,
