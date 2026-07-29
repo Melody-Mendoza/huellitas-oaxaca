@@ -1,0 +1,35 @@
+meta {
+  name: 40 - Cambiar estado inválido - ADMIN
+  type: http
+  seq: 40
+}
+
+patch {
+  url: {{baseUrl}}/usuarios/{{usuarioId}}/estado
+  body: json
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "activo": null
+  }
+}
+
+tests {
+  test("devuelve 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  test("informa el estado obligatorio", function() {
+    expect(res.body.validationErrors.activo).to.equal("El estado activo es obligatorio");
+  });
+}

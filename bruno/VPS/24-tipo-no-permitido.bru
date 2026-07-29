@@ -1,0 +1,36 @@
+meta {
+  name: 24 - Tipo de foto no permitido
+  type: http
+  seq: 24
+}
+
+patch {
+  url: {{baseUrl}}/perfil/foto
+  body: multipart-form
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+body:multipart-form {
+  foto: @file() @contentType(text/plain)
+}
+
+tests {
+  test("devuelve 415", function() {
+    expect(res.status).to.equal(415);
+  });
+  test("incluye mensaje", function() {
+    expect(res.body.message).to.be.a("string").and.not.empty;
+  });
+}
+
+docs {
+  Selecciona un TXT de demostración. El rechazo no debe modificar el perfil.
+}

@@ -1,0 +1,36 @@
+meta {
+  name: 27 - Archivo mayor de 5 MiB
+  type: http
+  seq: 27
+}
+
+patch {
+  url: {{baseUrl}}/perfil/foto
+  body: multipart-form
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+body:multipart-form {
+  foto: @file() @contentType(image/jpeg)
+}
+
+tests {
+  test("devuelve 413", function() {
+    expect(res.status).to.equal(413);
+  });
+  test("incluye mensaje", function() {
+    expect(res.body.message).to.be.a("string").and.not.empty;
+  });
+}
+
+docs {
+  Selecciona un archivo de demostración mayor de 5 MiB.
+}

@@ -1,0 +1,30 @@
+meta {
+  name: 21 - Consultar perfil con foto
+  type: http
+  seq: 21
+}
+
+get {
+  url: {{baseUrl}}/perfil
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+tests {
+  test("devuelve 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("conserva la foto JPEG y el usuario", function() {
+    expect(res.body.fotoPerfil).to.equal(bru.getVar("fotoPerfilInicial"));
+    expect(res.body.correo).to.equal(bru.getVar("correoPrueba"));
+  });
+}

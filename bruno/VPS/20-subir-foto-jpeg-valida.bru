@@ -1,0 +1,36 @@
+meta {
+  name: NO EJECUTAR - 20 - Subir foto JPEG válida
+  type: http
+  seq: 20
+}
+
+patch {
+  url: {{baseUrl}}/perfil/foto
+  body: multipart-form
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+body:multipart-form {
+  foto: @file() @contentType(image/jpeg)
+}
+
+tests {
+  test("devuelve 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  test("devuelve ruta de foto", function() {
+    expect(res.body.fotoPerfil).to.be.a("string").and.not.empty;
+  });
+}
+
+docs {
+  Modifica la foto de la cuenta autenticada. No ejecutar automáticamente en VPS.
+}

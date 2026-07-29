@@ -159,13 +159,14 @@ public class SecurityConfig
                                 "/media/perfiles/**"
                         ).permitAll()
                         .requestMatchers(
-                                 "/api/auth/registro",
-                                 "/api/auth/login",
-                                 "/api/auth/google",
-                                 "/api/auth/recuperar-password",
-                                "/api/auth/restablecer-password",
-                                "/error"
+                                HttpMethod.POST,
+                                "/api/auth/registro",
+                                "/api/auth/login",
+                                "/api/auth/google",
+                                "/api/auth/recuperar-password",
+                                "/api/auth/restablecer-password"
                         ).permitAll()
+                        .requestMatchers("/error").permitAll()
                         .anyRequest().authenticated()
         )
         .exceptionHandling(exception ->

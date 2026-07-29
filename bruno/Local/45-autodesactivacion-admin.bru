@@ -1,0 +1,39 @@
+meta {
+  name: 45 - Autodesactivación ADMIN rechazada
+  type: http
+  seq: 45
+}
+
+patch {
+  url: {{baseUrl}}/usuarios/{{adminId}}/estado
+  body: json
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{adminToken}}
+}
+
+body:json {
+  {
+    "activo": false
+  }
+}
+
+tests {
+  test("devuelve 422 sin cambiar el estado", function() {
+    expect(res.status).to.equal(422);
+  });
+  test("prohíbe la autodesactivación", function() {
+    expect(res.body.message).to.equal("No puedes desactivar tu propia cuenta");
+  });
+}
+
+docs {
+  adminId y adminToken deben corresponder al mismo administrador de demostración.
+}

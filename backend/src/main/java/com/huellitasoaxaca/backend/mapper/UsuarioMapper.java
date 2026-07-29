@@ -28,6 +28,8 @@ public class UsuarioMapper
                 usuario.getCorreo(),
                 usuario.getTelefono(),
                 usuario.getFotoPerfil(),
+                usuario.getPassword() != null
+                        && !usuario.getPassword().isBlank(),
                 usuario.getActivo(),
                 usuario.getFechaRegistro(),
                 rolMapper.toResponse(usuario.getRol())

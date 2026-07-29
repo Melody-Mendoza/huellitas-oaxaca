@@ -1,0 +1,28 @@
+meta {
+  name: 41 - Listar usuarios como USUARIO
+  type: http
+  seq: 41
+}
+
+get {
+  url: {{baseUrl}}/usuarios
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+tests {
+  test("devuelve 403", function() {
+    expect(res.status).to.equal(403);
+  });
+  test("devuelve error JSON consistente", function() {
+    expect(res.body.message).to.equal("No tienes permiso para acceder a este recurso");
+  });
+}

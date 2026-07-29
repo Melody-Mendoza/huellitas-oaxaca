@@ -1,0 +1,32 @@
+meta {
+  name: 39 - JWT de usuario desactivado
+  type: http
+  seq: 39
+}
+
+get {
+  url: {{baseUrl}}/auth/me
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{usuarioToken}}
+}
+
+tests {
+  test("devuelve 401", function() {
+    expect(res.status).to.equal(401);
+  });
+  test("rechaza el JWT del usuario desactivado", function() {
+    expect(res.body.message).to.equal("Debes iniciar sesión para acceder a este recurso");
+  });
+}
+
+docs {
+  Ejecutar después de 38 usando usuarioId y usuarioToken de la misma cuenta de demostración.
+}

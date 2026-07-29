@@ -1,0 +1,42 @@
+meta {
+  name: NO EJECUTAR - 01 - Registro válido
+  type: http
+  seq: 1
+}
+
+post {
+  url: {{baseUrl}}/auth/registro
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "nombre": "Usuario",
+    "apellidoPaterno": "Demostracion",
+    "apellidoMaterno": "VPS",
+    "correo": "{{correoPrueba}}",
+    "password": "{{passwordInicial}}",
+    "telefono": "9511234567"
+  }
+}
+
+tests {
+  test("devuelve 201", function() {
+    expect(res.status).to.equal(201);
+  });
+  test("no expone contraseña", function() {
+    expect(res.body).to.not.have.property("password");
+    expect(res.body).to.not.have.property("firebaseUid");
+    expect(res.body.tienePasswordLocal).to.equal(true);
+  });
+}
+
+docs {
+  Crea un usuario de demostración. No ejecutar sin confirmar que correoPrueba es exclusivo y reversible.
+}

@@ -39,7 +39,8 @@ public interface UsuarioService
 
         UsuarioResponse cambiarEstado(
                 Long id,
-                Boolean activo
+                Boolean activo,
+                String correoAdministrador
         );
 
         void desactivar(Long id);
