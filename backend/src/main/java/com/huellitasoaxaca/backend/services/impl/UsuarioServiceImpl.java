@@ -4,7 +4,10 @@ import java.util.List;
 
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.support.TransactionSynchronization;
+import org.springframework.transaction.support.TransactionSynchronizationManager;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.multipart.MultipartFile;
 
 import com.huellitasoaxaca.backend.dto.request.CambiarPasswordRequest;
 import com.huellitasoaxaca.backend.dto.request.UsuarioActualizarRequest;
@@ -14,18 +17,22 @@ import com.huellitasoaxaca.backend.exception.ReglaNegocioException;
 import com.huellitasoaxaca.backend.exception.RecursoNoEncontradoException;
 import com.huellitasoaxaca.backend.mapper.UsuarioMapper;
 import com.huellitasoaxaca.backend.repository.UsuarioRepository;
+import com.huellitasoaxaca.backend.services.PerfilFotoStorageService;
 import com.huellitasoaxaca.backend.services.UsuarioService;
 
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 @Transactional(readOnly = true)
 public class UsuarioServiceImpl implements UsuarioService
 {
         private final UsuarioRepository usuarioRepository;
         private final UsuarioMapper usuarioMapper;
         private final PasswordEncoder passwordEncoder;
+        private final PerfilFotoStorageService perfilFotoStorageService;
 
         @Override
         public List<UsuarioResponse> listarTodos()
@@ -122,6 +129,55 @@ public class UsuarioServiceImpl implements UsuarioService
 
         @Override
         @Transactional
+        public UsuarioResponse actualizarFotoPerfil(
+                String correoAutenticado,
+                MultipartFile foto
+        )
+        {
+                Usuario usuario = buscarActivoParaActualizar(
+                        correoAutenticado
+                );
+                String fotoAnterior = usuario.getFotoPerfil();
+                String fotoNueva = perfilFotoStorageService.guardar(foto);
+
+                registrarReemplazoTrasTransaccion(
+                        fotoAnterior,
+                        fotoNueva
+                );
+
+                usuario.setFotoPerfil(fotoNueva);
+
+                return usuarioMapper.toResponse(
+                        usuarioRepository.saveAndFlush(usuario)
+                );
+        }
+
+        @Override
+        @Transactional
+        public UsuarioResponse eliminarFotoPerfil(
+                String correoAutenticado
+        )
+        {
+                Usuario usuario = buscarActivoParaActualizar(
+                        correoAutenticado
+                );
+                String fotoAnterior = usuario.getFotoPerfil();
+
+                if (fotoAnterior == null)
+                {
+                        return usuarioMapper.toResponse(usuario);
+                }
+
+                registrarEliminacionTrasCommit(fotoAnterior);
+                usuario.setFotoPerfil(null);
+
+                return usuarioMapper.toResponse(
+                        usuarioRepository.saveAndFlush(usuario)
+                );
+        }
+
+        @Override
+        @Transactional
         public void cambiarPassword(
                 String correoAutenticado,
                 CambiarPasswordRequest request
@@ -175,6 +231,114 @@ public class UsuarioServiceImpl implements UsuarioService
                 return usuarioMapper.toResponse(
                         usuarioRepository.save(usuario)
                 );
+        }
+
+        private Usuario buscarActivoParaActualizar(
+                String correoAutenticado
+        )
+        {
+                return usuarioRepository
+                        .findActivoPorCorreoParaActualizar(
+                                correoAutenticado.trim().toLowerCase()
+                        )
+                        .orElseThrow(() ->
+                                new RecursoNoEncontradoException(
+                                        "No se encontró el usuario autenticado"
+                                )
+                        );
+        }
+
+        private void registrarReemplazoTrasTransaccion(
+                String fotoAnterior,
+                String fotoNueva
+        )
+        {
+                try
+                {
+                        verificarSincronizacionActiva();
+                        TransactionSynchronizationManager
+                                .registerSynchronization(
+                                        new TransactionSynchronization()
+                                        {
+                                                @Override
+                                                public void afterCompletion(
+                                                        int status
+                                                )
+                                                {
+                                                        if (status == STATUS_COMMITTED)
+                                                        {
+                                                                eliminarFotoSinPropagar(
+                                                                        fotoAnterior
+                                                                );
+                                                        }
+                                                        else
+                                                        {
+                                                                eliminarFotoSinPropagar(
+                                                                        fotoNueva
+                                                                );
+                                                        }
+                                                }
+                                        }
+                                );
+                }
+                catch (RuntimeException exception)
+                {
+                        eliminarFotoSinPropagar(fotoNueva);
+                        throw exception;
+                }
+        }
+
+        private void registrarEliminacionTrasCommit(
+                String fotoAnterior
+        )
+        {
+                verificarSincronizacionActiva();
+                TransactionSynchronizationManager.registerSynchronization(
+                        new TransactionSynchronization()
+                        {
+                                @Override
+                                public void afterCompletion(int status)
+                                {
+                                        if (status == STATUS_COMMITTED)
+                                        {
+                                                eliminarFotoSinPropagar(
+                                                        fotoAnterior
+                                                );
+                                        }
+                                }
+                        }
+                );
+        }
+
+        private void verificarSincronizacionActiva()
+        {
+                if (!TransactionSynchronizationManager
+                        .isSynchronizationActive())
+                {
+                        throw new IllegalStateException(
+                                "No existe una transacción activa para actualizar la foto"
+                        );
+                }
+        }
+
+        private void eliminarFotoSinPropagar(String fotoPerfil)
+        {
+                if (fotoPerfil == null)
+                {
+                        return;
+                }
+
+                try
+                {
+                        perfilFotoStorageService.eliminarSiExiste(fotoPerfil);
+                }
+                catch (RuntimeException exception)
+                {
+                        log.error(
+                                "No fue posible limpiar una foto de perfil después de completar la transacción",
+                                exception
+                        );
+                }
         }
 
         private String limpiarTextoOpcional(String valor)
