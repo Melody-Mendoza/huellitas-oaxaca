@@ -1,0 +1,30 @@
+css
+.avatar {
+    position: relative;
+    flex: 0 0 auto;
+    width: var(--avatar-size);
+    height: var(--avatar-size);
+    display: inline-grid;
+    place-items: center;
+    overflow: hidden;
+    border: 2px solid rgba(47, 110, 79, .18);
+    border-radius: 50%;
+    background: #E5EFE8;
+    color: #2F6E4F;
+    font-size: calc(var(--avatar-size) * .36);
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+}
+
+.avatar-fallback,
+.avatar-image {
+    grid-area: 1 / 1;
+}
+
+.avatar-image {
+    width: 100%;
+    height: 100%;
+    display: block;
+    object-fit: cover;
+}

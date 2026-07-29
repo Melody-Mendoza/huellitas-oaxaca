@@ -9,6 +9,10 @@ export default defineConfig({
       "/api": {
         target: "http://localhost:1929",
         changeOrigin: true
+      },
+      "/media": {
+        target: "http://localhost:1929",
+        changeOrigin: true
       }
     }
   }

@@ -37,10 +37,7 @@ export function clearStoredSession() {
 }
 
 const api = axios.create({
-    baseURL: "/api",
-    headers: {
-        "Content-Type": "application/json"
-    }
+    baseURL: "/api"
 });
 
 let unauthorizedHandler = null;
@@ -57,7 +54,7 @@ export function setUnauthorizedHandler(handler) {
 
 api.interceptors.request.use(
     (config) => {
-         const token = readStoredSession()?.token;
+        const token = readStoredSession()?.token;
 
         if (token) {
             config.headers.Authorization = `Bearer ${token}`;
