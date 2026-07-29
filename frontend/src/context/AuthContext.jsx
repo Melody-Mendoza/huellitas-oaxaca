@@ -2,14 +2,17 @@ import {
     createContext,
     useContext,
     useEffect,
+    useRef,
     useState
 } from "react";
+
 import api, {
-    AUTH_UNAUTHORIZED_EVENT,
     clearStoredSession,
     readStoredSession,
+    setUnauthorizedHandler,
     writeStoredSession
 } from "../services/api";
+
 import { signInWithGoogle } from "../services/googleAuth";
 
 export const AuthContext = createContext();
@@ -18,7 +21,11 @@ export function AuthProvider({ children }) {
     const [session, setSession] = useState(
         () => readStoredSession()
     );
+
     const [loading, setLoading] = useState(true);
+
+
+    const authOperationRef = useRef(0);
 
     const saveSession = (nextSession) => {
         setSession(nextSession);
@@ -31,108 +38,179 @@ export function AuthProvider({ children }) {
     };
 
     useEffect(() => {
-        let active = true;
+        const controller = new AbortController();
+
+        const operationId =
+            ++authOperationRef.current;
 
         const handleUnauthorized = () => {
-            if (active) {
-                clearStoredSession();
-                setSession(null);
-                setLoading(false);
-            }
+
+            authOperationRef.current += 1;
+
+            clearStoredSession();
+            setSession(null);
+            setLoading(false);
         };
 
+        const removeUnauthorizedHandler =
+            setUnauthorizedHandler(
+                handleUnauthorized
+            );
+
         const restoreSession = async () => {
-            const storedSession = readStoredSession();
+            const storedSession =
+                readStoredSession();
 
             if (!storedSession?.token) {
-                if (active) {
+                if (
+                    authOperationRef.current
+                    === operationId
+                ) {
                     setSession(null);
                     setLoading(false);
                 }
+
                 return;
             }
 
             try {
-                const response = await api.get("/auth/me");
+                const response = await api.get(
+                    "/auth/me",
+                    {
+                        signal: controller.signal
+                    }
+                );
 
-                if (active) {
-                    const restoredSession = {
-                        token: storedSession.token,
-                        user: response.data
-                    };
-
-                    writeStoredSession(restoredSession);
-                    setSession(restoredSession);
+                if (
+                    authOperationRef.current
+                    !== operationId
+                ) {
+                    return;
                 }
-            } catch {
-                if (active) {
+
+                const restoredSession = {
+                    token: storedSession.token,
+                    user: response.data
+                };
+
+                writeStoredSession(restoredSession);
+                setSession(restoredSession);
+            } catch (error) {
+                if (
+                    authOperationRef.current
+                    !== operationId
+                    || error.code === "ERR_CANCELED"
+                ) {
+                    return;
+                }
+
+
+                if (error.response?.status === 401) {
                     clearStoredSession();
                     setSession(null);
                 }
             } finally {
-                if (active) {
+                if (
+                    authOperationRef.current
+                    === operationId
+                ) {
                     setLoading(false);
                 }
             }
         };
 
-        window.addEventListener(
-            AUTH_UNAUTHORIZED_EVENT,
-            handleUnauthorized
-        );
-
         restoreSession();
 
         return () => {
-            active = false;
-            window.removeEventListener(
-                AUTH_UNAUTHORIZED_EVENT,
-                handleUnauthorized
-            );
+            controller.abort();
+
+            removeUnauthorizedHandler();
+
+            if (
+                authOperationRef.current
+                === operationId
+            ) {
+                authOperationRef.current += 1;
+            }
         };
     }, []);
 
     const login = async (credentials) => {
+        const operationId =
+            ++authOperationRef.current;
+
         const response = await api.post(
             "/auth/login",
             credentials
         );
 
-        const nextSession = {
-            token: response.data.token,
-            user: response.data.usuario
-        };
-
-        saveSession(nextSession);
+        if (
+            authOperationRef.current
+            === operationId
+        ) {
+            saveSession({
+                token: response.data.token,
+                user: response.data.usuario
+            });
+        }
 
         return response.data;
     };
 
     const loginWithGoogle = async () => {
-        const idToken = await signInWithGoogle();
-        const response = await api.post("/auth/google", { idToken });
+        const operationId =
+            ++authOperationRef.current;
 
-        const nextSession = {
-            token: response.data.token,
-            user: response.data.usuario
-        };
+        const idToken =
+            await signInWithGoogle();
 
-        saveSession(nextSession);
+        if (
+            authOperationRef.current
+            !== operationId
+        ) {
+            return null;
+        }
+
+        const response = await api.post(
+            "/auth/google",
+            { idToken }
+        );
+
+        if (
+            authOperationRef.current
+            === operationId
+        ) {
+            saveSession({
+                token: response.data.token,
+                user: response.data.usuario
+            });
+        }
 
         return response.data;
     };
 
     const logout = async () => {
+        const operationId =
+            ++authOperationRef.current;
+
+        const tokenToRevoke = session?.token;
+
         let logoutError = null;
 
         try {
-            if (session?.token) {
+            if (tokenToRevoke) {
                 await api.post("/auth/logout");
             }
         } catch (error) {
             logoutError = error;
         } finally {
-            saveSession(null);
+
+            if (
+                authOperationRef.current
+                === operationId
+            ) {
+                saveSession(null);
+            }
         }
 
         if (logoutError) {
@@ -152,6 +230,7 @@ export function AuthProvider({ children }) {
             };
 
             writeStoredSession(nextSession);
+
             return nextSession;
         });
     };
