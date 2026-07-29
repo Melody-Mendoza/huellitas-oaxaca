@@ -10,6 +10,7 @@ import api, {
     readStoredSession,
     writeStoredSession
 } from "../services/api";
+import { signInWithGoogle } from "../services/googleAuth";
 
 export const AuthContext = createContext();
 
@@ -107,6 +108,20 @@ export function AuthProvider({ children }) {
         return response.data;
     };
 
+    const loginWithGoogle = async () => {
+        const idToken = await signInWithGoogle();
+        const response = await api.post("/auth/google", { idToken });
+
+        const nextSession = {
+            token: response.data.token,
+            user: response.data.usuario
+        };
+
+        saveSession(nextSession);
+
+        return response.data;
+    };
+
     const logout = async () => {
         let logoutError = null;
 
@@ -148,6 +163,7 @@ export function AuthProvider({ children }) {
                 token: session?.token ?? null,
                 loading,
                 login,
+                loginWithGoogle,
                 logout,
                 updateUser
             }}

@@ -65,6 +65,13 @@
 			<artifactId>spring-security-oauth2-jose</artifactId>
 		</dependency>
 
+		<!-- Firebase Admin -->
+		<dependency>
+			<groupId>com.google.firebase</groupId>
+			<artifactId>firebase-admin</artifactId>
+			<version>9.10.0</version>
+		</dependency>
+
 		<!-- Base de datos -->
 		<dependency>
 			<groupId>com.mysql</groupId>

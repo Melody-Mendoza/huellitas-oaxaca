@@ -1,14 +1,17 @@
 import "./Login.css";
 import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
-import { useState } from "react";
+import { FcGoogle } from "react-icons/fc";
+import { useRef, useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
 import { useAuth } from "../../context/AuthContext";
 
 function Login() {
     const [showPassword, setShowPassword] = useState(false);
-    const { login } = useAuth();
+    const [isGoogleSubmitting, setIsGoogleSubmitting] = useState(false);
+    const isLoginProcessing = useRef(false);
+    const { login, loginWithGoogle } = useAuth();
     const location = useLocation();
     const navigate = useNavigate();
 
@@ -24,20 +27,30 @@ function Login() {
         }
     });
 
+    const redirectAfterLogin = () => {
+        const requestedLocation = location.state?.from;
+        const destination = requestedLocation
+            ? `${requestedLocation.pathname}${requestedLocation.search}${requestedLocation.hash}`
+            : "/";
+
+        toast.success("Inicio de sesión correcto");
+        navigate(destination, { replace: true });
+    };
+
     const onSubmit = async (data) => {
+        if (isLoginProcessing.current) {
+            return;
+        }
+
+        isLoginProcessing.current = true;
+
         try {
             await login({
                 correo: data.correo.trim(),
                 password: data.password
             });
 
-            const requestedLocation = location.state?.from;
-            const destination = requestedLocation
-                ? `${requestedLocation.pathname}${requestedLocation.search}${requestedLocation.hash}`
-                : "/";
-
-            toast.success("Inicio de sesión correcto");
-            navigate(destination, { replace: true });
+            redirectAfterLogin();
         } catch (error) {
             const status = error.response?.status;
             const responseData = error.response?.data;
@@ -65,6 +78,53 @@ function Login() {
                 responseData?.message
                 ?? "No fue posible iniciar sesión"
             );
+        } finally {
+            isLoginProcessing.current = false;
+        }
+    };
+
+    const handleGoogleLogin = async () => {
+        if (isLoginProcessing.current) {
+            return;
+        }
+
+        isLoginProcessing.current = true;
+        setIsGoogleSubmitting(true);
+
+        try {
+            await loginWithGoogle();
+            redirectAfterLogin();
+        } catch (error) {
+            const quietErrors = [
+                "auth/popup-closed-by-user",
+                "auth/cancelled-popup-request"
+            ];
+
+            if (quietErrors.includes(error.code)) {
+                return;
+            }
+
+            const firebaseMessages = {
+                "auth/popup-blocked": "El navegador bloqueó la ventana de Google. Habilita las ventanas emergentes e inténtalo de nuevo.",
+                "auth/unauthorized-domain": "Este dominio no está autorizado para iniciar sesión con Google.",
+                "auth/configuration-not-found": "La configuración de Google no corresponde al proyecto Firebase.",
+                "auth/invalid-api-key": "La API key configurada para Firebase no es válida.",
+                "auth/operation-not-allowed": "El inicio de sesión con Google no está habilitado.",
+                "auth/network-request-failed": "No se pudo conectar con Google. Revisa tu conexión e inténtalo de nuevo."
+            };
+            const firebaseError = error.code?.startsWith("auth/")
+                ? `${error.message ?? "Error de Firebase"} (${error.code})`
+                : null;
+
+            toast.error(
+                firebaseMessages[error.code]
+                ?? error.response?.data?.message
+                ?? firebaseError
+                ?? "No fue posible iniciar sesión con Google"
+            );
+        } finally {
+            isLoginProcessing.current = false;
+            setIsGoogleSubmitting(false);
         }
     };
 
@@ -78,7 +138,10 @@ function Login() {
 
                 <h2>Iniciar Sesión</h2>
 
-                <form onSubmit={handleSubmit(onSubmit)} noValidate>
+                <form
+                    onSubmit={(event) => handleSubmit(onSubmit)(event)}
+                    noValidate
+                >
                     <label htmlFor="correo">Correo electrónico</label>
 
                     <div className="input-group">
@@ -143,13 +206,29 @@ function Login() {
                     <button
                         type="submit"
                         className="login-button"
-                        disabled={isSubmitting}
+                        disabled={isSubmitting || isGoogleSubmitting}
                     >
                         {isSubmitting
                             ? "Ingresando..."
                             : "Iniciar sesión"}
                     </button>
                 </form>
+
+                <div className="divider">
+                    <span>o</span>
+                </div>
+
+                <button
+                    type="button"
+                    className="google-button"
+                    onClick={handleGoogleLogin}
+                    disabled={isSubmitting || isGoogleSubmitting}
+                >
+                    <FcGoogle size={20} aria-hidden="true" />
+                    {isGoogleSubmitting
+                        ? "Conectando con Google..."
+                        : "Continuar con Google"}
+                </button>
 
                 <p className="register">
                     ¿No tienes cuenta?

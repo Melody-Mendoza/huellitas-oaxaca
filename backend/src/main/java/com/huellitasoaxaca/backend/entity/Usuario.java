@@ -43,8 +43,11 @@ public class Usuario
     @Column(name = "correo", nullable = false, unique = true, length = 150)
     private String correo;
 
-    @Column(name = "password", nullable = false, length = 255)
+    @Column(name = "password", length = 255)
     private String password;
+
+    @Column(name = "firebase_uid", unique = true, length = 128)
+    private String firebaseUid;
 
     @Column(name = "telefono", length = 20)
     private String telefono;
