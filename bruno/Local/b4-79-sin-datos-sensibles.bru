@@ -1,0 +1,25 @@
+meta {
+  name: B4 - 79 - Sin datos sensibles
+  type: http
+  seq: 79
+}
+
+get {
+  url: {{baseUrl}}/mascotas/{{mascotaId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+tests {
+  test("no expone campos sensibles", function() {
+    expect(res.status).to.equal(200);
+    const contenido = JSON.stringify(res.body);
+    ["password", "firebaseUid", "usuario", "usuarioId", "rol"].forEach(function(campo) {
+      expect(contenido).to.not.include('"' + campo + '"');
+    });
+  });
+}

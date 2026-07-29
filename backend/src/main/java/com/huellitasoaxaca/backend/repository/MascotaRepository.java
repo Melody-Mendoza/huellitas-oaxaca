@@ -4,13 +4,19 @@ import com.huellitasoaxaca.backend.entity.Mascota;
 import com.huellitasoaxaca.backend.entity.enums.Especie;
 import com.huellitasoaxaca.backend.entity.enums.EstadoMascota;
 import java.util.List;
+import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.domain.Specification;
+import org.springframework.data.jpa.repository.Lock;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
+
+import jakarta.persistence.LockModeType;
 
 @Repository
 public interface MascotaRepository extends
@@ -24,6 +30,17 @@ public interface MascotaRepository extends
             Specification<Mascota> specification,
             Pageable pageable
     );
+
+    @EntityGraph(attributePaths = "refugio")
+    Optional<Mascota> findByIdAndEstadoAndRefugioActivoTrue(
+            Long id,
+            EstadoMascota estado
+    );
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @EntityGraph(attributePaths = "refugio")
+    @Query("SELECT mascota FROM Mascota mascota WHERE mascota.id = :id")
+    Optional<Mascota> findByIdParaSolicitud(@Param("id") Long id);
 
     List<Mascota> findByEstado(EstadoMascota estado);
 

@@ -11,5 +11,7 @@ public interface ImagenMascotaRepository extends JpaRepository<ImagenMascota, Lo
 
     List<ImagenMascota> findByMascotaId(Long mascotaId);
 
+    List<ImagenMascota> findByMascotaIdOrderByIdAsc(Long mascotaId);
+
     void deleteByMascotaId(Long mascotaId);
 }

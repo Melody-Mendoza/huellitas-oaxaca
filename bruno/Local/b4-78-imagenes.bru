@@ -1,0 +1,27 @@
+meta {
+  name: B4 - 78 - Imagen principal y adicionales
+  type: http
+  seq: 78
+}
+
+get {
+  url: {{baseUrl}}/mascotas/{{mascotaId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+tests {
+  test("devuelve 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  test("incluye el contrato de imagen principal", function() {
+    expect(res.body).to.have.property("imagenPrincipal");
+  });
+  test("incluye imágenes adicionales como lista", function() {
+    expect(res.body.imagenesAdicionales).to.be.an("array");
+  });
+}

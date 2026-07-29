@@ -1,0 +1,21 @@
+meta {
+  name: B4 - 71 - Detalle público sin token
+  type: http
+  seq: 71
+}
+
+get {
+  url: {{baseUrl}}/mascotas/{{mascotaId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+tests {
+  test("no requiere autenticación", function() {
+    expect(res.status).to.equal(200);
+  });
+}
