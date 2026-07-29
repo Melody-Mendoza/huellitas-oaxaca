@@ -2,8 +2,11 @@ import {
     useEffect,
     useState
 } from "react";
+import toast from "react-hot-toast";
 
 import Loader from "../../components/Loader/Loader";
+import Modal from "../../components/Modal/Modal";
+import { useAuth } from "../../context/AuthContext";
 import api from "../../services/api";
 
 import "./Admin.css";
@@ -66,14 +69,19 @@ function getRequestErrorMessage(error) {
 
         case 403:
             return (
-                "No tienes permiso para consultar "
-                + "los usuarios."
+                "No tienes permiso para administrar usuarios."
             );
 
         case 404:
             return (
                 backendMessage
-                || "No se encontró el recurso solicitado."
+                || "No se encontró el usuario solicitado."
+            );
+
+        case 422:
+            return (
+                backendMessage
+                || "La operación incumple una regla de negocio."
             );
 
         case 500:
@@ -84,17 +92,21 @@ function getRequestErrorMessage(error) {
         default:
             return (
                 backendMessage
-                || "No fue posible cargar los usuarios."
+                || "No fue posible completar la operación."
             );
     }
 }
 
 function Admin() {
+    const { user: authenticatedUser } = useAuth();
+
     const [users, setUsers] = useState([]);
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState("");
     const [retryVersion, setRetryVersion] =
         useState(0);
+    const [updatingUserId, setUpdatingUserId] =
+        useState(null);
 
     useEffect(() => {
         const controller = new AbortController();
@@ -142,6 +154,72 @@ function Admin() {
         };
     }, [retryVersion]);
 
+    const handleStateChange = async (targetUser) => {
+        if (updatingUserId !== null) {
+            return;
+        }
+
+        const nextActiveState = !targetUser.activo;
+
+        const isSelfDeactivation =
+            !nextActiveState
+            && String(targetUser.id)
+                === String(authenticatedUser?.id);
+
+        if (isSelfDeactivation) {
+            toast.error(
+                "No puedes desactivar tu propia cuenta."
+            );
+            return;
+        }
+
+        const actionText = nextActiveState
+            ? "activar"
+            : "desactivar";
+
+        const confirmation = await Modal.confirm(
+            nextActiveState
+                ? "Activar usuario"
+                : "Desactivar usuario",
+            `¿Deseas ${actionText} a ${getFullName(targetUser)}?`
+        );
+
+        if (!confirmation.isConfirmed) {
+            return;
+        }
+
+        setUpdatingUserId(targetUser.id);
+
+        try {
+            const response = await api.patch(
+                `/usuarios/${targetUser.id}/estado`,
+                {
+                    activo: nextActiveState
+                }
+            );
+
+            setUsers((currentUsers) =>
+                currentUsers.map((currentUser) =>
+                    currentUser.id === targetUser.id
+                        ? response.data
+                        : currentUser
+                )
+            );
+
+            toast.success(
+                nextActiveState
+                    ? "Usuario activado correctamente."
+                    : "Usuario desactivado correctamente."
+            );
+        } catch (error) {
+            toast.error(
+                getRequestErrorMessage(error)
+            );
+        } finally {
+            setUpdatingUserId(null);
+        }
+    };
+
     if (loading) {
         return <Loader />;
     }
@@ -179,6 +257,7 @@ function Admin() {
         <section
             className="admin-page"
             aria-labelledby="admin-title"
+            aria-busy={updatingUserId !== null}
         >
             <header className="admin-header">
                 <div>
@@ -191,8 +270,8 @@ function Admin() {
                     </h1>
 
                     <p className="admin-description">
-                        Consulta las cuentas registradas
-                        en Huellitas Oaxaca.
+                        Consulta las cuentas registradas y
+                        administra su estado de acceso.
                     </p>
                 </div>
 
@@ -250,59 +329,117 @@ function Admin() {
                                 <th scope="col">
                                     Fecha de registro
                                 </th>
+
+                                <th scope="col">
+                                    Acción
+                                </th>
                             </tr>
                         </thead>
 
                         <tbody>
-                            {users.map((listedUser) => (
-                                <tr key={listedUser.id}>
-                                    <td
-                                        data-label={
-                                            "Nombre completo"
-                                        }
-                                    >
-                                        <strong>
-                                            {getFullName(
-                                                listedUser
-                                            )}
-                                        </strong>
-                                    </td>
+                            {users.map((listedUser) => {
+                                const isUpdating =
+                                    updatingUserId
+                                    === listedUser.id;
 
-                                    <td data-label="Correo">
-                                        {listedUser.correo
-                                            || "Sin correo"}
-                                    </td>
+                                const isAuthenticatedUser =
+                                    String(listedUser.id)
+                                    === String(
+                                        authenticatedUser?.id
+                                    );
 
-                                    <td data-label="Rol">
-                                        {listedUser.rol?.nombre
-                                            || "Sin rol"}
-                                    </td>
+                                const isSelfDeactivation =
+                                    listedUser.activo
+                                    && isAuthenticatedUser;
 
-                                    <td data-label="Estado">
-                                        <span
-                                            className={
-                                                listedUser.activo
-                                                    ? "admin-status admin-status-active"
-                                                    : "admin-status admin-status-inactive"
+                                const actionText =
+                                    listedUser.activo
+                                        ? "Desactivar"
+                                        : "Activar";
+
+                                return (
+                                    <tr key={listedUser.id}>
+                                        <td
+                                            data-label={
+                                                "Nombre completo"
                                             }
                                         >
-                                            {listedUser.activo
-                                                ? "Activo"
-                                                : "Inactivo"}
-                                        </span>
-                                    </td>
+                                            <strong>
+                                                {getFullName(
+                                                    listedUser
+                                                )}
+                                            </strong>
+                                        </td>
 
-                                    <td
-                                        data-label={
-                                            "Fecha de registro"
-                                        }
-                                    >
-                                        {formatRegistrationDate(
-                                            listedUser.fechaRegistro
-                                        )}
-                                    </td>
-                                </tr>
-                            ))}
+                                        <td data-label="Correo">
+                                            {listedUser.correo
+                                                || "Sin correo"}
+                                        </td>
+
+                                        <td data-label="Rol">
+                                            {listedUser.rol?.nombre
+                                                || "Sin rol"}
+                                        </td>
+
+                                        <td data-label="Estado">
+                                            <span
+                                                className={
+                                                    listedUser.activo
+                                                        ? "admin-status admin-status-active"
+                                                        : "admin-status admin-status-inactive"
+                                                }
+                                            >
+                                                {listedUser.activo
+                                                    ? "Activo"
+                                                    : "Inactivo"}
+                                            </span>
+                                        </td>
+
+                                        <td
+                                            data-label={
+                                                "Fecha de registro"
+                                            }
+                                        >
+                                            {formatRegistrationDate(
+                                                listedUser.fechaRegistro
+                                            )}
+                                        </td>
+
+                                        <td data-label="Acción">
+                                            <button
+                                                type="button"
+                                                className={
+                                                    listedUser.activo
+                                                        ? "admin-action-button admin-action-danger"
+                                                        : "admin-action-button admin-action-success"
+                                                }
+                                                disabled={
+                                                    updatingUserId
+                                                    !== null
+                                                    || isSelfDeactivation
+                                                }
+                                                aria-label={
+                                                    `${actionText} a ${getFullName(listedUser)}`
+                                                }
+                                                title={
+                                                    isSelfDeactivation
+                                                        ? "No puedes desactivar tu propia cuenta"
+                                                        : actionText
+                                                }
+                                                onClick={() => {
+                                                    handleStateChange(
+                                                        listedUser
+                                                    );
+                                                }}
+                                            >
+                                                {isUpdating
+                                                    ? "Actualizando..."
+                                                    : actionText}
+                                            </button>
+                                        </td>
+                                    </tr>
+                                );
+                            })}
                         </tbody>
                     </table>
                 </div>
