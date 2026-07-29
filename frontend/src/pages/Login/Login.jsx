@@ -1,235 +1,165 @@
 import "./Login.css";
-import { Link } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import { Mail, Lock, Eye, EyeOff } from "lucide-react";
 import { useState } from "react";
 import { useForm } from "react-hook-form";
 import toast from "react-hot-toast";
-
-import { signInWithGoogle } from "../../services/googleAuth";
-//import { Chrome } from "lucide-react";
+import { useAuth } from "../../context/AuthContext";
 
 function Login() {
-
     const [showPassword, setShowPassword] = useState(false);
+    const { login } = useAuth();
+    const location = useLocation();
+    const navigate = useNavigate();
 
     const {
-
         register,
-
         handleSubmit,
-
+        setError,
         formState: { errors, isSubmitting }
-
-    } = useForm();
+    } = useForm({
+        defaultValues: {
+            correo: "",
+            password: ""
+        }
+    });
 
     const onSubmit = async (data) => {
+        try {
+            await login({
+                correo: data.correo.trim(),
+                password: data.password
+            });
 
-        await new Promise(resolve => setTimeout(resolve, 1500));
+            const requestedLocation = location.state?.from;
+            const destination = requestedLocation
+                ? `${requestedLocation.pathname}${requestedLocation.search}${requestedLocation.hash}`
+                : "/";
 
-        console.log(data);
+            toast.success("Inicio de sesión correcto");
+            navigate(destination, { replace: true });
+        } catch (error) {
+            const status = error.response?.status;
+            const responseData = error.response?.data;
 
-        toast.success("Inicio de sesión correcto");
+            if (status === 400 && responseData?.validationErrors) {
+                Object.entries(responseData.validationErrors).forEach(
+                    ([field, message]) => {
+                        setError(field, {
+                            type: "server",
+                            message
+                        });
+                    }
+                );
+            }
 
-    };
+            if (status === 401) {
+                setError("password", {
+                    type: "server",
+                    message: responseData?.message
+                        ?? "Correo o contraseña incorrectos"
+                });
+            }
 
-    const handleGoogleLogin = async () => {
-
-        const response = await signInWithGoogle();
-
-        if (response.success) {
-
-            console.log(response.user);
-
-            toast.success(`Bienvenido ${response.user.nombre}`);
-
-
-            // enviar response.user al backend
-            // guardar JWT
-            // navegar al dashboard
-
-        } else {
-
-            toast.error("No fue posible iniciar sesión con Google.");
-
+            toast.error(
+                responseData?.message
+                ?? "No fue posible iniciar sesión"
+            );
         }
-
     };
-
-    // await api.post("/auth/login", data);
-
-
 
     return (
-
         <section className="login-page">
-
             <div className="login-card">
-
                 <div className="login-header">
-
                     <h1>Huellitas Oaxaca</h1>
-
                     <p>Bienvenido de nuevo</p>
-
                 </div>
 
                 <h2>Iniciar Sesión</h2>
 
                 <form onSubmit={handleSubmit(onSubmit)} noValidate>
-
-                    <label>Correo electrónico</label>
+                    <label htmlFor="correo">Correo electrónico</label>
 
                     <div className="input-group">
-
                         <Mail size={18} />
-
                         <input
-
+                            id="correo"
                             type="email"
-
                             placeholder="tu@correo.com"
-
-                            {...register("email", {
-
+                            autoComplete="email"
+                            {...register("correo", {
                                 required: "El correo es obligatorio.",
-
                                 pattern: {
                                     value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                    message: "Ingresa un correo electrónico válido."
+                                    message: "El correo no tiene un formato válido."
                                 }
-
                             })}
-
                         />
-
                     </div>
 
-                    {errors.email &&
-
+                    {errors.correo && (
                         <p className="error">
-
-                            {errors.email.message}
-
+                            {errors.correo.message}
                         </p>
+                    )}
 
-                    }
-
-                    <label>Contraseña</label>
+                    <label htmlFor="password">Contraseña</label>
 
                     <div className="input-group">
-
                         <Lock size={18} />
-
                         <input
-
+                            id="password"
                             type={showPassword ? "text" : "password"}
-
                             placeholder="********"
-
+                            autoComplete="current-password"
                             {...register("password", {
-
-                                required: "La contraseña es obligatoria.",
-
-                                minLength: {
-                                    value: 8,
-                                    message: "La contraseña debe tener al menos 8 caracteres."
-                                }
-
+                                required: "La contraseña es obligatoria."
                             })}
-
                         />
 
                         <button
-
                             type="button"
-
                             className="eye-btn"
-
-                            onClick={() => setShowPassword(!showPassword)}
-
-                        >
-
-                            {
-
+                            onClick={() => setShowPassword((visible) => !visible)}
+                            aria-label={
                                 showPassword
-
-                                    ? <EyeOff size={18} />
-
-                                    : <Eye size={18} />
-
+                                    ? "Ocultar contraseña"
+                                    : "Mostrar contraseña"
                             }
-
+                        >
+                            {showPassword
+                                ? <EyeOff size={18} />
+                                : <Eye size={18} />}
                         </button>
-
                     </div>
 
-                    {errors.password &&
-
+                    {errors.password && (
                         <p className="error">
-
                             {errors.password.message}
-
                         </p>
-
-                    }
-
-                    <div className="forgot">
-
-                        <Link to="/recuperar-password">
-
-                            ¿Olvidaste tu contraseña?
-
-                        </Link>
-
-                    </div>
+                    )}
 
                     <button
                         type="submit"
                         className="login-button"
                         disabled={isSubmitting}
                     >
-
-                        {
-                            isSubmitting
-                                ? "Ingresando..."
-                                : "Iniciar sesión"
-                        }
-
+                        {isSubmitting
+                            ? "Ingresando..."
+                            : "Iniciar sesión"}
                     </button>
-
-                    <div className="divider">
-                        <span>o</span>
-                    </div>
-
-                    <button
-                        type="button"
-                        className="google-button"
-                        onClick={handleGoogleLogin}
-                    >
-                        G
-                        Continuar con Google
-                    </button>
-
                 </form>
 
                 <p className="register">
-
                     ¿No tienes cuenta?
-
                     <Link to="/register">
-
                         Crear una cuenta
-
                     </Link>
-
                 </p>
-
             </div>
-
         </section>
-
     );
-
 }
 
 export default Login;

@@ -21,8 +21,10 @@ import Nosotros from "../pages/Nosotros/Nosotros";
 import Privacidad from "../pages/Privacidad/Privacidad";
 import Terminos from "../pages/Terminos/Terminos";
 import Contacto from "../pages/Contacto/Contacto";
-import RecuperarPassword from "../pages/RecuperarPassword/RecuperarPassword";
-import RestablecerPassword from "../pages/RestablecerPassword/RestablecerPassword";
+
+//import RecuperarPassword from "../pages/RecuperarPassword/RecuperarPassword";
+//import RestablecerPassword from "../pages/RestablecerPassword/RestablecerPassword";
+
 import ComoAdoptar from "../pages/Adopcion/ComoAdoptar";
 
 
@@ -53,14 +55,9 @@ function AppRouter() {
                 <Route path="/privacidad" element={<Privacidad />} />
                 <Route path="/terminos" element={<Terminos />} />
                 <Route path="/contacto" element={<Contacto />} />
-                <Route
-                    path="/recuperar-password"
-                    element={<RecuperarPassword />}
-                />
-                <Route
-                    path="/restablecer-password"
-                    element={<RestablecerPassword />}
-                />
+
+                
+
                 <Route
                     path="/perfil"
                     element={

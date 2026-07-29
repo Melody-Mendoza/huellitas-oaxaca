@@ -1,30 +1,155 @@
-import { createContext, useContext, useState } from "react";
+import {
+    createContext,
+    useContext,
+    useEffect,
+    useState
+} from "react";
+import api, {
+    AUTH_UNAUTHORIZED_EVENT,
+    clearStoredSession,
+    readStoredSession,
+    writeStoredSession
+} from "../services/api";
 
 export const AuthContext = createContext();
 
 export function AuthProvider({ children }) {
+    const [session, setSession] = useState(
+        () => readStoredSession()
+    );
+    const [loading, setLoading] = useState(true);
 
-    const [user, setUser] = useState(null);
+    const saveSession = (nextSession) => {
+        setSession(nextSession);
 
-    const [token, setToken] = useState(null);
-
-    const login = (userData, jwt) => {
-        setUser(userData);
-        setToken(jwt);
+        if (nextSession) {
+            writeStoredSession(nextSession);
+        } else {
+            clearStoredSession();
+        }
     };
 
-    const logout = () => {
-        setUser(null);
-        setToken(null);
+    useEffect(() => {
+        let active = true;
+
+        const handleUnauthorized = () => {
+            if (active) {
+                clearStoredSession();
+                setSession(null);
+                setLoading(false);
+            }
+        };
+
+        const restoreSession = async () => {
+            const storedSession = readStoredSession();
+
+            if (!storedSession?.token) {
+                if (active) {
+                    setSession(null);
+                    setLoading(false);
+                }
+                return;
+            }
+
+            try {
+                const response = await api.get("/auth/me");
+
+                if (active) {
+                    const restoredSession = {
+                        token: storedSession.token,
+                        user: response.data
+                    };
+
+                    writeStoredSession(restoredSession);
+                    setSession(restoredSession);
+                }
+            } catch {
+                if (active) {
+                    clearStoredSession();
+                    setSession(null);
+                }
+            } finally {
+                if (active) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        window.addEventListener(
+            AUTH_UNAUTHORIZED_EVENT,
+            handleUnauthorized
+        );
+
+        restoreSession();
+
+        return () => {
+            active = false;
+            window.removeEventListener(
+                AUTH_UNAUTHORIZED_EVENT,
+                handleUnauthorized
+            );
+        };
+    }, []);
+
+    const login = async (credentials) => {
+        const response = await api.post(
+            "/auth/login",
+            credentials
+        );
+
+        const nextSession = {
+            token: response.data.token,
+            user: response.data.usuario
+        };
+
+        saveSession(nextSession);
+
+        return response.data;
+    };
+
+    const logout = async () => {
+        let logoutError = null;
+
+        try {
+            if (session?.token) {
+                await api.post("/auth/logout");
+            }
+        } catch (error) {
+            logoutError = error;
+        } finally {
+            saveSession(null);
+        }
+
+        if (logoutError) {
+            throw logoutError;
+        }
+    };
+
+    const updateUser = (updatedUser) => {
+        setSession((currentSession) => {
+            if (!currentSession?.token) {
+                return currentSession;
+            }
+
+            const nextSession = {
+                token: currentSession.token,
+                user: updatedUser
+            };
+
+            writeStoredSession(nextSession);
+            return nextSession;
+        });
     };
 
     return (
         <AuthContext.Provider
             value={{
-                user,
-                token,
+                user: session?.user ?? null,
+                token: session?.token ?? null,
+                loading,
                 login,
-                logout
+                logout,
+                updateUser
             }}
         >
             {children}
