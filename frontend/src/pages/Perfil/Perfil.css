@@ -1,0 +1,120 @@
+.perfil-page {
+    width: min(100% - 40px, 1000px);
+    margin: 0 auto;
+    padding: 48px 0 64px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 24px;
+}
+
+.perfil-page > h1 {
+    grid-column: 1 / -1;
+    color: #2F6E4F;
+    text-align: center;
+}
+
+.perfil-page section {
+    min-width: 0;
+    padding: 32px;
+    background: var(--surface);
+    border-radius: 20px;
+    box-shadow: var(--shadow);
+}
+
+.perfil-page section h2 {
+    margin-bottom: 24px;
+    color: var(--text);
+    font-size: 1.25rem;
+}
+
+.perfil-page form {
+    display: flex;
+    flex-direction: column;
+}
+
+.perfil-page label {
+    margin-bottom: 8px;
+    color: var(--text);
+    font-size: .9rem;
+    font-weight: 600;
+}
+
+.perfil-page input {
+    width: 100%;
+    min-width: 0;
+    min-height: 48px;
+    margin-bottom: 18px;
+    padding: 12px 14px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+    outline: none;
+    transition: border-color .2s, box-shadow .2s;
+}
+
+.perfil-page input:focus {
+    border-color: #2F6E4F;
+    box-shadow: 0 0 0 3px rgba(47, 110, 79, .12);
+}
+
+.perfil-page input:disabled {
+    background: #F1F3F1;
+    color: var(--text-light);
+    cursor: not-allowed;
+}
+
+.perfil-page .error {
+    margin-top: -10px;
+    margin-bottom: 14px;
+    color: var(--danger);
+    font-size: .82rem;
+}
+
+.perfil-page button[type="submit"] {
+    min-height: 48px;
+    margin-top: 8px;
+    padding: 12px 18px;
+    border: none;
+    border-radius: 10px;
+    background: #2F6E4F;
+    color: #fff;
+    font: inherit;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background .2s, opacity .2s;
+}
+
+.perfil-page button[type="submit"]:hover:not(:disabled) {
+    background: #24563D;
+}
+
+.perfil-page button[type="submit"]:disabled {
+    opacity: .7;
+    cursor: not-allowed;
+}
+
+@media(max-width: 768px) {
+    .perfil-page {
+        width: min(100% - 32px, 620px);
+        grid-template-columns: 1fr;
+        padding: 36px 0 48px;
+    }
+
+    .perfil-page > h1 {
+        grid-column: auto;
+    }
+}
+
+@media(max-width: 480px) {
+    .perfil-page {
+        width: calc(100% - 24px);
+        padding: 28px 0 40px;
+        gap: 18px;
+    }
+
+    .perfil-page section {
+        padding: 24px 18px;
+    }
+}

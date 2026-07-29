@@ -1,0 +1,42 @@
+.stories-container{
+
+    max-width:1200px;
+    margin:70px auto;
+    padding:0 20px;
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(320px,1fr));
+    gap:30px;
+
+}
+
+.story-card{
+    background:white;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow:0 10px 25px rgba(0,0,0,.08);
+    transition:.3s;
+}
+
+.story-card:hover{
+    transform:translateY(-6px);
+}
+
+.story-card img{
+    width:100%;
+    height:250px;
+    object-fit:cover;
+}
+
+.story-content{
+    padding:25px;
+}
+
+.story-content h2{
+    color:#2F6E4F;
+    margin-bottom:15px;
+}
+
+.story-content p{
+    color:#555;
+    line-height:1.7;
+}

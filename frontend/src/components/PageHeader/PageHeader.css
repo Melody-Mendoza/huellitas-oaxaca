@@ -1,0 +1,32 @@
+.page-header{
+    background:#F5F7F5;
+    padding:80px 20px;
+    text-align:center;
+}
+
+.page-header-content{
+    max-width:800px;
+    margin:auto;
+}
+
+.page-header h1{
+    font-size:2.7rem;
+    color:#2F6E4F;
+    margin-bottom:20px;
+}
+
+.page-header p{
+    color:#666;
+    line-height:1.7;
+    font-size:1.05rem;
+}
+
+@media(max-width:768px){
+
+.page-header h1{
+
+font-size:2rem;
+
+}
+
+}

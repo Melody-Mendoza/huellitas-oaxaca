@@ -14,15 +14,18 @@ import SolicitudAdopcion from "../pages/SolicitudAdopcion/SolicitudAdopcion";
 import NotFound from "../pages/NotFound/NotFound";
 import Perfil from "../pages/Perfil/Perfil";
 
-import Adopcion from "../pages/Adopcion/Adopcion";
+import Adopcion from "../pages/Adopcion/ComoAdoptar";
 import Historias from "../pages/Historias/Historias";
 import Nosotros from "../pages/Nosotros/Nosotros";
 
 import Privacidad from "../pages/Privacidad/Privacidad";
 import Terminos from "../pages/Terminos/Terminos";
 import Contacto from "../pages/Contacto/Contacto";
-import RecuperarPassword from "../pages/RecuperarPassword/RecuperarPassword";
-import RestablecerPassword from "../pages/RestablecerPassword/RestablecerPassword";
+
+//import RecuperarPassword from "../pages/RecuperarPassword/RecuperarPassword";
+//import RestablecerPassword from "../pages/RestablecerPassword/RestablecerPassword";
+
+import ComoAdoptar from "../pages/Adopcion/ComoAdoptar";
 
 
 function AppRouter() {
@@ -46,20 +49,15 @@ function AppRouter() {
                         </ProtectedRoute>
                     }
                 />
-                <Route path="/adopcion" element={<Adopcion />} />
+                <Route path="/adopcion" element={<ComoAdoptar />} />
                 <Route path="/historias" element={<Historias />} />
                 <Route path="/nosotros" element={<Nosotros />} />
                 <Route path="/privacidad" element={<Privacidad />} />
                 <Route path="/terminos" element={<Terminos />} />
                 <Route path="/contacto" element={<Contacto />} />
-                <Route
-                    path="/recuperar-password"
-                    element={<RecuperarPassword />}
-                />
-                <Route
-                    path="/restablecer-password"
-                    element={<RestablecerPassword />}
-                />
+
+                
+
                 <Route
                     path="/perfil"
                     element={
