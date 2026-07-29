@@ -1,0 +1,38 @@
+meta {
+  name: 03 - Registro inválido
+  type: http
+  seq: 3
+}
+
+post {
+  url: {{baseUrl}}/auth/registro
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "nombre": "",
+    "apellidoPaterno": "",
+    "apellidoMaterno": "ApellidoMaternoDemasiadoLargo",
+    "correo": "correo-invalido",
+    "password": "",
+    "telefono": "95112"
+  }
+}
+
+tests {
+  test("devuelve 400", function() {
+    expect(res.status).to.equal(400);
+  });
+
+  test("informa campos inválidos", function() {
+    expect(res.body.message).to.equal("Existen campos inválidos");
+    expect(res.body.validationErrors).to.be.an("object");
+  });
+}

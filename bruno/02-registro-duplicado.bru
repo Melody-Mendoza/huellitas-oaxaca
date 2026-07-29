@@ -1,0 +1,37 @@
+meta {
+  name: 02 - Registro duplicado
+  type: http
+  seq: 2
+}
+
+post {
+  url: {{baseUrl}}/auth/registro
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "nombre": "Mel",
+    "apellidoPaterno": "Perez",
+    "apellidoMaterno": "Reyes",
+    "correo": "{{correoPrueba}}",
+    "password": "{{passwordInicial}}",
+    "telefono": "9511234567"
+  }
+}
+
+tests {
+  test("devuelve 422", function() {
+    expect(res.status).to.equal(422);
+  });
+  
+  test("informa correo duplicado", function() {
+    expect(res.body.message).to.equal("Ya existe un usuario registrado con ese correo");
+  });
+}

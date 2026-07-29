@@ -1,0 +1,30 @@
+meta {
+  name: 23 - Consultar foto reemplazada
+  type: http
+  seq: 23
+}
+
+get {
+  url: {{baseUrl}}/perfil
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("devuelve 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("devuelve únicamente la foto reemplazada", function() {
+    expect(res.body.fotoPerfil).to.equal(bru.getVar("fotoPerfilNueva"));
+    expect(res.body.fotoPerfil).to.not.equal(bru.getVar("fotoPerfilInicial"));
+  });
+}

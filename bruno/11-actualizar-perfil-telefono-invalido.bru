@@ -1,0 +1,39 @@
+meta {
+  name: 11 - Actualizar perfil - Teléfono inválido
+  type: http
+  seq: 11
+}
+
+put {
+  url: {{baseUrl}}/perfil
+  body: json
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "nombre": "Mel",
+    "apellidoPaterno": "Santos",
+    "apellidoMaterno": "Reyes",
+    "telefono": "95112ABC"
+  }
+}
+
+tests {
+  test("devuelve 400", function() {
+    expect(res.status).to.equal(400);
+  });
+  
+  test("rechaza el teléfono inválido", function() {
+    expect(res.body.validationErrors.telefono).to.equal("El teléfono debe contener 10 dígitos");
+  });
+}
