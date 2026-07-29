@@ -6,6 +6,7 @@ import javax.crypto.spec.SecretKeySpec;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationProvider;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
@@ -149,6 +150,14 @@ public class SecurityConfig
         .authenticationProvider(authenticationProvider)
         .authorizeHttpRequests(authorize ->
                 authorize
+                        .requestMatchers(
+                                HttpMethod.GET,
+                                "/media/perfiles/**"
+                        ).permitAll()
+                        .requestMatchers(
+                                HttpMethod.HEAD,
+                                "/media/perfiles/**"
+                        ).permitAll()
                         .requestMatchers(
                                 "/api/auth/registro",
                                 "/api/auth/login",

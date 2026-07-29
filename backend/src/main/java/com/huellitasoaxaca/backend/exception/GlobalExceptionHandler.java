@@ -13,6 +13,9 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RestControllerAdvice;
+import org.springframework.web.multipart.MaxUploadSizeExceededException;
+import org.springframework.web.multipart.support.MissingServletRequestPartException;
+import org.springframework.web.servlet.resource.NoResourceFoundException;
 
 import com.huellitasoaxaca.backend.dto.response.ErrorResponse;
 
@@ -144,6 +147,72 @@ public class GlobalExceptionHandler
 
                 return ResponseEntity
                         .status(HttpStatus.UNPROCESSABLE_ENTITY)
+                        .body(respuesta);
+        }
+
+        @ExceptionHandler(FotoPerfilException.class)
+        public ResponseEntity<ErrorResponse> manejarFotoPerfil(
+                FotoPerfilException exception,
+                HttpServletRequest request
+        )
+        {
+                ErrorResponse respuesta = crearError(
+                        exception.getStatus(),
+                        exception.getMessage(),
+                        request.getRequestURI()
+                );
+
+                return ResponseEntity
+                        .status(exception.getStatus())
+                        .body(respuesta);
+        }
+
+        @ExceptionHandler(MissingServletRequestPartException.class)
+        public ResponseEntity<ErrorResponse> manejarParteMultipartAusente(
+                MissingServletRequestPartException exception,
+                HttpServletRequest request
+        )
+        {
+                ErrorResponse respuesta = crearError(
+                        HttpStatus.BAD_REQUEST,
+                        "Debe enviar el archivo en el campo 'foto'",
+                        request.getRequestURI()
+                );
+
+                return ResponseEntity.badRequest().body(respuesta);
+        }
+
+        @ExceptionHandler(MaxUploadSizeExceededException.class)
+        public ResponseEntity<ErrorResponse> manejarTamanoExcedido(
+                MaxUploadSizeExceededException exception,
+                HttpServletRequest request
+        )
+        {
+                ErrorResponse respuesta = crearError(
+                        HttpStatus.PAYLOAD_TOO_LARGE,
+                        "La foto no debe superar 5 MiB",
+                        request.getRequestURI()
+                );
+
+                return ResponseEntity
+                        .status(HttpStatus.PAYLOAD_TOO_LARGE)
+                        .body(respuesta);
+        }
+
+        @ExceptionHandler(NoResourceFoundException.class)
+        public ResponseEntity<ErrorResponse> manejarRecursoInexistente(
+                NoResourceFoundException exception,
+                HttpServletRequest request
+        )
+        {
+                ErrorResponse respuesta = crearError(
+                        HttpStatus.NOT_FOUND,
+                        "No se encontró el recurso solicitado",
+                        request.getRequestURI()
+                );
+
+                return ResponseEntity
+                        .status(HttpStatus.NOT_FOUND)
                         .body(respuesta);
         }
 
