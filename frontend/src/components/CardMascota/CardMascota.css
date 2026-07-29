@@ -1,114 +1,132 @@
-.card-mascota{
-    background:#fff;
-    border-radius:18px;
-    overflow:hidden;
-    box-shadow:0 6px 18px rgba(0,0,0,.08);
-    transition:.3s;
-    display:flex;
-    flex-direction:column;
-    height:100%;
+.card-mascota {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+    border-radius: 18px;
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    transition: transform .2s, box-shadow .2s;
 }
 
-.card-mascota:hover{
-    transform:translateY(-4px);
+.card-mascota:hover {
+    transform: translateY(-4px);
 }
 
-.card-image{
-    position:relative;
+.card-image {
+    position: relative;
+    min-height: 220px;
+    background: var(--background);
 }
 
-.card-image img{
-    width:100%;
-    height:220px;
-    object-fit:cover;
+.card-image img {
+    width: 100%;
+    height: 220px;
+    display: block;
+    object-fit: cover;
 }
 
-.status-badge{
-    position:absolute;
-    top:12px;
-    left:12px;
-    background:#EAF7EE;
-    color:#2F6E4F;
-    padding:5px 12px;
-    border-radius:30px;
-    font-size:.75rem;
-    font-weight:600;
+.card-image img[src*="logo"] {
+    padding: 36px;
+    object-fit: contain;
 }
 
-.status-badge.urgent{
-    background:#FEE2E2;
-    color:#B91C1C;
+.status-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    padding: 5px 12px;
+    border-radius: 30px;
+    background: #eaf7ee;
+    color: var(--primary);
+    font-size: .75rem;
+    font-weight: 700;
 }
 
-.favorite-btn{
-    position:absolute;
-    top:12px;
-    right:12px;
-    width:38px;
-    height:38px;
-    border:none;
-    border-radius:50%;
-    background:#fff;
-    display:flex;
-    justify-content:center;
-    align-items:center;
-    cursor:pointer;
-    transition:.3s;
+.card-body {
+    height: 100%;
+    padding: 18px;
+    display: flex;
+    flex-direction: column;
 }
 
-.favorite-btn:hover{
-    background:#F7F7F7;
+.card-header {
+    margin-bottom: 10px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
 }
 
-.card-body{
-    padding:18px;
-    display:flex;
-flex-direction:column;
-height:100%;
+.card-header h2 {
+    color: var(--primary);
+    font-size: 1.2rem;
 }
 
-.card-header{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    margin-bottom:12px;
+.card-species,
+.card-breed {
+    color: var(--text-light);
+    font-size: .85rem;
 }
 
-.card-header h3{
-    color:#2F6E4F;
-    font-size:1.2rem;
+.card-species {
+    margin-top: 4px;
 }
 
-.age-badge{
-    background:#DDEFD8;
-    color:#2F6E4F;
-    padding:4px 10px;
-    border-radius:15px;
-    font-size:.75rem;
-    font-weight:600;
+.card-breed {
+    margin-bottom: 4px;
 }
 
-.info{
-    display:flex;
-    align-items:center;
-    gap:8px;
-    color:#666;
-    margin:8px 0;
-    font-size:.9rem;
+.age-badge {
+    flex: 0 0 auto;
+    padding: 4px 10px;
+    border-radius: 15px;
+    background: #ddefd8;
+    color: var(--primary);
+    font-size: .75rem;
+    font-weight: 600;
 }
 
-.details-btn{
-    display:block;
-    margin-top:auto;
-    text-align:center;
-    background:#2F6E4F;
-    color:#fff;
-    text-decoration:none;
-    padding:12px;
-    border-radius:8px;
-    transition:.3s;
+.info {
+    margin: 8px 0;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    color: var(--text-light);
+    font-size: .9rem;
+    line-height: 1.4;
 }
 
-.details-btn:hover{
-    background:#24563D;
+.info svg {
+    flex: 0 0 auto;
+    margin-top: 2px;
+}
+
+.details-btn {
+    min-height: 44px;
+    margin-top: auto;
+    padding: 12px;
+    display: block;
+    border-radius: 8px;
+    background: var(--primary);
+    color: var(--surface);
+    text-align: center;
+    text-decoration: none;
+    transition: filter .2s;
+}
+
+.details-btn:hover {
+    filter: brightness(.9);
+}
+
+.details-btn:focus-visible {
+    outline: 3px solid rgba(76, 175, 80, .3);
+    outline-offset: 3px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .card-mascota,
+    .details-btn {
+        transition: none;
+    }
 }
