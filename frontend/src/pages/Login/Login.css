@@ -65,15 +65,6 @@
     font-size: .95rem;
 }
 
-.login-card .input-group input {
-    flex: 1;
-    min-width: 0;
-    border: none;
-    outline: none;
-    margin-left: 10px;
-    font-size: .95rem;
-}
-
 .forgot {
     text-align: right;
     margin-bottom: 20px;
@@ -123,9 +114,16 @@
     font-weight: 500;
 }
 
-.login-button:disabled{
+.login-button:disabled,
+.google-button:disabled {
     opacity:.7;
     cursor:not-allowed;
+}
+
+.login-button:focus-visible,
+.google-button:focus-visible {
+    outline: 3px solid rgba(71, 102, 70, .35);
+    outline-offset: 3px;
 }
 
 .divider {
@@ -164,7 +162,7 @@
     transition: .25s;
 }
 
-.google-button:hover {
+.google-button:hover:not(:disabled) {
     background: #f5f5f5;
     border-color: #bbb;
 }

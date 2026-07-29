@@ -17,6 +17,9 @@ import jakarta.persistence.LockModeType;
 public interface UsuarioRepository extends JpaRepository<Usuario, Long> 
 {
 
+    @EntityGraph(attributePaths = "rol")
+    Optional<Usuario> findByFirebaseUid(String firebaseUid);
+
     Optional<Usuario> findByCorreo(String correo);
 
     boolean existsByCorreo(String correo);
@@ -35,6 +38,17 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long>
               AND usuario.activo = true
             """)
     Optional<Usuario> findActivoPorCorreoParaActualizar(
+            @Param("correo") String correo
+    );
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @EntityGraph(attributePaths = "rol")
+    @Query("""
+            SELECT usuario
+            FROM Usuario usuario
+            WHERE usuario.correo = :correo
+            """)
+    Optional<Usuario> findPorCorreoParaActualizar(
             @Param("correo") String correo
     );
 

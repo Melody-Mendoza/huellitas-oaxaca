@@ -15,6 +15,8 @@ import org.springframework.security.oauth2.jwt.JwtEncoder;
 import org.springframework.security.oauth2.jwt.JwtEncoderParameters;
 import org.springframework.stereotype.Service;
 
+import com.huellitasoaxaca.backend.entity.Usuario;
+
 import lombok.RequiredArgsConstructor;
 
 @Service
@@ -29,7 +31,34 @@ public class JwtService
         @Value("${security.jwt.issuer}")
         private String issuer;
 
-        public String generarToken(UserDetails userDetails) {
+        public String generarToken(UserDetails userDetails)
+        {
+                List<String> roles = userDetails.getAuthorities()
+                        .stream()
+                        .map(GrantedAuthority::getAuthority)
+                        .toList();
+
+                return generarToken(
+                        userDetails.getUsername(),
+                        roles
+                );
+        }
+
+        public String generarToken(Usuario usuario)
+        {
+                return generarToken(
+                        usuario.getCorreo(),
+                        List.of(
+                                "ROLE_" + usuario.getRol().getNombre()
+                        )
+                );
+        }
+
+        private String generarToken(
+                String correo,
+                List<String> roles
+        )
+        {
                 Instant ahora = Instant.now();
                 Instant expiracion = ahora.plus(
                         expirationMinutes,
@@ -38,17 +67,12 @@ public class JwtService
 
                 String jti = UUID.randomUUID().toString();
 
-                List<String> roles = userDetails.getAuthorities()
-                        .stream()
-                        .map(GrantedAuthority::getAuthority)
-                        .toList();
-
                 JwtClaimsSet claims = JwtClaimsSet.builder()
                         .id(jti)
                         .issuer(issuer)
                         .issuedAt(ahora)
                         .expiresAt(expiracion)
-                        .subject(userDetails.getUsername())
+                        .subject(correo)
                         .claim("roles", roles)
                         .build();
 

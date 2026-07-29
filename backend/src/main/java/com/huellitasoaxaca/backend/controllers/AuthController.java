@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.huellitasoaxaca.backend.dto.request.LoginRequest;
+import com.huellitasoaxaca.backend.dto.request.GoogleLoginRequest;
 import com.huellitasoaxaca.backend.dto.request.RecuperarPasswordRequest;
 import com.huellitasoaxaca.backend.dto.request.RestablecerPasswordRequest;
 import com.huellitasoaxaca.backend.dto.request.UsuarioRegistroRequest;
@@ -48,6 +49,16 @@ public class AuthController
         ) 
         {
                 return ResponseEntity.ok(authService.login(request));
+        }
+
+        @PostMapping("/google")
+        public ResponseEntity<AuthResponse> loginGoogle(
+                @Valid @RequestBody GoogleLoginRequest request
+        )
+        {
+                return ResponseEntity.ok(
+                        authService.loginGoogle(request)
+                );
         }
 
         @GetMapping("/me")

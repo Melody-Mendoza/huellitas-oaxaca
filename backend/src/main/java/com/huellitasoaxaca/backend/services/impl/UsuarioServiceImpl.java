@@ -191,6 +191,13 @@ public class UsuarioServiceImpl implements UsuarioService
                                 )
                         );
 
+                if (usuario.getPassword() == null)
+                {
+                        throw new ReglaNegocioException(
+                                "No fue posible cambiar la contraseña"
+                        );
+                }
+
                 if (!passwordEncoder.matches(request.passwordActual(),usuario.getPassword()))
                 {
                         throw new ReglaNegocioException(

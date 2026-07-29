@@ -150,6 +150,23 @@ public class GlobalExceptionHandler
                         .body(respuesta);
         }
 
+        @ExceptionHandler(GoogleAuthenticationException.class)
+        public ResponseEntity<ErrorResponse> manejarAutenticacionGoogle(
+                GoogleAuthenticationException exception,
+                HttpServletRequest request
+        )
+        {
+                ErrorResponse respuesta = crearError(
+                        exception.getStatus(),
+                        exception.getMessage(),
+                        request.getRequestURI()
+                );
+
+                return ResponseEntity
+                        .status(exception.getStatus())
+                        .body(respuesta);
+        }
+
         @ExceptionHandler(FotoPerfilException.class)
         public ResponseEntity<ErrorResponse> manejarFotoPerfil(
                 FotoPerfilException exception,
