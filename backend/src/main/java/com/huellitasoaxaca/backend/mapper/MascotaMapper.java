@@ -3,12 +3,36 @@ package com.huellitasoaxaca.backend.mapper;
 import org.springframework.stereotype.Component;
 
 import com.huellitasoaxaca.backend.dto.response.MascotaResponse;
+import com.huellitasoaxaca.backend.dto.response.MascotaCatalogoResponse;
+import com.huellitasoaxaca.backend.dto.response.RefugioCatalogoResponse;
 import com.huellitasoaxaca.backend.entity.Mascota;
 import com.huellitasoaxaca.backend.entity.Refugio;
 
 @Component
 public class MascotaMapper 
 {
+    public MascotaCatalogoResponse toCatalogoResponse(Mascota mascota)
+    {
+        Refugio refugio = mascota.getRefugio();
+
+        return new MascotaCatalogoResponse(
+                mascota.getId(),
+                mascota.getNombre(),
+                mascota.getEspecie(),
+                mascota.getRaza(),
+                mascota.getEdad(),
+                mascota.getSexo(),
+                mascota.getTamano(),
+                mascota.getEstado(),
+                mascota.getImagen(),
+                new RefugioCatalogoResponse(
+                        refugio.getId(),
+                        refugio.getNombre(),
+                        refugio.getDireccion()
+                )
+        );
+    }
+
     public MascotaResponse toResponse(Mascota mascota) 
     {
         if (mascota == null) 
@@ -27,7 +51,6 @@ public class MascotaMapper
                 mascota.getEdad(),
                 mascota.getPeso(),
                 mascota.getTamano(),
-                mascota.getColor(),
                 mascota.getDescripcion(),
                 mascota.getEstado(),
                 mascota.getFechaIngreso(),

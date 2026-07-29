@@ -4,11 +4,26 @@ import com.huellitasoaxaca.backend.entity.Mascota;
 import com.huellitasoaxaca.backend.entity.enums.Especie;
 import com.huellitasoaxaca.backend.entity.enums.EstadoMascota;
 import java.util.List;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface MascotaRepository extends JpaRepository<Mascota, Long> {
+public interface MascotaRepository extends
+        JpaRepository<Mascota, Long>,
+        JpaSpecificationExecutor<Mascota>
+{
+
+    @Override
+    @EntityGraph(attributePaths = "refugio")
+    Page<Mascota> findAll(
+            Specification<Mascota> specification,
+            Pageable pageable
+    );
 
     List<Mascota> findByEstado(EstadoMascota estado);
 

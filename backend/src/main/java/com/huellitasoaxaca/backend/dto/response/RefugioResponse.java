@@ -7,7 +7,6 @@ public record RefugioResponse(
     String direccion,
     String telefono,
     String correo,
-    String sitioWeb,
     Boolean activo,
     Long usuarioId,
     String nombreResponsable
