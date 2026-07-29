@@ -1,0 +1,40 @@
+meta {
+  name: 14 - Actualizar perfil válido
+  type: http
+  seq: 14
+}
+
+put {
+  url: {{baseUrl}}/perfil
+  body: json
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+body:json {
+  {
+    "nombre": "Mel",
+    "apellidoPaterno": "Santos",
+    "apellidoMaterno": "Reyes",
+    "telefono": "9517654321"
+  }
+}
+
+tests {
+  test("devuelve 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  
+  test("devuelve los datos actualizados", function() {
+    expect(res.body.nombre).to.equal("Lucia Elena");
+    expect(res.body.telefono).to.equal("9517654321");
+  });
+}

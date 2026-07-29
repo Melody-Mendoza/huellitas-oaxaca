@@ -1,0 +1,29 @@
+meta {
+  name: 29 - Eliminar foto
+  type: http
+  seq: 29
+}
+
+delete {
+  url: {{baseUrl}}/perfil/foto
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{token}}
+}
+
+tests {
+  test("devuelve 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("elimina la foto del perfil", function() {
+    expect(res.body.fotoPerfil).to.equal(null);
+  });
+}
