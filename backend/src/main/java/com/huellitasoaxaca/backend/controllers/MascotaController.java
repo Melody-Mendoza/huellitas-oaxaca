@@ -3,11 +3,13 @@ package com.huellitasoaxaca.backend.controllers;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.huellitasoaxaca.backend.dto.response.MascotaCatalogoResponse;
+import com.huellitasoaxaca.backend.dto.response.MascotaDetalleResponse;
 import com.huellitasoaxaca.backend.entity.enums.Especie;
 import com.huellitasoaxaca.backend.entity.enums.SexoMascota;
 import com.huellitasoaxaca.backend.entity.enums.TamanoMascota;
@@ -21,6 +23,14 @@ import lombok.RequiredArgsConstructor;
 public class MascotaController
 {
     private final MascotaService mascotaService;
+
+    @GetMapping("/{id}")
+    public ResponseEntity<MascotaDetalleResponse> obtenerDetalle(
+            @PathVariable Long id
+    )
+    {
+        return ResponseEntity.ok(mascotaService.obtenerDetallePublico(id));
+    }
 
     @GetMapping
     public ResponseEntity<Page<MascotaCatalogoResponse>> listar(

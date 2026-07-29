@@ -12,7 +12,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.huellitasoaxaca.backend.dto.response.MascotaCatalogoResponse;
+import com.huellitasoaxaca.backend.dto.response.MascotaDetalleResponse;
 import com.huellitasoaxaca.backend.dto.response.MascotaResponse;
+import com.huellitasoaxaca.backend.entity.ImagenMascota;
 import com.huellitasoaxaca.backend.entity.Mascota;
 import com.huellitasoaxaca.backend.entity.enums.Especie;
 import com.huellitasoaxaca.backend.entity.enums.EstadoMascota;
@@ -22,6 +24,7 @@ import com.huellitasoaxaca.backend.exception.ParametroInvalidoException;
 import com.huellitasoaxaca.backend.exception.RecursoNoEncontradoException;
 import com.huellitasoaxaca.backend.mapper.MascotaMapper;
 import com.huellitasoaxaca.backend.repository.MascotaRepository;
+import com.huellitasoaxaca.backend.repository.ImagenMascotaRepository;
 import com.huellitasoaxaca.backend.services.MascotaService;
 
 import lombok.RequiredArgsConstructor;
@@ -45,7 +48,34 @@ public class MascotaServiceImpl implements MascotaService
     );
 
     private final MascotaRepository mascotaRepository;
+    private final ImagenMascotaRepository imagenMascotaRepository;
     private final MascotaMapper mascotaMapper;
+
+    @Override
+    public MascotaDetalleResponse obtenerDetallePublico(Long id)
+    {
+        Mascota mascota = mascotaRepository
+                .findByIdAndEstadoAndRefugioActivoTrue(
+                        id,
+                        EstadoMascota.DISPONIBLE
+                )
+                .orElseThrow(() ->
+                        new RecursoNoEncontradoException(
+                                "No se encontró la mascota solicitada"
+                        )
+                );
+
+        List<String> imagenesAdicionales = imagenMascotaRepository
+                .findByMascotaIdOrderByIdAsc(id)
+                .stream()
+                .map(ImagenMascota::getUrl)
+                .toList();
+
+        return mascotaMapper.toDetalleResponse(
+                mascota,
+                imagenesAdicionales
+        );
+    }
 
     @Override
     public Page<MascotaCatalogoResponse> listarCatalogo(

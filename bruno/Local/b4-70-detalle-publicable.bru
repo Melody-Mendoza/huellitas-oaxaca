@@ -1,0 +1,28 @@
+meta {
+  name: B4 - 70 - Detalle publicable
+  type: http
+  seq: 70
+}
+
+get {
+  url: {{baseUrl}}/mascotas/{{mascotaId}}
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+tests {
+  test("devuelve 200 y el detalle público", function() {
+    expect(res.status).to.equal(200);
+    expect(res.body.id).to.equal(Number(bru.getVar("mascotaId")));
+    expect(res.body.estado).to.equal("DISPONIBLE");
+    expect(res.body.refugio).to.be.an("object");
+  });
+}
+
+docs {
+  Configura mascotaId con una mascota DISPONIBLE perteneciente a un refugio activo.
+}

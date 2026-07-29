@@ -2,6 +2,7 @@ package com.huellitasoaxaca.backend.services;
 
 import com.huellitasoaxaca.backend.dto.response.MascotaResponse;
 import com.huellitasoaxaca.backend.dto.response.MascotaCatalogoResponse;
+import com.huellitasoaxaca.backend.dto.response.MascotaDetalleResponse;
 import com.huellitasoaxaca.backend.entity.enums.Especie;
 import com.huellitasoaxaca.backend.entity.enums.EstadoMascota;
 import com.huellitasoaxaca.backend.entity.enums.SexoMascota;
@@ -13,6 +14,8 @@ import java.util.List;
 
 public interface MascotaService 
 {
+    MascotaDetalleResponse obtenerDetallePublico(Long id);
+
     Page<MascotaCatalogoResponse> listarCatalogo(
             String nombre,
             Especie especie,

@@ -1,0 +1,21 @@
+meta {
+  name: B4 - 77 - ID con formato inválido
+  type: http
+  seq: 77
+}
+
+get {
+  url: {{baseUrl}}/mascotas/id-invalido
+  body: none
+  auth: none
+}
+
+headers {
+  Accept: application/json
+}
+
+tests {
+  test("devuelve error controlado", function() {
+    expect(res.status).to.equal(400);
+  });
+}
