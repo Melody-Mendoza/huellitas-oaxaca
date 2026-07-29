@@ -1,0 +1,38 @@
+meta {
+  name: 32 - Login con Google - Estructura
+  type: http
+  seq: 32
+}
+
+post {
+  url: {{baseUrl}}/auth/google
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "idToken": "{{firebaseIdToken}}"
+  }
+}
+
+script:post-response {
+  if (res.status === 200 && res.body?.token) {
+    bru.setVar("authToken", res.body.token);
+  }
+}
+
+tests {
+  test("devuelve autenticación o rechazo controlado", function() {
+    expect([200, 400, 401]).to.include(res.status);
+  });
+}
+
+docs {
+  Completa firebaseIdToken como secreto con un ID token obtenido legítimamente desde el frontend. No registres ni guardes el token en archivos.
+}

@@ -1,0 +1,29 @@
+meta {
+  name: 07 - Restaurar sesión - Auth Me
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/auth/me
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+tests {
+  test("devuelve 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  test("devuelve usuario sin contraseña", function() {
+    expect(res.body.correo).to.be.a("string").and.not.empty;
+    expect(res.body).to.not.have.property("password");
+  });
+}

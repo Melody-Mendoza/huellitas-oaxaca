@@ -1,0 +1,30 @@
+meta {
+  name: 07 - Restaurar sesión - Auth Me
+  type: http
+  seq: 7
+}
+
+get {
+  url: {{baseUrl}}/auth/me
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+tests {
+  test("devuelve 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("restaura el usuario autenticado", function() {
+    expect(res.body.correo).to.equal(bru.getVar("correoPrueba"));
+    expect(res.body.activo).to.equal(true);
+  });
+}

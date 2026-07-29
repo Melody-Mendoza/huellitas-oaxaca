@@ -1,0 +1,36 @@
+meta {
+  name: NO EJECUTAR - 22 - Reemplazar foto por PNG válida
+  type: http
+  seq: 22
+}
+
+patch {
+  url: {{baseUrl}}/perfil/foto
+  body: multipart-form
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+body:multipart-form {
+  foto: @file() @contentType(image/png)
+}
+
+tests {
+  test("devuelve 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  test("devuelve ruta de foto", function() {
+    expect(res.body.fotoPerfil).to.be.a("string").and.not.empty;
+  });
+}
+
+docs {
+  Reemplaza la foto existente. No ejecutar automáticamente en VPS.
+}

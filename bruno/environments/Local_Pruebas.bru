@@ -1,11 +1,14 @@
 vars {
   baseUrl: http://localhost:1929/api
-  correoPrueba: huellitas.prueba.02@example.com
-  ~passwordInicial: Prueba#2607
-  ~passwordNueva: Nueva#2707
+  correoPrueba: usuario-prueba-alternativo@example.invalid
   mediaBaseUrl: http://localhost:1929
+  usuarioId: 0
 }
+
 vars:secret [
   passwordInicial,
-  passwordNueva
+  passwordNueva,
+  authToken,
+  firebaseIdToken,
+  recoveryToken
 ]

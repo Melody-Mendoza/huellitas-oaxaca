@@ -1,0 +1,42 @@
+meta {
+  name: NO EJECUTAR - 14 - Actualizar perfil válido
+  type: http
+  seq: 14
+}
+
+put {
+  url: {{baseUrl}}/perfil
+  body: json
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+body:json {
+  {
+    "nombre": "Usuario",
+    "apellidoPaterno": "Demostracion",
+    "apellidoMaterno": "VPS",
+    "telefono": "9517654321"
+  }
+}
+
+tests {
+  test("devuelve 200", function() {
+    expect(res.status).to.equal(200);
+  });
+  test("no expone contraseña", function() {
+    expect(res.body).to.not.have.property("password");
+  });
+}
+
+docs {
+  Modifica el perfil autenticado. Ejecutar sólo sobre una cuenta de demostración identificada.
+}

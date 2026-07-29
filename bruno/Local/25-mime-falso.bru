@@ -1,0 +1,37 @@
+meta {
+  name: 25 - MIME falso
+  type: http
+  seq: 25
+}
+
+patch {
+  url: {{baseUrl}}/perfil/foto
+  body: multipart-form
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+body:multipart-form {
+  foto: @file() @contentType(image/jpeg)
+}
+
+tests {
+  test("devuelve 415", function() {
+    expect(res.status).to.equal(415);
+  });
+
+  test("detecta que MIME y contenido no coinciden", function() {
+    expect(res.body.message).to.equal("El tipo declarado no corresponde al contenido de la foto");
+  });
+}
+
+docs {
+  Selecciona un PNG válido renombrado con extensión .jpg. La parte se declara image/jpeg para probar la discordancia real.
+}

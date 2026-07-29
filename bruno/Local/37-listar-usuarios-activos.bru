@@ -1,0 +1,32 @@
+meta {
+  name: 37 - Listar usuarios activos - ADMIN
+  type: http
+  seq: 37
+}
+
+get {
+  url: {{baseUrl}}/usuarios/activos
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+tests {
+  test("devuelve 200 para ADMIN", function() {
+    expect(res.status).to.equal(200);
+  });
+  test("devuelve sólo usuarios activos", function() {
+    expect(res.body).to.be.an("array");
+    res.body.forEach(function(usuario) {
+      expect(usuario.activo).to.equal(true);
+      expect(usuario).to.not.have.property("password");
+    });
+  });
+}

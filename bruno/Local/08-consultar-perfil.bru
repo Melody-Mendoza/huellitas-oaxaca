@@ -1,0 +1,30 @@
+meta {
+  name: 08 - Consultar perfil
+  type: http
+  seq: 8
+}
+
+get {
+  url: {{baseUrl}}/perfil
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+tests {
+  test("devuelve 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("devuelve el perfil autenticado", function() {
+    expect(res.body.correo).to.equal(bru.getVar("correoPrueba"));
+    expect(res.body.rol.nombre).to.equal("USUARIO");
+  });
+}

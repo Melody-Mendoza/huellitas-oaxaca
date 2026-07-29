@@ -1,0 +1,31 @@
+meta {
+  name: 35 - Listar usuarios - ADMIN
+  type: http
+  seq: 35
+}
+
+get {
+  url: {{baseUrl}}/usuarios
+  body: none
+  auth: bearer
+}
+
+headers {
+  Accept: application/json
+}
+
+auth:bearer {
+  token: {{authToken}}
+}
+
+tests {
+  test("devuelve 200 para ADMIN", function() {
+    expect(res.status).to.equal(200);
+  });
+  test("devuelve lista sin contraseñas", function() {
+    expect(res.body).to.be.an("array");
+    res.body.forEach(function(usuario) {
+      expect(usuario).to.not.have.property("password");
+    });
+  });
+}

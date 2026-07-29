@@ -1,0 +1,41 @@
+meta {
+  name: 06 - Login válido
+  type: http
+  seq: 6
+}
+
+post {
+  url: {{baseUrl}}/auth/login
+  body: json
+  auth: none
+}
+
+headers {
+  Accept: application/json
+  Content-Type: application/json
+}
+
+body:json {
+  {
+    "correo": "{{correoPrueba}}",
+    "password": "{{passwordInicial}}"
+  }
+}
+
+script:post-response {
+  if (res.status === 200 && res.body?.token) {
+    bru.setVar("authToken", res.body.token);
+  }
+}
+
+tests {
+  test("devuelve 200", function() {
+    expect(res.status).to.equal(200);
+  });
+
+  test("devuelve autenticación Bearer", function() {
+    expect(res.body.tipo).to.equal("Bearer");
+    expect(res.body.token).to.be.a("string").and.not.empty;
+    expect(res.body.expiresIn).to.equal(3600);
+  });
+}
