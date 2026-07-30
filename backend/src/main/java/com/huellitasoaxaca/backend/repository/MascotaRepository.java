@@ -48,6 +48,13 @@ public interface MascotaRepository extends
 
     List<Mascota> findByRefugioId(Long refugioId);
 
+    long countByRefugioId(Long refugioId);
+
+    long countByRefugioIdAndEstado(
+            Long refugioId,
+            EstadoMascota estado
+    );
+
     List<Mascota> findByNombreContainingIgnoreCase(String nombre);
 
     List<Mascota> findByEspecieAndEstado(
