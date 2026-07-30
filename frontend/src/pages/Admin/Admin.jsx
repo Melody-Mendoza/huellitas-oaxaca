@@ -6,6 +6,7 @@ import toast from "react-hot-toast";
 
 import Loader from "../../components/Loader/Loader";
 import Modal from "../../components/Modal/Modal";
+import Pagination from "../../components/Pagination/Pagination";
 import { useAuth } from "../../context/AuthContext";
 import api from "../../services/api";
 
@@ -97,359 +98,101 @@ function getRequestErrorMessage(error) {
     }
 }
 
+function isValidPage(data) {
+    return Boolean(data && Array.isArray(data.content) && Number.isInteger(data.number)
+        && Number.isInteger(data.totalPages) && Number.isInteger(data.totalElements)
+        && typeof data.first === "boolean" && typeof data.last === "boolean");
+}
+
 function Admin() {
     const { user: authenticatedUser } = useAuth();
-
-    const [users, setUsers] = useState([]);
+    const [filters, setFilters] = useState({ texto: "", rol: "", activo: "" });
+    const [draftFilters, setDraftFilters] = useState(filters);
+    const [page, setPage] = useState(0);
+    const [pageData, setPageData] = useState(null);
     const [loading, setLoading] = useState(true);
     const [loadError, setLoadError] = useState("");
-    const [retryVersion, setRetryVersion] =
-        useState(0);
-    const [updatingUserId, setUpdatingUserId] =
-        useState(null);
+    const [retryVersion, setRetryVersion] = useState(0);
+    const [updatingUserId, setUpdatingUserId] = useState(null);
 
     useEffect(() => {
         const controller = new AbortController();
-
         const loadUsers = async () => {
             setLoading(true);
             setLoadError("");
-
             try {
-                const response = await api.get(
-                    "/usuarios",
-                    {
-                        signal: controller.signal
-                    }
-                );
-
-                const receivedUsers =
-                    Array.isArray(response.data)
-                        ? response.data
-                        : [];
-
-                setUsers(receivedUsers);
-            } catch (error) {
-                if (
-                    error.code === "ERR_CANCELED"
-                    || controller.signal.aborted
-                ) {
+                const params = { page, size: 10, sort: "fechaRegistro,desc" };
+                Object.entries(filters).forEach(([key, value]) => {
+                    if (value) params[key] = value;
+                });
+                const response = await api.get("/admin/usuarios", { params, signal: controller.signal });
+                if (!isValidPage(response.data)) {
+                    setLoadError("El backend devolvió una página de usuarios no compatible.");
                     return;
                 }
-
-                setLoadError(
-                    getRequestErrorMessage(error)
-                );
+                setPageData(response.data);
+            } catch (error) {
+                if (error.code === "ERR_CANCELED" || controller.signal.aborted) return;
+                setLoadError(getRequestErrorMessage(error));
             } finally {
-                if (!controller.signal.aborted) {
-                    setLoading(false);
-                }
+                if (!controller.signal.aborted) setLoading(false);
             }
         };
-
         loadUsers();
+        return () => controller.abort();
+    }, [filters, page, retryVersion]);
 
-        return () => {
-            controller.abort();
-        };
-    }, [retryVersion]);
-
+    const applyFilters = (event) => {
+        event.preventDefault();
+        setPage(0);
+        setFilters({ ...draftFilters, texto: draftFilters.texto.trim() });
+    };
     const handleStateChange = async (targetUser) => {
-        if (updatingUserId !== null) {
-            return;
-        }
-
+        if (updatingUserId !== null) return;
         const nextActiveState = !targetUser.activo;
-
-        const isSelfDeactivation =
-            !nextActiveState
-            && String(targetUser.id)
-                === String(authenticatedUser?.id);
-
-        if (isSelfDeactivation) {
-            toast.error(
-                "No puedes desactivar tu propia cuenta."
-            );
+        if (!nextActiveState && String(targetUser.id) === String(authenticatedUser?.id)) {
+            toast.error("No puedes desactivar tu propia cuenta.");
             return;
         }
-
-        const actionText = nextActiveState
-            ? "activar"
-            : "desactivar";
-
-        const confirmation = await Modal.confirm(
-            nextActiveState
-                ? "Activar usuario"
-                : "Desactivar usuario",
-            `¿Deseas ${actionText} a ${getFullName(targetUser)}?`
-        );
-
-        if (!confirmation.isConfirmed) {
-            return;
-        }
-
+        const confirmation = await Modal.confirm(nextActiveState ? "Activar usuario" : "Desactivar usuario", `¿Deseas cambiar el estado de ${getFullName(targetUser)}?`);
+        if (!confirmation.isConfirmed) return;
         setUpdatingUserId(targetUser.id);
-
         try {
-            const response = await api.patch(
-                `/usuarios/${targetUser.id}/estado`,
-                {
-                    activo: nextActiveState
-                }
-            );
-
-            setUsers((currentUsers) =>
-                currentUsers.map((currentUser) =>
-                    currentUser.id === targetUser.id
-                        ? response.data
-                        : currentUser
-                )
-            );
-
-            toast.success(
-                nextActiveState
-                    ? "Usuario activado correctamente."
-                    : "Usuario desactivado correctamente."
-            );
+            await api.patch(`/admin/usuarios/${targetUser.id}/estado`, { activo: nextActiveState });
+            toast.success(nextActiveState ? "Usuario activado correctamente." : "Usuario desactivado correctamente.");
+            setRetryVersion((version) => version + 1);
         } catch (error) {
-            toast.error(
-                getRequestErrorMessage(error)
-            );
+            toast.error(getRequestErrorMessage(error));
         } finally {
             setUpdatingUserId(null);
         }
     };
 
-    if (loading) {
-        return <Loader />;
-    }
-
-    if (loadError) {
-        return (
-            <section
-                className="admin-page admin-feedback"
-                role="alert"
-                aria-labelledby="admin-error-title"
-            >
-                <h1 id="admin-error-title">
-                    No fue posible cargar los usuarios
-                </h1>
-
-                <p>{loadError}</p>
-
-                <button
-                    type="button"
-                    className="admin-primary-button"
-                    onClick={() => {
-                        setRetryVersion(
-                            (currentVersion) =>
-                                currentVersion + 1
-                        );
-                    }}
-                >
-                    Reintentar
-                </button>
-            </section>
-        );
-    }
-
+    if (loading) return <section className="admin-page" aria-label="Cargando usuarios"><h1 className="admin-visually-hidden">Usuarios</h1><Loader /></section>;
+    if (loadError) return <section className="admin-page admin-feedback" role="alert"><h1>No fue posible cargar los usuarios</h1><p>{loadError}</p><button type="button" className="admin-primary-button" onClick={() => setRetryVersion((version) => version + 1)}>Reintentar</button></section>;
+    const users = pageData?.content ?? [];
     return (
-        <section
-            className="admin-page"
-            aria-labelledby="admin-title"
-            aria-busy={updatingUserId !== null}
-        >
+        <section className="admin-page" aria-labelledby="admin-title" aria-busy={updatingUserId !== null}>
             <header className="admin-header">
-                <div>
-                    <p className="admin-eyebrow">
-                        Administración
-                    </p>
-
-                    <h1 id="admin-title">
-                        Usuarios
-                    </h1>
-
-                    <p className="admin-description">
-                        Consulta las cuentas registradas y
-                        administra su estado de acceso.
-                    </p>
-                </div>
-
-                <p
-                    className="admin-user-count"
-                    aria-live="polite"
-                >
-                    {users.length}{" "}
-                    {users.length === 1
-                        ? "usuario"
-                        : "usuarios"}
-                </p>
+                <div><p className="admin-eyebrow">Administración</p><h1 id="admin-title">Usuarios</h1><p className="admin-description">Consulta las cuentas registradas y administra su estado de acceso.</p></div>
+                <p className="admin-user-count" aria-live="polite">{pageData?.totalElements ?? 0} usuarios</p>
             </header>
-
-            {users.length === 0 ? (
-                <div
-                    className="admin-empty-state"
-                    role="status"
-                >
-                    <h2>
-                        No hay usuarios registrados
-                    </h2>
-
-                    <p>
-                        El backend devolvió un listado
-                        vacío.
-                    </p>
-                </div>
-            ) : (
-                <div className="admin-table-container">
-                    <table className="admin-users-table">
-                        <caption className="admin-visually-hidden">
-                            Usuarios registrados en
-                            Huellitas Oaxaca
-                        </caption>
-
-                        <thead>
-                            <tr>
-                                <th scope="col">
-                                    Nombre completo
-                                </th>
-
-                                <th scope="col">
-                                    Correo
-                                </th>
-
-                                <th scope="col">
-                                    Rol
-                                </th>
-
-                                <th scope="col">
-                                    Estado
-                                </th>
-
-                                <th scope="col">
-                                    Fecha de registro
-                                </th>
-
-                                <th scope="col">
-                                    Acción
-                                </th>
-                            </tr>
-                        </thead>
-
-                        <tbody>
-                            {users.map((listedUser) => {
-                                const isUpdating =
-                                    updatingUserId
-                                    === listedUser.id;
-
-                                const isAuthenticatedUser =
-                                    String(listedUser.id)
-                                    === String(
-                                        authenticatedUser?.id
-                                    );
-
-                                const isSelfDeactivation =
-                                    listedUser.activo
-                                    && isAuthenticatedUser;
-
-                                const actionText =
-                                    listedUser.activo
-                                        ? "Desactivar"
-                                        : "Activar";
-
-                                return (
-                                    <tr key={listedUser.id}>
-                                        <td
-                                            data-label={
-                                                "Nombre completo"
-                                            }
-                                        >
-                                            <strong>
-                                                {getFullName(
-                                                    listedUser
-                                                )}
-                                            </strong>
-                                        </td>
-
-                                        <td data-label="Correo">
-                                            {listedUser.correo
-                                                || "Sin correo"}
-                                        </td>
-
-                                        <td data-label="Rol">
-                                            {listedUser.rol?.nombre
-                                                || "Sin rol"}
-                                        </td>
-
-                                        <td data-label="Estado">
-                                            <span
-                                                className={
-                                                    listedUser.activo
-                                                        ? "admin-status admin-status-active"
-                                                        : "admin-status admin-status-inactive"
-                                                }
-                                            >
-                                                {listedUser.activo
-                                                    ? "Activo"
-                                                    : "Inactivo"}
-                                            </span>
-                                        </td>
-
-                                        <td
-                                            data-label={
-                                                "Fecha de registro"
-                                            }
-                                        >
-                                            {formatRegistrationDate(
-                                                listedUser.fechaRegistro
-                                            )}
-                                        </td>
-
-                                        <td data-label="Acción">
-                                            <button
-                                                type="button"
-                                                className={
-                                                    listedUser.activo
-                                                        ? "admin-action-button admin-action-danger"
-                                                        : "admin-action-button admin-action-success"
-                                                }
-                                                disabled={
-                                                    updatingUserId
-                                                    !== null
-                                                    || isSelfDeactivation
-                                                }
-                                                aria-label={
-                                                    `${actionText} a ${getFullName(listedUser)}`
-                                                }
-                                                title={
-                                                    isSelfDeactivation
-                                                        ? "No puedes desactivar tu propia cuenta"
-                                                        : actionText
-                                                }
-                                                onClick={() => {
-                                                    handleStateChange(
-                                                        listedUser
-                                                    );
-                                                }}
-                                            >
-                                                {isUpdating
-                                                    ? "Actualizando..."
-                                                    : actionText}
-                                            </button>
-                                        </td>
-                                    </tr>
-                                );
-                            })}
-                        </tbody>
-                    </table>
-                </div>
+            <form className="admin-filters" onSubmit={applyFilters}>
+                <label>Buscar<input value={draftFilters.texto} onChange={(event) => setDraftFilters((current) => ({ ...current, texto: event.target.value }))} /></label>
+                <label>Rol<select value={draftFilters.rol} onChange={(event) => setDraftFilters((current) => ({ ...current, rol: event.target.value }))}><option value="">Todos</option><option value="ADMIN">Admin</option><option value="USUARIO">Usuario</option><option value="REFUGIO">Refugio</option></select></label>
+                <label>Estado<select value={draftFilters.activo} onChange={(event) => setDraftFilters((current) => ({ ...current, activo: event.target.value }))}><option value="">Todos</option><option value="true">Activo</option><option value="false">Inactivo</option></select></label>
+                <button type="submit" className="admin-primary-button">Aplicar filtros</button>
+            </form>
+            {users.length === 0 ? <div className="admin-empty-state" role="status"><h2>No hay usuarios registrados</h2><p>No hay resultados para los filtros seleccionados.</p></div> : (
+                <div className="admin-table-container"><table className="admin-users-table"><caption className="admin-visually-hidden">Usuarios registrados en Huellitas Oaxaca</caption><thead><tr><th>Nombre completo</th><th>Correo</th><th>Rol</th><th>Estado</th><th>Fecha de registro</th><th>Acción</th></tr></thead><tbody>
+                    {users.map((listedUser) => {
+                        const isSelfDeactivation = listedUser.activo && String(listedUser.id) === String(authenticatedUser?.id);
+                        const actionText = listedUser.activo ? "Desactivar" : "Activar";
+                        return <tr key={listedUser.id}><td data-label="Nombre completo"><strong>{getFullName(listedUser)}</strong></td><td data-label="Correo">{listedUser.correo || "Sin correo"}</td><td data-label="Rol">{listedUser.rol?.nombre || "Sin rol"}</td><td data-label="Estado"><span className={listedUser.activo ? "admin-status admin-status-active" : "admin-status admin-status-inactive"}>{listedUser.activo ? "Activo" : "Inactivo"}</span></td><td data-label="Fecha de registro">{formatRegistrationDate(listedUser.fechaRegistro)}</td><td data-label="Acción"><button type="button" className={listedUser.activo ? "admin-action-button admin-action-danger" : "admin-action-button admin-action-success"} disabled={updatingUserId !== null || isSelfDeactivation} onClick={() => handleStateChange(listedUser)}>{updatingUserId === listedUser.id ? "Actualizando..." : actionText}</button></td></tr>;
+                    })}
+                </tbody></table></div>
             )}
-
-            <p className="admin-pagination-notice">
-                El listado todavía no incluye
-                paginación porque el backend no ofrece
-                paginación del lado del servidor.
-            </p>
+            {pageData && <Pagination currentPage={pageData.number} totalPages={pageData.totalPages} first={pageData.first} last={pageData.last} onPageChange={setPage} disabled={loading} ariaLabel="Paginación de usuarios" />}
         </section>
     );
 }

@@ -26,6 +26,7 @@ import Contacto from "../pages/Contacto/Contacto";
 import Admin from "../pages/Admin/Admin";
 import RecuperarPassword from "../pages/RecuperarPassword/RecuperarPassword";
 import RestablecerPassword from "../pages/RestablecerPassword/RestablecerPassword";
+import Favoritos from "../pages/Favoritos/Favoritos";
 import Refugio from "../pages/Refugio/Refugio";
 import PerfilRefugio from "../pages/PerfilRefugio/PerfilRefugio";
 import MascotasRefugio from "../pages/MascotasRefugio/MascotasRefugio";
@@ -57,7 +58,7 @@ function AppRouter() {
                 <Route
                     path="/donaciones"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute allowedRoles={[USER_ROLES.USUARIO]}>
                             <Donaciones />
                         </ProtectedRoute>
                     }
@@ -79,6 +80,14 @@ function AppRouter() {
                             allowedRoles={[USER_ROLES.USUARIO]}
                         >
                             <MisSolicitudes />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/favoritos"
+                    element={
+                        <ProtectedRoute allowedRoles={[USER_ROLES.USUARIO]}>
+                            <Favoritos />
                         </ProtectedRoute>
                     }
                 />

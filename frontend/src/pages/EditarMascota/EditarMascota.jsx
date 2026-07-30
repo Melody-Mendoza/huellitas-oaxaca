@@ -119,6 +119,12 @@ function getErrorMessage(error, operation) {
     return `No fue posible ${operation}.`;
 }
 
+function isValidImageList(data) {
+    return Array.isArray(data) && data.every((image) => image
+        && Number.isSafeInteger(image.id) && image.id > 0
+        && typeof image.url === "string" && typeof image.principal === "boolean");
+}
+
 function EditarMascota() {
     const { selectedRefuge } = useOutletContext();
     const { mascotaId } = useParams();
@@ -130,6 +136,11 @@ function EditarMascota() {
     const [fieldErrors, setFieldErrors] = useState({});
     const [operationError, setOperationError] = useState("");
     const [feedbackMessage, setFeedbackMessage] = useState("");
+    const [images, setImages] = useState([]);
+    const [imagesLoading, setImagesLoading] = useState(true);
+    const [imagesError, setImagesError] = useState("");
+    const [selectedFile, setSelectedFile] = useState(null);
+    const [imageSaving, setImageSaving] = useState(false);
     const [saving, setSaving] = useState(false);
     const [retryVersion, setRetryVersion] = useState(0);
     const mutationLock = useRef(false);
@@ -168,6 +179,30 @@ function EditarMascota() {
             controller.abort();
             mutationController.current?.abort();
         };
+    }, [petId, selectedRefuge.id, retryVersion]);
+
+    useEffect(() => {
+        if (petId === null) { return undefined; }
+        const controller = new AbortController();
+        const loadImages = async () => {
+            setImagesLoading(true);
+            setImagesError("");
+            try {
+                const response = await api.get(`/refugios/${selectedRefuge.id}/mascotas/${petId}/imagenes`, { signal: controller.signal });
+                if (!isValidImageList(response.data)) {
+                    setImagesError("El backend devolvió una lista de imágenes no compatible.");
+                    return;
+                }
+                setImages(response.data);
+            } catch (error) {
+                if (error.code === "ERR_CANCELED" || controller.signal.aborted) { return; }
+                setImagesError(getErrorMessage(error, "cargar las imágenes"));
+            } finally {
+                if (!controller.signal.aborted) { setImagesLoading(false); }
+            }
+        };
+        loadImages();
+        return () => controller.abort();
     }, [petId, selectedRefuge.id, retryVersion]);
 
     const handleChange = (event) => {
@@ -256,6 +291,47 @@ function EditarMascota() {
         } finally {
             finishMutation(controller);
         }
+    };
+    const handleImageUpload = async (event) => {
+        event.preventDefault();
+        if (!selectedFile || imageSaving) { return; }
+        if (!new Set(["image/jpeg", "image/png"]).has(selectedFile.type) || selectedFile.size > 5 * 1024 * 1024) {
+            setImagesError("Selecciona una imagen JPG o PNG de máximo 5 MiB.");
+            return;
+        }
+        const formData = new FormData();
+        formData.append("imagen", selectedFile);
+        setImageSaving(true);
+        setImagesError("");
+        try {
+            const response = await api.post(`/refugios/${selectedRefuge.id}/mascotas/${petId}/imagenes`, formData);
+            if (!isValidImageList([response.data])) {
+                setImagesError("El backend devolvió una imagen no compatible.");
+                return;
+            }
+            setImages((current) => [...current, response.data]);
+            setSelectedFile(null);
+            event.target.reset();
+            toast.success("Imagen subida correctamente.");
+        } catch (error) {
+            setImagesError(getErrorMessage(error, "subir la imagen"));
+        } finally {
+            setImageSaving(false);
+        }
+    };
+    const handleSetPrincipal = async (imageId) => {
+        try {
+            const response = await api.patch(`/refugios/${selectedRefuge.id}/mascotas/${petId}/imagenes/${imageId}/principal`);
+            if (!isValidImageList([response.data])) { setImagesError("El backend devolvió una imagen no compatible."); return; }
+            setImages((current) => current.map((image) => ({ ...image, principal: image.id === imageId })));
+        } catch (error) { setImagesError(getErrorMessage(error, "seleccionar la imagen principal")); }
+    };
+    const handleDeleteImage = async (imageId) => {
+        try {
+            await api.delete(`/refugios/${selectedRefuge.id}/mascotas/${petId}/imagenes/${imageId}`);
+            setImages((current) => current.filter((image) => image.id !== imageId));
+            toast.success("Imagen eliminada correctamente.");
+        } catch (error) { setImagesError(getErrorMessage(error, "eliminar la imagen")); }
     };
 
     if (petId === null) {
@@ -359,6 +435,17 @@ function EditarMascota() {
                 {feedbackMessage && <p className="edit-pet-success" role="status">{feedbackMessage}</p>}
                 <button type="submit" disabled={saving}>{saving ? "Guardando..." : "Guardar cambios"}</button>
             </form>
+            <section className="edit-pet-images" aria-labelledby="edit-pet-images-title">
+                <h2 id="edit-pet-images-title">Imágenes</h2>
+                <p>JPG o PNG, máximo 5 MiB por archivo y hasta 8 imágenes.</p>
+                {imagesLoading && <p role="status">Cargando imágenes...</p>}
+                {imagesError && <p role="alert">{imagesError}</p>}
+                {!imagesLoading && !imagesError && images.length === 0 && <p role="status">Esta mascota todavía no tiene imágenes.</p>}
+                <div className="edit-pet-image-list">
+                    {images.map((image) => <article key={image.id}><img src={image.url} alt={`Imagen de ${detail.nombre}`} /><div><span>{image.principal ? "Principal" : "Adicional"}</span>{!image.principal && <button type="button" onClick={() => handleSetPrincipal(image.id)}>Hacer principal</button>}<button type="button" onClick={() => handleDeleteImage(image.id)}>Eliminar</button></div></article>)}
+                </div>
+                {images.length < 8 && <form onSubmit={handleImageUpload}><label htmlFor="pet-image-upload">Agregar imagen</label><input id="pet-image-upload" type="file" accept="image/jpeg,image/png" onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)} /><button type="submit" disabled={!selectedFile || imageSaving}>{imageSaving ? "Subiendo..." : "Subir imagen"}</button></form>}
+            </section>
         </section>
     );
 }
