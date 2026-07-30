@@ -2,6 +2,7 @@ import { Route, Routes } from "react-router-dom";
 
 import PublicLayout from "../layouts/PublicLayout";
 import AdminLayout from "../layouts/AdminLayout";
+import RefugioLayout from "../layouts/RefugioLayout";
 
 import ProtectedRoute from "./ProtectedRoute";
 
@@ -25,6 +26,8 @@ import Contacto from "../pages/Contacto/Contacto";
 import Admin from "../pages/Admin/Admin";
 import RecuperarPassword from "../pages/RecuperarPassword/RecuperarPassword";
 import RestablecerPassword from "../pages/RestablecerPassword/RestablecerPassword";
+import Refugio from "../pages/Refugio/Refugio";
+import PerfilRefugio from "../pages/PerfilRefugio/PerfilRefugio";
 
 import { USER_ROLES } from "../utils/constants";
 
@@ -116,6 +119,20 @@ function AppRouter() {
                 }
             >
                 <Route index element={<Admin />} />
+            </Route>
+
+            <Route
+                path="/refugio"
+                element={
+                    <ProtectedRoute
+                        allowedRoles={[USER_ROLES.REFUGIO]}
+                    >
+                        <RefugioLayout />
+                    </ProtectedRoute>
+                }
+            >
+                <Route index element={<Refugio />} />
+                <Route path="perfil" element={<PerfilRefugio />} />
             </Route>
 
             <Route path="*" element={<NotFound />} />

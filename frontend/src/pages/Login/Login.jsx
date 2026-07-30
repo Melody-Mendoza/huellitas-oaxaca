@@ -79,7 +79,9 @@ function Login() {
             destination =
                 userRole === USER_ROLES.ADMIN
                     ? "/admin"
-                    : "/perfil";
+                    : userRole === USER_ROLES.REFUGIO
+                        ? "/refugio"
+                        : "/perfil";
         }
 
         toast.success(
