@@ -6,6 +6,8 @@ spring.servlet.multipart.max-file-size=5MB
 spring.servlet.multipart.max-request-size=6MB
 
 app.storage.perfil-fotos-dir=${HUELLITAS_PERFIL_FOTOS_DIR:C:/xampp/huellitas-data/perfil-fotos}
+# Opcional. Si se omite, usa el directorio temporal seguro del sistema.
+app.storage.mascota-imagenes-dir=${HUELLITAS_MASCOTA_IMAGENES_DIR:}
 
 spring.datasource.url=jdbc:mysql://localhost:3306/huellitas_oaxaca?useSSL=false&serverTimezone=America/Mexico_City
 spring.datasource.username=TU_USUARIO_MYSQL

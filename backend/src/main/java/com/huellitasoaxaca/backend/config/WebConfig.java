@@ -13,14 +13,19 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 public class WebConfig implements WebMvcConfigurer
 {
     private final Path directorioFotos;
+    private final Path directorioImagenesMascotas;
 
     public WebConfig(
-            @Value("${app.storage.perfil-fotos-dir}") String rutaDirectorio
+            @Value("${app.storage.perfil-fotos-dir}") String rutaDirectorio,
+            @Value("${app.storage.mascota-imagenes-dir:}") String rutaMascotas
     )
     {
         this.directorioFotos = Path.of(rutaDirectorio)
                 .toAbsolutePath()
                 .normalize();
+        this.directorioImagenesMascotas = resolverDirectorioMascotas(
+                rutaMascotas
+        );
     }
 
     @Override
@@ -40,5 +45,36 @@ public class WebConfig implements WebMvcConfigurer
                                 .cachePublic()
                                 .immutable()
                 );
+
+        String ubicacionMascotas = directorioImagenesMascotas
+                .toUri()
+                .toString();
+
+        if (!ubicacionMascotas.endsWith("/"))
+        {
+            ubicacionMascotas += "/";
+        }
+
+        registry.addResourceHandler("/media/mascotas/**")
+                .addResourceLocations(ubicacionMascotas)
+                .setCacheControl(
+                        CacheControl.maxAge(Duration.ofDays(365))
+                                .cachePublic()
+                                .immutable()
+                );
+    }
+
+    private Path resolverDirectorioMascotas(String ruta)
+    {
+        if (ruta != null && !ruta.isBlank())
+        {
+            return Path.of(ruta).toAbsolutePath().normalize();
+        }
+
+        return Path.of(
+                System.getProperty("java.io.tmpdir"),
+                "huellitas-oaxaca",
+                "mascota-imagenes"
+        ).toAbsolutePath().normalize();
     }
 }

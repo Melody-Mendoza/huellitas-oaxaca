@@ -32,6 +32,9 @@ public class ImagenMascota
     @Column(name = "url", nullable = false, length = 255)
     private String url;
 
+    @Column(name = "principal", nullable = false)
+    private Boolean principal;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "mascota_id", nullable = false)
     private Mascota mascota;

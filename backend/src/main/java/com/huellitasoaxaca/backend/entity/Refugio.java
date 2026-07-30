@@ -48,6 +48,6 @@ public class Refugio
     private Boolean activo;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "usuario_id", unique = true)
+    @JoinColumn(name = "usuario_id")
     private Usuario usuario;
 }

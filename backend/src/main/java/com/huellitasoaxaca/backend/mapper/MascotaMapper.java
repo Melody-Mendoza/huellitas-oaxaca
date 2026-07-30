@@ -7,6 +7,8 @@ import org.springframework.stereotype.Component;
 import com.huellitasoaxaca.backend.dto.response.MascotaResponse;
 import com.huellitasoaxaca.backend.dto.response.MascotaCatalogoResponse;
 import com.huellitasoaxaca.backend.dto.response.MascotaDetalleResponse;
+import com.huellitasoaxaca.backend.dto.response.MascotaPropiaDetalleResponse;
+import com.huellitasoaxaca.backend.dto.response.MascotaPropiaResumenResponse;
 import com.huellitasoaxaca.backend.dto.response.RefugioCatalogoResponse;
 import com.huellitasoaxaca.backend.dto.response.RefugioDetalleResponse;
 import com.huellitasoaxaca.backend.entity.Mascota;
@@ -15,6 +17,48 @@ import com.huellitasoaxaca.backend.entity.Refugio;
 @Component
 public class MascotaMapper 
 {
+    public MascotaPropiaResumenResponse toPropiaResumen(Mascota mascota)
+    {
+        return new MascotaPropiaResumenResponse(
+                mascota.getId(),
+                mascota.getNombre(),
+                mascota.getEspecie(),
+                mascota.getRaza(),
+                mascota.getSexo(),
+                mascota.getEdad(),
+                mascota.getTamano(),
+                mascota.getEstado(),
+                mascota.getFechaIngreso(),
+                mascota.getImagen()
+        );
+    }
+
+    public MascotaPropiaDetalleResponse toPropiaDetalle(
+            Mascota mascota,
+            List<String> imagenesAdicionales
+    )
+    {
+        Refugio refugio = mascota.getRefugio();
+
+        return new MascotaPropiaDetalleResponse(
+                mascota.getId(),
+                mascota.getNombre(),
+                mascota.getEspecie(),
+                mascota.getRaza(),
+                mascota.getSexo(),
+                mascota.getEdad(),
+                mascota.getPeso(),
+                mascota.getTamano(),
+                mascota.getDescripcion(),
+                mascota.getEstado(),
+                mascota.getFechaIngreso(),
+                mascota.getImagen(),
+                List.copyOf(imagenesAdicionales),
+                refugio.getId(),
+                refugio.getNombre()
+        );
+    }
+
     public MascotaDetalleResponse toDetalleResponse(
             Mascota mascota,
             List<String> imagenesAdicionales

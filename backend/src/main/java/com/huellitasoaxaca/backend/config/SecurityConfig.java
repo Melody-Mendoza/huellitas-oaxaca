@@ -153,12 +153,14 @@ public class SecurityConfig
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/media/perfiles/**",
+                                "/media/mascotas/**",
                                 "/api/mascotas",
                                 "/api/mascotas/*"
                         ).permitAll()
                         .requestMatchers(
                                 HttpMethod.HEAD,
-                                "/media/perfiles/**"
+                                "/media/perfiles/**",
+                                "/media/mascotas/**"
                         ).permitAll()
                         .requestMatchers(
                                 HttpMethod.POST,
