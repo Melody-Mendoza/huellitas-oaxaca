@@ -1,46 +1,174 @@
 import "./Sidebar.css";
 
-function Sidebar(){
-    return(
-        <aside className="sidebar">
+const SIZE_OPTIONS = [
+    { value: "", label: "Todos" },
+    { value: "PEQUENO", label: "Pequeño" },
+    { value: "MEDIANO", label: "Mediano" },
+    { value: "GRANDE", label: "Grande" }
+];
+
+function Sidebar({
+    values = {
+        especie: "",
+        sexo: "",
+        tamano: "",
+        edad: ""
+    },
+    onChange = () => {},
+    disabled = false
+}) {
+    return (
+        <aside
+            className="sidebar"
+            aria-label="Filtros del catálogo"
+        >
             <h3>Filtros</h3>
+
+            <fieldset className="filter-group">
+                <legend>Especie</legend>
+
+                <label>
+                    <input
+                        type="radio"
+                        name="especie"
+                        value=""
+                        checked={values.especie === ""}
+                        onChange={(event) => {
+                            onChange("especie", event.target.value);
+                        }}
+                        disabled={disabled}
+                    />
+                    Todas
+                </label>
+
+                <label>
+                    <input
+                        type="radio"
+                        name="especie"
+                        value="PERRO"
+                        checked={values.especie === "PERRO"}
+                        onChange={(event) => {
+                            onChange("especie", event.target.value);
+                        }}
+                        disabled={disabled}
+                    />
+                    Perros
+                </label>
+
+                <label>
+                    <input
+                        type="radio"
+                        name="especie"
+                        value="GATO"
+                        checked={values.especie === "GATO"}
+                        onChange={(event) => {
+                            onChange("especie", event.target.value);
+                        }}
+                        disabled={disabled}
+                    />
+                    Gatos
+                </label>
+            </fieldset>
+
             <div className="filter-group">
-                <h4>Especie</h4>
-                <label><input type="checkbox"/> Perros (42)</label>
-                <label><input type="checkbox"/> Gatos (18)</label>
-                <label><input type="checkbox"/> Otros (3)</label>
+                <label
+                    className="filter-heading"
+                    htmlFor="catalogo-edad"
+                >
+                    Edad exacta
+                </label>
+
+                <input
+                    id="catalogo-edad"
+                    className="age-filter"
+                    type="number"
+                    min="0"
+                    max="40"
+                    step="1"
+                    inputMode="numeric"
+                    placeholder="0 a 40 años"
+                    value={values.edad}
+                    onChange={(event) => {
+                        onChange("edad", event.target.value);
+                    }}
+                    disabled={disabled}
+                />
             </div>
 
-            <div className="filter-group">
-                <h4>Edad</h4>
-                <label><input type="checkbox"/> Cachorro</label>
-                <label><input type="checkbox"/> Joven</label>
-                <label><input type="checkbox"/> Adulto</label>
-                <label><input type="checkbox"/> Senior</label>
+            <fieldset className="filter-group">
+                <legend>Tamaño</legend>
 
-            </div>
-
-            <div className="filter-group">
-                <h4>Tamaño</h4>
                 <div className="chips">
-                    <button>Pequeño</button>
-                    <button className="active">Mediano</button>
-                    <button>Grande</button>
+                    {SIZE_OPTIONS.map((option) => (
+                        <button
+                            key={option.value || "TODOS"}
+                            type="button"
+                            className={
+                                values.tamano === option.value
+                                    ? "active"
+                                    : ""
+                            }
+                            aria-pressed={
+                                values.tamano === option.value
+                            }
+                            onClick={() => {
+                                onChange("tamano", option.value);
+                            }}
+                            disabled={disabled}
+                        >
+                            {option.label}
+                        </button>
+                    ))}
                 </div>
+            </fieldset>
 
-            </div>
-            <div className="filter-group">
-                <h4>Sexo</h4>
-                <label><input type="radio" name="sexo"/> Macho</label>
-                <label><input type="radio" name="sexo"/> Hembra</label>
-                <label><input type="radio" name="sexo"/> Ambos</label>
+            <fieldset className="filter-group">
+                <legend>Sexo</legend>
 
-            </div>
+                <label>
+                    <input
+                        type="radio"
+                        name="sexo"
+                        value=""
+                        checked={values.sexo === ""}
+                        onChange={(event) => {
+                            onChange("sexo", event.target.value);
+                        }}
+                        disabled={disabled}
+                    />
+                    Ambos
+                </label>
 
+                <label>
+                    <input
+                        type="radio"
+                        name="sexo"
+                        value="MACHO"
+                        checked={values.sexo === "MACHO"}
+                        onChange={(event) => {
+                            onChange("sexo", event.target.value);
+                        }}
+                        disabled={disabled}
+                    />
+                    Macho
+                </label>
+
+                <label>
+                    <input
+                        type="radio"
+                        name="sexo"
+                        value="HEMBRA"
+                        checked={values.sexo === "HEMBRA"}
+                        onChange={(event) => {
+                            onChange("sexo", event.target.value);
+                        }}
+                        disabled={disabled}
+                    />
+                    Hembra
+                </label>
+            </fieldset>
         </aside>
-
     );
-
 }
 
 export default Sidebar;

@@ -1,151 +1,309 @@
 import "./Catalogo.css";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
+import CardMascota from "../../components/CardMascota/CardMascota";
+import Loader from "../../components/Loader/Loader";
+import Pagination from "../../components/Pagination/Pagination";
 import SearchBar from "../../components/SearchBar/SearchBar";
 import Sidebar from "../../components/Sidebar/Sidebar";
-import CardMascota from "../../components/CardMascota/CardMascota";
-import Pagination from "../../components/Pagination/Pagination";
+import api from "../../services/api";
+
+const PAGE_SIZE = 12;
+const SEARCH_DEBOUNCE_MS = 350;
+
+const INITIAL_FILTERS = {
+    especie: "",
+    sexo: "",
+    tamano: "",
+    edad: ""
+};
+
+const EMPTY_PAGE = {
+    content: [],
+    number: 0,
+    totalPages: 0,
+    totalElements: 0,
+    first: true,
+    last: true
+};
+
+function isNonNegativeInteger(value) {
+    return Number.isInteger(value) && value >= 0;
+}
+
+function isValidPageResponse(data) {
+    return Boolean(
+        data
+        && Array.isArray(data.content)
+        && isNonNegativeInteger(data.number)
+        && isNonNegativeInteger(data.totalPages)
+        && isNonNegativeInteger(data.totalElements)
+        && typeof data.first === "boolean"
+        && typeof data.last === "boolean"
+    );
+}
+
+function getValidAge(value) {
+    if (value === "" || !/^\d+$/.test(value)) {
+        return null;
+    }
+
+    const age = Number(value);
+
+    return Number.isInteger(age) && age >= 0 && age <= 40
+        ? age
+        : null;
+}
+
+function getRequestErrorMessage(error) {
+    if (!error.response) {
+        return "No fue posible conectar con el backend.";
+    }
+
+    const backendMessage = error.response.data?.message;
+
+    switch (error.response.status) {
+        case 400:
+            return backendMessage
+                || "Los filtros o parámetros enviados no son válidos.";
+        case 401:
+            return "La sesión no es válida.";
+        case 403:
+            return "No tienes permiso para consultar el catálogo.";
+        case 404:
+            return backendMessage
+                || "No se encontró el recurso solicitado.";
+        case 409:
+            return backendMessage
+                || "La consulta generó un conflicto.";
+        case 422:
+            return backendMessage
+                || "No fue posible procesar la consulta.";
+        case 500:
+            return "Ocurrió un error interno en el servidor.";
+        default:
+            return backendMessage
+                || "No fue posible cargar el catálogo.";
+    }
+}
 
 function Catalogo() {
+    const [search, setSearch] = useState("");
+    const [debouncedSearch, setDebouncedSearch] = useState("");
+    const [filters, setFilters] = useState(INITIAL_FILTERS);
+    const [page, setPage] = useState(0);
+    const [pageData, setPageData] = useState(EMPTY_PAGE);
+    const [loading, setLoading] = useState(true);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [retryVersion, setRetryVersion] = useState(0);
 
-    const [busqueda, setBusqueda] = useState("");
+    useEffect(() => {
+        const timeoutId = window.setTimeout(() => {
+            setDebouncedSearch(search.trim());
+        }, SEARCH_DEBOUNCE_MS);
 
-    const termino = busqueda.toLowerCase();
+        return () => {
+            window.clearTimeout(timeoutId);
+        };
+    }, [search]);
 
-    const mascotas = [
+    useEffect(() => {
+        const controller = new AbortController();
 
-        {
-            id: 1,
-            nombre: "Luna",
-            edad: "2 años",
-            sexo: "Hembra",
-            tamano: "Tamaño Mediano",
-            ubicacion: "Refugio Central, Oaxaca",
-            estado: "Disponible",
-            imagen: "https://images.unsplash.com/photo-1517849845537-4d257902454a?w=600"
-        },
+        const loadCatalog = async () => {
+            setLoading(true);
+            setErrorMessage("");
 
-        {
-            id: 2,
-            nombre: "Pixy",
-            edad: "4 meses",
-            sexo: "Hembra",
-            tamano: "Tamaño Pequeño",
-            ubicacion: "Hogar Temporal, Centro",
-            estado: "Urgente",
-            imagen: "https://images.unsplash.com/photo-1519052537078-e6302a4968d4?w=600"
-        },
+            const params = {
+                page,
+                size: PAGE_SIZE,
+                sort: "nombre,asc"
+            };
 
-        {
-            id: 3,
-            nombre: "Max",
-            edad: "5 años",
-            sexo: "Macho",
-            tamano: "Tamaño Grande",
-            ubicacion: "Refugio Central, Oaxaca",
-            estado: "Disponible",
-            imagen: "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=600"
-        },
+            if (debouncedSearch) {
+                params.nombre = debouncedSearch;
+            }
 
-        {
-            id: 4,
-            nombre: "Mila",
-            edad: "2 años",
-            sexo: "Hembra",
-            tamano: "Tamaño Mediano",
-            ubicacion: "Hogar Temporal, Xoxo",
-            estado: "Disponible",
-            imagen: "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=600"
-        },
+            if (filters.especie) {
+                params.especie = filters.especie;
+            }
 
-        {
-            id: 5,
-            nombre: "Toby",
-            edad: "1 año",
-            sexo: "Macho",
-            tamano: "Tamaño Pequeño",
-            ubicacion: "Refugio Central, Oaxaca",
-            estado: "Disponible",
-            imagen: "https://images.unsplash.com/photo-1591160690555-5debfba289f0?w=600"
-        }
+            if (filters.sexo) {
+                params.sexo = filters.sexo;
+            }
 
-    ];
+            if (filters.tamano) {
+                params.tamano = filters.tamano;
+            }
 
-    //const mascotasFiltradas = mascotas.filter((mascota) =>
-      //  mascota.nombre.toLowerCase().includes(busqueda.toLowerCase())
-    //);
+            const validAge = getValidAge(filters.edad);
 
-    const mascotasFiltradas = mascotas.filter((mascota) =>
+            if (validAge !== null) {
+                params.edad = validAge;
+            }
 
-        mascota.nombre.toLowerCase().includes(termino) ||
+            try {
+                const response = await api.get("/mascotas", {
+                    params,
+                    signal: controller.signal
+                });
 
-        mascota.tamano.toLowerCase().includes(termino) ||
+                if (!isValidPageResponse(response.data)) {
+                    setPageData(EMPTY_PAGE);
+                    setErrorMessage(
+                        "El backend devolvió una estructura de paginación no compatible."
+                    );
+                    return;
+                }
 
-        mascota.estado.toLowerCase().includes(termino)
+                if (
+                    response.data.totalPages > 0
+                    && response.data.number >= response.data.totalPages
+                ) {
+                    setPage(response.data.totalPages - 1);
+                    return;
+                }
 
-    );
+                setPageData(response.data);
+            } catch (error) {
+                if (
+                    error.code === "ERR_CANCELED"
+                    || controller.signal.aborted
+                ) {
+                    return;
+                }
+
+                setPageData(EMPTY_PAGE);
+                setErrorMessage(getRequestErrorMessage(error));
+            } finally {
+                if (!controller.signal.aborted) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        loadCatalog();
+
+        return () => {
+            controller.abort();
+        };
+    }, [
+        debouncedSearch,
+        filters.edad,
+        filters.especie,
+        filters.sexo,
+        filters.tamano,
+        page,
+        retryVersion
+    ]);
+
+    const handleSearchChange = (event) => {
+        setSearch(event.target.value);
+        setPage(0);
+    };
+
+    const handleFilterChange = (name, value) => {
+        setFilters((currentFilters) => ({
+            ...currentFilters,
+            [name]: value
+        }));
+        setPage(0);
+    };
 
     return (
-
-        <section className="catalogo">
-
+        <section
+            className="catalogo"
+            aria-labelledby="catalogo-title"
+            aria-busy={loading}
+        >
             <div className="catalogo-layout">
-
-                <Sidebar />
+                <Sidebar
+                    values={filters}
+                    onChange={handleFilterChange}
+                />
 
                 <div className="catalogo-content">
-
                     <div className="catalogo-top">
-
                         <div>
+                            <h1 id="catalogo-title">
+                                Catálogo de mascotas
+                            </h1>
 
-                            <h1>{mascotasFiltradas.length}</h1>
-
-                            <p>Mascotas esperando un hogar</p>
-
+                            <p aria-live="polite">
+                                <strong className="catalogo-total">
+                                    {pageData.totalElements}
+                                </strong>{" "}
+                                {pageData.totalElements === 1
+                                    ? "mascota esperando un hogar"
+                                    : "mascotas esperando un hogar"}
+                            </p>
                         </div>
 
                         <SearchBar
-
-                            value={busqueda}
-
-                            onChange={(e) => setBusqueda(e.target.value)}
-
+                            value={search}
+                            onChange={handleSearchChange}
                         />
-
                     </div>
 
-                    <div className="catalogo-grid">
+                    {loading ? (
+                        <Loader />
+                    ) : errorMessage ? (
+                        <div
+                            className="catalogo-feedback catalogo-error"
+                            role="alert"
+                        >
+                            <h2>No fue posible cargar el catálogo</h2>
+                            <p>{errorMessage}</p>
 
-                        {
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    setRetryVersion(
+                                        (currentVersion) =>
+                                            currentVersion + 1
+                                    );
+                                }}
+                            >
+                                Reintentar
+                            </button>
+                        </div>
+                    ) : pageData.content.length === 0 ? (
+                        <div
+                            className="catalogo-feedback catalogo-empty"
+                            role="status"
+                        >
+                            <h2>No se encontraron mascotas</h2>
+                            <p>
+                                Prueba con otro nombre o cambia los
+                                filtros seleccionados.
+                            </p>
+                        </div>
+                    ) : (
+                        <>
+                            <div className="catalogo-grid">
+                                {pageData.content.map((mascota) => (
+                                    <CardMascota
+                                        key={mascota.id}
+                                        mascota={mascota}
+                                    />
+                                ))}
+                            </div>
 
-                            mascotasFiltradas.map((mascota) => (
-
-                                <CardMascota
-
-                                    key={mascota.id}
-
-                                    mascota={mascota}
-
-                                />
-
-                            ))
-
-                        }
-
-                    </div>
-
-                    <Pagination />
-
+                            <Pagination
+                                currentPage={pageData.number}
+                                totalPages={pageData.totalPages}
+                                first={pageData.first}
+                                last={pageData.last}
+                                onPageChange={setPage}
+                                disabled={loading}
+                            />
+                        </>
+                    )}
                 </div>
-
             </div>
-
         </section>
-
     );
-
 }
 
 export default Catalogo;
