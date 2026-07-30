@@ -24,7 +24,8 @@ function Pagination({
     first = true,
     last = true,
     onPageChange = () => {},
-    disabled = false
+    disabled = false,
+    ariaLabel = "Paginación del catálogo"
 }) {
     if (totalPages <= 1) {
         return null;
@@ -51,7 +52,7 @@ function Pagination({
     return (
         <nav
             className="pagination"
-            aria-label="Paginación del catálogo"
+            aria-label={ariaLabel}
         >
             <button
                 type="button"

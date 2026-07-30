@@ -1,0 +1,223 @@
+.edit-pet-header {
+    margin-bottom: 24px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.edit-pet-header h1 {
+    margin: 5px 0 8px;
+    color: #2F6E4F;
+    font-size: clamp(2rem, 5vw, 3rem);
+    overflow-wrap: anywhere;
+}
+
+.edit-pet-header p {
+    color: var(--text-light);
+    line-height: 1.55;
+}
+
+.edit-pet-header > div > p:first-child {
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.edit-pet-header a,
+.edit-pet-feedback a {
+    min-height: 44px;
+    padding: 10px 16px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #78ae8b;
+    border-radius: 9px;
+    color: #2F6E4F;
+    font-weight: 700;
+    text-align: center;
+}
+
+.edit-pet-status {
+    margin-bottom: 22px;
+    padding: 20px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px;
+    border: 1px solid #dfe7e0;
+    border-radius: var(--radius);
+    background: #f4faf6;
+}
+
+.edit-pet-status h2 {
+    margin-bottom: 5px;
+    color: #2F6E4F;
+    font-size: 1.15rem;
+}
+
+.edit-pet-status p {
+    color: var(--text-light);
+    line-height: 1.5;
+}
+
+.edit-pet-status button,
+.edit-pet-feedback button {
+    min-height: 44px;
+    padding: 10px 16px;
+    border-radius: 9px;
+    background: #2F6E4F;
+    color: var(--surface);
+    font: inherit;
+    font-weight: 700;
+}
+
+.edit-pet-form {
+    padding: 28px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 21px;
+    border: 1px solid #dfe7e0;
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.edit-pet-field {
+    min-width: 0;
+}
+
+.edit-pet-wide,
+.edit-pet-error,
+.edit-pet-success,
+.edit-pet-form > button {
+    grid-column: 1 / -1;
+}
+
+.edit-pet-field label {
+    margin-bottom: 7px;
+    display: block;
+    font-weight: 700;
+}
+
+.edit-pet-field label span {
+    color: var(--text-light);
+    font-size: .82rem;
+    font-weight: 400;
+}
+
+.edit-pet-field input,
+.edit-pet-field select,
+.edit-pet-field textarea {
+    width: 100%;
+    padding: 11px 12px;
+    border: 1px solid #b9c9bc;
+    border-radius: 9px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+}
+
+.edit-pet-field textarea {
+    resize: vertical;
+}
+
+.edit-pet-field > span {
+    margin-top: 5px;
+    display: block;
+    color: var(--text-light);
+    font-size: .8rem;
+    text-align: right;
+}
+
+.edit-pet-field > p,
+.edit-pet-error {
+    margin-top: 6px;
+    color: #a12d28;
+    font-size: .88rem;
+    line-height: 1.45;
+}
+
+.edit-pet-success {
+    color: #2F6E4F;
+    font-weight: 700;
+}
+
+.edit-pet-form > button {
+    min-height: 46px;
+    padding: 11px 20px;
+    border-radius: 10px;
+    background: #2F6E4F;
+    color: var(--surface);
+    font: inherit;
+    font-weight: 700;
+}
+
+.edit-pet button:disabled {
+    opacity: .65;
+    cursor: not-allowed;
+}
+
+.edit-pet-loading,
+.edit-pet-feedback {
+    min-height: 360px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.edit-pet-feedback {
+    gap: 14px;
+    text-align: center;
+}
+
+.edit-pet-feedback h1 {
+    color: #2F6E4F;
+}
+
+.edit-pet-feedback p {
+    max-width: 580px;
+    color: var(--text-light);
+    line-height: 1.55;
+}
+
+.edit-pet-feedback > div {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+}
+
+.edit-pet :focus-visible,
+.edit-pet-feedback :focus-visible {
+    outline: 3px solid rgba(76, 175, 80, .3);
+    outline-offset: 3px;
+}
+
+@media (max-width: 650px) {
+    .edit-pet-header,
+    .edit-pet-status {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .edit-pet-header a,
+    .edit-pet-status button {
+        width: 100%;
+    }
+
+    .edit-pet-form {
+        grid-template-columns: 1fr;
+        padding: 20px;
+    }
+
+    .edit-pet-field,
+    .edit-pet-wide,
+    .edit-pet-error,
+    .edit-pet-success,
+    .edit-pet-form > button {
+        grid-column: 1;
+    }
+}

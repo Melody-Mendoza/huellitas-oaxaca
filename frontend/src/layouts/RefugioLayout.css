@@ -1,0 +1,144 @@
+.refuge-layout {
+    width: min(1180px, calc(100% - 40px));
+    min-height: 65vh;
+    margin: auto;
+    padding: 34px 0 70px;
+}
+
+.refuge-layout-toolbar {
+    margin-bottom: 34px;
+    padding: 18px 20px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+    border: 1px solid #dfe7e0;
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.refuge-selector label,
+.refuge-selector span {
+    margin-bottom: 7px;
+    display: block;
+    color: var(--text-light);
+    font-size: .82rem;
+    font-weight: 700;
+}
+
+.refuge-selector strong {
+    display: block;
+    overflow-wrap: anywhere;
+}
+
+.refuge-selector select {
+    width: min(360px, 100%);
+    min-height: 44px;
+    padding: 9px 36px 9px 12px;
+    border: 1px solid #b9c9bc;
+    border-radius: 9px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+}
+
+.refuge-navigation {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.refuge-navigation a {
+    min-height: 44px;
+    padding: 10px 15px;
+    display: inline-flex;
+    align-items: center;
+    border-radius: 9px;
+    color: #2F6E4F;
+    font-weight: 700;
+}
+
+.refuge-navigation a:hover,
+.refuge-navigation a.active {
+    background: #e8f3ec;
+}
+
+.refuge-navigation a:focus-visible,
+.refuge-selector select:focus-visible,
+.refuge-layout-feedback button:focus-visible {
+    outline: 3px solid rgba(76, 175, 80, .3);
+    outline-offset: 3px;
+}
+
+.refuge-layout-feedback {
+    min-height: 360px;
+    padding: 35px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    text-align: center;
+}
+
+.refuge-layout-feedback h1 {
+    color: #2F6E4F;
+    font-size: clamp(1.8rem, 5vw, 2.7rem);
+}
+
+.refuge-layout-feedback p {
+    max-width: 580px;
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+.refuge-layout-feedback button {
+    min-height: 44px;
+    padding: 11px 18px;
+    border-radius: 9px;
+    background: #2F6E4F;
+    color: var(--surface);
+    font: inherit;
+    font-weight: 700;
+}
+
+.refuge-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+    white-space: nowrap;
+}
+
+@media (max-width: 700px) {
+    .refuge-layout-toolbar {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .refuge-selector,
+    .refuge-selector select,
+    .refuge-navigation,
+    .refuge-navigation a {
+        width: 100%;
+    }
+
+    .refuge-navigation a {
+        justify-content: center;
+    }
+}
+
+@media (max-width: 480px) {
+    .refuge-layout {
+        width: min(100% - 28px, 1180px);
+        padding: 24px 0 48px;
+    }
+
+    .refuge-layout-toolbar {
+        padding: 15px;
+    }
+}

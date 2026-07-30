@@ -1,0 +1,289 @@
+.shelter-pets-header {
+    margin-bottom: 26px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.shelter-pets-header h1 {
+    margin: 5px 0 8px;
+    color: #2F6E4F;
+    font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.shelter-pets-header p {
+    color: var(--text-light);
+    line-height: 1.55;
+}
+
+.shelter-pets-header > div > p:first-child {
+    font-size: .82rem;
+    font-weight: 700;
+    letter-spacing: .08em;
+    text-transform: uppercase;
+}
+
+.shelter-pets-header > a,
+.shelter-pets-feedback a,
+.shelter-pets-feedback button {
+    min-height: 44px;
+    padding: 11px 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: #2F6E4F;
+    color: var(--surface);
+    font: inherit;
+    font-weight: 700;
+    text-align: center;
+}
+
+.shelter-pets-filters {
+    margin-bottom: 28px;
+    padding: 20px;
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto auto;
+    align-items: end;
+    gap: 14px;
+    border: 1px solid #dfe7e0;
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.shelter-pets-filters label {
+    margin-bottom: 7px;
+    display: block;
+    font-size: .88rem;
+    font-weight: 700;
+}
+
+.shelter-pets-filters input,
+.shelter-pets-filters select {
+    width: 100%;
+    min-height: 44px;
+    padding: 10px 12px;
+    border: 1px solid #b9c9bc;
+    border-radius: 9px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+}
+
+.shelter-pets-filters button {
+    min-height: 44px;
+    padding: 10px 15px;
+    border-radius: 9px;
+    background: #2F6E4F;
+    color: var(--surface);
+    font: inherit;
+    font-weight: 700;
+}
+
+.shelter-pets-filters button.secondary {
+    border: 1px solid #78ae8b;
+    background: var(--surface);
+    color: #2F6E4F;
+}
+
+.shelter-pets-filters button:disabled {
+    opacity: .6;
+    cursor: not-allowed;
+}
+
+.shelter-pets-summary {
+    margin-bottom: 14px;
+    display: flex;
+    justify-content: space-between;
+    gap: 16px;
+    color: var(--text-light);
+}
+
+.shelter-pets-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.shelter-pet-card {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: 180px 1fr;
+    overflow: hidden;
+    border: 1px solid #dfe7e0;
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.shelter-pet-card > img,
+.shelter-pet-placeholder {
+    width: 100%;
+    height: 100%;
+    min-height: 265px;
+    object-fit: cover;
+    background: #e8f3ec;
+}
+
+.shelter-pet-placeholder {
+    display: grid;
+    place-items: center;
+    color: #52705e;
+    font-size: .88rem;
+    font-weight: 700;
+}
+
+.shelter-pet-content {
+    min-width: 0;
+    padding: 19px;
+    display: flex;
+    flex-direction: column;
+}
+
+.shelter-pet-content h2 {
+    margin: 7px 0 14px;
+    color: #2F6E4F;
+    overflow-wrap: anywhere;
+}
+
+.shelter-pet-status {
+    padding: 5px 9px;
+    display: inline-block;
+    border-radius: 999px;
+    background: #e8f6ed;
+    color: #245c3d;
+    font-size: .75rem;
+    font-weight: 800;
+}
+
+.shelter-pet-status.status-en_proceso {
+    background: #fff3d5;
+    color: #735510;
+}
+
+.shelter-pet-status.status-adoptado {
+    background: #edf0f2;
+    color: #53616b;
+}
+
+.shelter-pet-content dl {
+    margin: 0 0 18px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+}
+
+.shelter-pet-content dt {
+    color: var(--text-light);
+    font-size: .75rem;
+    font-weight: 700;
+    text-transform: uppercase;
+}
+
+.shelter-pet-content dd {
+    margin: 2px 0 0;
+    overflow-wrap: anywhere;
+}
+
+.shelter-pet-content > a {
+    margin-top: auto;
+    min-height: 40px;
+    padding: 9px 14px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #78ae8b;
+    border-radius: 9px;
+    color: #2F6E4F;
+    font-weight: 700;
+}
+
+.shelter-pets-loading,
+.shelter-pets-feedback {
+    min-height: 330px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.shelter-pets-feedback {
+    gap: 13px;
+    text-align: center;
+}
+
+.shelter-pets-feedback h2 {
+    color: #2F6E4F;
+}
+
+.shelter-pets-feedback p {
+    max-width: 560px;
+    color: var(--text-light);
+    line-height: 1.55;
+}
+
+.shelter-pets :focus-visible {
+    outline: 3px solid rgba(76, 175, 80, .3);
+    outline-offset: 3px;
+}
+
+@media (max-width: 980px) {
+    .shelter-pets-filters {
+        grid-template-columns: repeat(3, 1fr);
+    }
+
+    .shelter-pets-filters button {
+        grid-column: span 1;
+    }
+
+    .shelter-pets-grid {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 650px) {
+    .shelter-pets-header {
+        align-items: stretch;
+        flex-direction: column;
+    }
+
+    .shelter-pets-header > a {
+        width: 100%;
+    }
+
+    .shelter-pets-filters {
+        grid-template-columns: 1fr 1fr;
+    }
+
+    .shelter-pets-filters > div:first-child {
+        grid-column: 1 / -1;
+    }
+}
+
+@media (max-width: 480px) {
+    .shelter-pets-filters {
+        grid-template-columns: 1fr;
+        padding: 16px;
+    }
+
+    .shelter-pets-filters > div:first-child {
+        grid-column: 1;
+    }
+
+    .shelter-pet-card {
+        grid-template-columns: 1fr;
+    }
+
+    .shelter-pet-card > img,
+    .shelter-pet-placeholder {
+        height: 210px;
+        min-height: 0;
+    }
+
+    .shelter-pets-summary {
+        flex-direction: column;
+        gap: 4px;
+    }
+}

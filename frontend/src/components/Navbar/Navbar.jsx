@@ -54,6 +54,12 @@ function Navbar() {
     const isAdmin =
         userRole === USER_ROLES.ADMIN;
 
+    const isUser =
+        userRole === USER_ROLES.USUARIO;
+
+    const isRefuge =
+        userRole === USER_ROLES.REFUGIO;
+
     const userName = [
         user?.nombre,
         user?.apellidoPaterno
@@ -251,6 +257,32 @@ function Navbar() {
                                         />
 
                                         Panel administrativo
+                                    </Link>
+                                )}
+
+                                {isUser && (
+                                    <Link
+                                        to="/mis-solicitudes"
+                                        role="menuitem"
+                                        onClick={
+                                            closeUserMenu
+                                        }
+                                    >
+                                        Mis solicitudes
+                                    </Link>
+                                )}
+
+                                {isRefuge && (
+                                    <Link
+                                        to="/refugio"
+                                        role="menuitem"
+                                        onClick={closeUserMenu}
+                                    >
+                                        <LayoutDashboard
+                                            size={17}
+                                            aria-hidden="true"
+                                        />
+                                        Panel de refugio
                                     </Link>
                                 )}
 
