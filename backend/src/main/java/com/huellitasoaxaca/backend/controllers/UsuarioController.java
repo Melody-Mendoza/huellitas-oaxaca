@@ -56,6 +56,7 @@ public class UsuarioController
                 usuarioService.cambiarEstado(
                         id,
                         request.activo(),
+                        "Cambio de estado mediante endpoint legado",
                         authentication.getName()
                 )
         );

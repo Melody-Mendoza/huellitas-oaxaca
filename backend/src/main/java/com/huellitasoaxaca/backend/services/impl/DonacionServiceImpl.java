@@ -217,7 +217,8 @@ public class DonacionServiceImpl implements DonacionService
                 .findById(refugioId)
                 .orElseThrow(this::refugioNoEncontrado);
 
-        if (!Boolean.TRUE.equals(refugio.getActivo()))
+        if (!Boolean.TRUE.equals(refugio.getActivo())
+                || !Boolean.TRUE.equals(refugio.getAprobado()))
         {
             throw refugioNoEncontrado();
         }

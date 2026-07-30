@@ -1,13 +1,11 @@
 package com.huellitasoaxaca.backend.services.impl;
 
-import java.util.Comparator;
 import java.util.List;
 
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.huellitasoaxaca.backend.dto.response.RefugioDonacionResponse;
-import com.huellitasoaxaca.backend.entity.Refugio;
 import com.huellitasoaxaca.backend.repository.RefugioRepository;
 import com.huellitasoaxaca.backend.services.RefugioDonacionService;
 
@@ -23,14 +21,9 @@ public class RefugioDonacionServiceImpl implements RefugioDonacionService
     @Override
     public List<RefugioDonacionResponse> listarDisponibles()
     {
-        return refugioRepository.findByActivoTrue()
+        return refugioRepository
+                .findByActivoTrueAndAprobadoTrueOrderByNombreAscIdAsc()
                 .stream()
-                .sorted(
-                        Comparator.comparing(
-                                Refugio::getNombre,
-                                String.CASE_INSENSITIVE_ORDER
-                        ).thenComparing(Refugio::getId)
-                )
                 .map(refugio -> new RefugioDonacionResponse(
                         refugio.getId(),
                         refugio.getNombre()

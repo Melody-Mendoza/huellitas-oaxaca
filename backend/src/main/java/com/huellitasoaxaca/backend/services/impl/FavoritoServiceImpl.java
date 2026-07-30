@@ -55,7 +55,7 @@ public class FavoritoServiceImpl implements FavoritoService
         }
 
         Mascota mascota = mascotaRepository
-                .findByIdAndEstadoAndRefugioActivoTrue(
+                .findByIdAndEstadoAndRefugioActivoTrueAndRefugioAprobadoTrue(
                         mascotaId,
                         EstadoMascota.DISPONIBLE
                 )

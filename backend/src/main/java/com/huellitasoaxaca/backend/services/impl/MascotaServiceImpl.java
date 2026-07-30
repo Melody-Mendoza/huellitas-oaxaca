@@ -235,7 +235,7 @@ public class MascotaServiceImpl implements MascotaService
     public MascotaDetalleResponse obtenerDetallePublico(Long id)
     {
         Mascota mascota = mascotaRepository
-                .findByIdAndEstadoAndRefugioActivoTrue(
+                .findByIdAndEstadoAndRefugioActivoTrueAndRefugioAprobadoTrue(
                         id,
                         EstadoMascota.DISPONIBLE
                 )
@@ -381,6 +381,7 @@ public class MascotaServiceImpl implements MascotaService
                     EstadoMascota.DISPONIBLE
             ));
             filtros.add(criteriaBuilder.isTrue(refugio.get("activo")));
+            filtros.add(criteriaBuilder.isTrue(refugio.get("aprobado")));
 
             if (nombre != null && !nombre.isBlank())
             {
@@ -485,9 +486,12 @@ public class MascotaServiceImpl implements MascotaService
                         "No se encontró el refugio solicitado"
                 ));
 
-        if (!Boolean.TRUE.equals(refugio.getActivo()))
+        if (!Boolean.TRUE.equals(refugio.getActivo())
+                || !Boolean.TRUE.equals(refugio.getAprobado()))
         {
-            throw new AccessDeniedException("El refugio no está activo");
+            throw new AccessDeniedException(
+                    "El refugio no está autorizado para operar"
+            );
         }
 
         return refugio;

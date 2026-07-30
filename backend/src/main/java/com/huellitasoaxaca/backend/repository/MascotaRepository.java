@@ -32,7 +32,7 @@ public interface MascotaRepository extends
     );
 
     @EntityGraph(attributePaths = "refugio")
-    Optional<Mascota> findByIdAndEstadoAndRefugioActivoTrue(
+    Optional<Mascota> findByIdAndEstadoAndRefugioActivoTrueAndRefugioAprobadoTrue(
             Long id,
             EstadoMascota estado
     );
@@ -57,6 +57,10 @@ public interface MascotaRepository extends
     @EntityGraph(attributePaths = "refugio")
     @Query("SELECT mascota FROM Mascota mascota WHERE mascota.id = :id")
     Optional<Mascota> findByIdParaSolicitud(@Param("id") Long id);
+
+    @EntityGraph(attributePaths = "refugio")
+    @Query("SELECT m FROM Mascota m WHERE m.id = :id")
+    Optional<Mascota> findAdminDetalleById(@Param("id") Long id);
 
     List<Mascota> findByEstado(EstadoMascota estado);
 

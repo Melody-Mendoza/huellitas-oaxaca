@@ -255,7 +255,8 @@ public class SolicitudAdopcionServiceImpl implements SolicitudAdopcionService
         Refugio refugio = mascota.getRefugio();
         if (mascota.getEstado() != EstadoMascota.DISPONIBLE
                 || refugio == null
-                || !Boolean.TRUE.equals(refugio.getActivo()))
+                || !Boolean.TRUE.equals(refugio.getActivo())
+                || !Boolean.TRUE.equals(refugio.getAprobado()))
         {
             throw mascotaNoEncontrada();
         }

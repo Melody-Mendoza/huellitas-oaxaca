@@ -6,7 +6,11 @@ import java.util.List;
 
 import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.EntityGraph;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
@@ -14,8 +18,17 @@ import org.springframework.stereotype.Repository;
 import jakarta.persistence.LockModeType;
 
 @Repository
-public interface UsuarioRepository extends JpaRepository<Usuario, Long> 
+public interface UsuarioRepository extends
+        JpaRepository<Usuario, Long>,
+        JpaSpecificationExecutor<Usuario>
 {
+
+    @Override
+    @EntityGraph(attributePaths = "rol")
+    Page<Usuario> findAll(
+            Specification<Usuario> specification,
+            Pageable pageable
+    );
 
     @EntityGraph(attributePaths = "rol")
     Optional<Usuario> findByFirebaseUid(String firebaseUid);
@@ -61,15 +74,7 @@ public interface UsuarioRepository extends JpaRepository<Usuario, Long>
             """)
     Optional<Usuario> findByIdParaActualizar(@Param("id") Long id);
 
-    @Lock(LockModeType.PESSIMISTIC_WRITE)
-    @Query("""
-            SELECT usuario
-            FROM Usuario usuario
-            WHERE usuario.activo = true
-              AND usuario.rol.nombre = 'ADMIN'
-            ORDER BY usuario.id
-            """)
-    List<Usuario> findAdministradoresActivosParaActualizar();
+    long countByRolNombreAndActivoTrue(String nombreRol);
 
     List<Usuario> findByActivoTrue();
 }

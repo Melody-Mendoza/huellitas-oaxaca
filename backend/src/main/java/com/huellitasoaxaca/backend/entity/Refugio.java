@@ -1,5 +1,7 @@
 package com.huellitasoaxaca.backend.entity;
 
+import java.time.LocalDateTime;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
@@ -46,6 +48,16 @@ public class Refugio
 
     @Column(name = "activo", nullable = false)
     private Boolean activo;
+
+    @Column(name = "aprobado", nullable = false)
+    private Boolean aprobado;
+
+    @Column(name = "fecha_aprobacion")
+    private LocalDateTime fechaAprobacion;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "aprobado_por")
+    private Usuario aprobadoPor;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "usuario_id")

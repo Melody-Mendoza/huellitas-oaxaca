@@ -188,16 +188,6 @@ public class RefugioServiceImpl implements RefugioService
                 .toList();
     }
 
-    @Override
-    @Transactional
-    public void desactivar(Long id) 
-    {
-        Refugio refugio = buscarEntidadPorId(id);
-
-        refugio.setActivo(false);
-        refugioRepository.save(refugio);
-    }
-
     private Refugio buscarEntidadPorId(Long id) 
     {
         return refugioRepository.findById(id)
@@ -244,10 +234,11 @@ public class RefugioServiceImpl implements RefugioService
 
     private void validarRefugioActivo(Refugio refugio)
     {
-        if (!Boolean.TRUE.equals(refugio.getActivo()))
+        if (!Boolean.TRUE.equals(refugio.getActivo())
+                || !Boolean.TRUE.equals(refugio.getAprobado()))
         {
             throw new AccessDeniedException(
-                    "El refugio no está activo"
+                    "El refugio no está autorizado para operar"
             );
         }
     }

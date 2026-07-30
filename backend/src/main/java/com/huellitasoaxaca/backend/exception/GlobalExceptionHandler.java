@@ -216,6 +216,23 @@ public class GlobalExceptionHandler
                         .body(respuesta);
         }
 
+        @ExceptionHandler(ConflictoAdministrativoException.class)
+        public ResponseEntity<ErrorResponse> manejarConflictoAdministrativo(
+                ConflictoAdministrativoException exception,
+                HttpServletRequest request
+        )
+        {
+                ErrorResponse respuesta = crearError(
+                        HttpStatus.CONFLICT,
+                        exception.getMessage(),
+                        request.getRequestURI()
+                );
+
+                return ResponseEntity
+                        .status(HttpStatus.CONFLICT)
+                        .body(respuesta);
+        }
+
         @ExceptionHandler(ImagenMascotaException.class)
         public ResponseEntity<ErrorResponse> manejarImagenMascota(
                 ImagenMascotaException exception,
