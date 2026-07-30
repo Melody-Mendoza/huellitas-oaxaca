@@ -37,6 +37,4 @@ public interface RefugioService
     RefugioResponse obtenerPorNombre(String nombre);
 
     List<RefugioResponse> listarPorUsuario(Long usuarioId);
-
-    void desactivar(Long id);    
 }

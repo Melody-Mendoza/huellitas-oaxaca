@@ -6,14 +6,18 @@ import java.util.List;
 import java.util.Optional;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.jpa.domain.Specification;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.JpaSpecificationExecutor;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 @Repository
-public interface SolicitudAdopcionRepository extends JpaRepository<SolicitudAdopcion, Long> 
+public interface SolicitudAdopcionRepository extends
+        JpaRepository<SolicitudAdopcion, Long>,
+        JpaSpecificationExecutor<SolicitudAdopcion>
 {
 
     List<SolicitudAdopcion> findByUsuarioId(Long usuarioId);
@@ -26,6 +30,25 @@ public interface SolicitudAdopcionRepository extends JpaRepository<SolicitudAdop
             Long usuarioId,
             Pageable pageable
     );
+
+    @Override
+    @EntityGraph(attributePaths = {
+            "usuario",
+            "mascota",
+            "mascota.refugio"
+    })
+    Page<SolicitudAdopcion> findAll(
+            Specification<SolicitudAdopcion> spec,
+            Pageable pageable
+    );
+
+    @EntityGraph(attributePaths = {
+            "usuario",
+            "mascota",
+            "mascota.refugio"
+    })
+    @Query("SELECT s FROM SolicitudAdopcion s WHERE s.id = :id")
+    Optional<SolicitudAdopcion> findAdminDetalleById(@Param("id") Long id);
 
     List<SolicitudAdopcion> findByMascotaId(Long mascotaId);
 

@@ -153,10 +153,11 @@ public class SecurityConfig
                         .requestMatchers(
                                 HttpMethod.GET,
                                 "/media/perfiles/**",
-                                "/media/mascotas/**",
-                                "/api/mascotas",
-                                "/api/mascotas/*"
-                        ).permitAll()
+                                 "/media/mascotas/**",
+                                 "/api/mascotas",
+                                 "/api/mascotas/*",
+                                 "/api/refugios/disponibles-para-donacion"
+                         ).permitAll()
                         .requestMatchers(
                                 HttpMethod.HEAD,
                                 "/media/perfiles/**",

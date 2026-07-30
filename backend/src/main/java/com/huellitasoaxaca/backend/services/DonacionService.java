@@ -1,28 +1,29 @@
 package com.huellitasoaxaca.backend.services;
 
-import java.time.LocalDateTime;
-import java.util.List;
+import org.springframework.data.domain.Page;
 
+import com.huellitasoaxaca.backend.dto.request.DonacionCrearRequest;
 import com.huellitasoaxaca.backend.dto.response.DonacionResponse;
-import com.huellitasoaxaca.backend.entity.enums.EstatusDonacion;
-import com.huellitasoaxaca.backend.entity.enums.MetodoPago;
 
 public interface DonacionService 
 {
-    List<DonacionResponse> listarTodas();
-
-    DonacionResponse obtenerPorId(Long id);
-
-    List<DonacionResponse> listarPorUsuario(Long usuarioId);
-
-    List<DonacionResponse> listarPorRefugio(Long refugioId);
-
-    List<DonacionResponse> listarPorEstatus(EstatusDonacion estatus);
-
-    List<DonacionResponse> listarPorMetodoPago(MetodoPago metodoPago);
-
-    List<DonacionResponse> listarPorRangoFechas(
-            LocalDateTime fechaInicio,
-            LocalDateTime fechaFin
+    ResultadoCreacion crear(
+            DonacionCrearRequest request,
+            String claveIdempotencia,
+            String correoAutenticado
     );
+
+    Page<DonacionResponse> listarPropias(
+            String correoAutenticado,
+            int page,
+            int size
+    );
+
+    DonacionResponse obtenerPropia(Long donacionId, String correoAutenticado);
+
+    DonacionResponse confirmar(Long donacionId, String correoAutenticado);
+
+    DonacionResponse cancelar(Long donacionId, String correoAutenticado);
+
+    record ResultadoCreacion(DonacionResponse donacion, boolean nueva) {}
 }
