@@ -12,6 +12,8 @@ import Catalogo from "../pages/Catalogo/Catalogo";
 import DetalleMascota from "../pages/DetalleMascota/DetalleMascota";
 import Donaciones from "../pages/Donaciones/Donaciones";
 import SolicitudAdopcion from "../pages/SolicitudAdopcion/SolicitudAdopcion";
+import MisSolicitudes from "../pages/MisSolicitudes/MisSolicitudes";
+import DetalleSolicitud from "../pages/DetalleSolicitud/DetalleSolicitud";
 import NotFound from "../pages/NotFound/NotFound";
 import Perfil from "../pages/Perfil/Perfil";
 import ComoAdoptar from "../pages/Adopcion/ComoAdoptar";
@@ -61,6 +63,26 @@ function AppRouter() {
                             allowedRoles={[USER_ROLES.USUARIO]}
                         >
                             <SolicitudAdopcion />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/mis-solicitudes"
+                    element={
+                        <ProtectedRoute
+                            allowedRoles={[USER_ROLES.USUARIO]}
+                        >
+                            <MisSolicitudes />
+                        </ProtectedRoute>
+                    }
+                />
+                <Route
+                    path="/mis-solicitudes/:solicitudId"
+                    element={
+                        <ProtectedRoute
+                            allowedRoles={[USER_ROLES.USUARIO]}
+                        >
+                            <DetalleSolicitud />
                         </ProtectedRoute>
                     }
                 />

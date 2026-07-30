@@ -1,0 +1,307 @@
+.detalle-solicitud-page {
+    width: min(1080px, calc(100% - 40px));
+    min-height: 65vh;
+    margin: auto;
+    padding: 40px 0 70px;
+}
+
+.detalle-solicitud-back-link {
+    min-height: 44px;
+    display: inline-flex;
+    align-items: center;
+    color: #2F6E4F;
+    font-weight: 700;
+}
+
+.detalle-solicitud-back-link:hover {
+    text-decoration: underline;
+}
+
+.detalle-solicitud-header {
+    margin: 24px 0 30px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 22px;
+}
+
+.detalle-solicitud-header h1 {
+    margin: 5px 0 9px;
+    color: #2F6E4F;
+    font-size: clamp(2.1rem, 6vw, 3.2rem);
+    overflow-wrap: anywhere;
+}
+
+.detalle-solicitud-header p {
+    color: var(--text-light);
+    line-height: 1.5;
+}
+
+.detalle-solicitud-status {
+    flex: 0 0 auto;
+    padding: 7px 12px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: .82rem;
+    font-weight: 700;
+}
+
+.detalle-solicitud-status-pendiente {
+    border-color: #d6ad43;
+    background: #fff8df;
+    color: #795d12;
+}
+
+.detalle-solicitud-status-aprobada {
+    border-color: #78ae8b;
+    background: #e8f6ed;
+    color: #245c3d;
+}
+
+.detalle-solicitud-status-rechazada {
+    border-color: #d9928f;
+    background: #fceceb;
+    color: #8a2925;
+}
+
+.detalle-solicitud-grid {
+    margin-bottom: 26px;
+    display: grid;
+    grid-template-columns: minmax(280px, .9fr) minmax(0, 1.1fr);
+    gap: 28px;
+}
+
+.detalle-solicitud-image,
+.detalle-solicitud-summary,
+.detalle-solicitud-panel {
+    overflow: hidden;
+    border: 1px solid #dfe7e0;
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.detalle-solicitud-image {
+    min-height: 310px;
+    background: #e8efe9;
+}
+
+.detalle-solicitud-image img,
+.detalle-solicitud-image-placeholder {
+    width: 100%;
+    height: 100%;
+    min-height: 310px;
+}
+
+.detalle-solicitud-image img {
+    display: block;
+    object-fit: cover;
+}
+
+.detalle-solicitud-image-placeholder {
+    padding: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-light);
+    font-weight: 700;
+    text-align: center;
+}
+
+.detalle-solicitud-summary,
+.detalle-solicitud-panel {
+    padding: 26px;
+}
+
+.detalle-solicitud-summary h2,
+.detalle-solicitud-panel h2 {
+    margin-bottom: 20px;
+    color: #2F6E4F;
+}
+
+.detalle-solicitud-summary dl {
+    display: grid;
+    gap: 17px;
+}
+
+.detalle-solicitud-summary dt {
+    margin-bottom: 4px;
+    color: var(--text-light);
+    font-size: .84rem;
+    font-weight: 700;
+}
+
+.detalle-solicitud-summary dd,
+.detalle-solicitud-panel p {
+    line-height: 1.65;
+    overflow-wrap: anywhere;
+}
+
+.detalle-solicitud-pet-link,
+.detalle-solicitud-feedback a,
+.detalle-solicitud-feedback button,
+.detalle-solicitud-history-error button {
+    min-height: 44px;
+    padding: 11px 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: #2F6E4F;
+    color: var(--surface);
+    font: inherit;
+    font-weight: 700;
+    text-align: center;
+}
+
+.detalle-solicitud-pet-link {
+    margin-top: 24px;
+}
+
+.detalle-solicitud-panel {
+    margin-top: 26px;
+}
+
+.detalle-solicitud-timeline {
+    list-style: none;
+}
+
+.detalle-solicitud-timeline li {
+    position: relative;
+    padding: 4px 0 24px 30px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.detalle-solicitud-timeline li::before {
+    content: "";
+    position: absolute;
+    top: 9px;
+    left: 5px;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    background: #2F6E4F;
+}
+
+.detalle-solicitud-timeline li:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 19px;
+    bottom: 0;
+    left: 9px;
+    width: 2px;
+    background: #cbd9ce;
+}
+
+.detalle-solicitud-timeline time {
+    color: var(--text-light);
+    line-height: 1.5;
+    text-align: right;
+}
+
+.detalle-solicitud-history-error {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 20px;
+}
+
+.detalle-solicitud-loading,
+.detalle-solicitud-feedback {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+}
+
+.detalle-solicitud-feedback {
+    gap: 16px;
+    text-align: center;
+}
+
+.detalle-solicitud-feedback h1 {
+    font-size: clamp(1.8rem, 6vw, 2.7rem);
+}
+
+.detalle-solicitud-feedback > p {
+    max-width: 620px;
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+.detalle-solicitud-feedback-actions {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 14px;
+}
+
+.detalle-solicitud-back-link:focus-visible,
+.detalle-solicitud-pet-link:focus-visible,
+.detalle-solicitud-feedback a:focus-visible,
+.detalle-solicitud-feedback button:focus-visible,
+.detalle-solicitud-history-error button:focus-visible {
+    outline: 3px solid rgba(76, 175, 80, .3);
+    outline-offset: 3px;
+}
+
+.detalle-solicitud-pet-link:hover,
+.detalle-solicitud-feedback a:hover,
+.detalle-solicitud-feedback button:hover,
+.detalle-solicitud-history-error button:hover {
+    filter: brightness(.92);
+}
+
+.detalle-solicitud-visually-hidden {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    border: 0;
+    white-space: nowrap;
+}
+
+@media (max-width: 760px) {
+    .detalle-solicitud-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .detalle-solicitud-header,
+    .detalle-solicitud-history-error {
+        flex-direction: column;
+    }
+
+    .detalle-solicitud-timeline li {
+        align-items: flex-start;
+        flex-direction: column;
+        gap: 9px;
+    }
+
+    .detalle-solicitud-timeline time {
+        text-align: left;
+    }
+}
+
+@media (max-width: 480px) {
+    .detalle-solicitud-page {
+        width: min(100% - 28px, 1080px);
+        padding: 26px 0 48px;
+    }
+
+    .detalle-solicitud-summary,
+    .detalle-solicitud-panel {
+        padding: 21px;
+    }
+
+    .detalle-solicitud-feedback-actions,
+    .detalle-solicitud-feedback a,
+    .detalle-solicitud-feedback button,
+    .detalle-solicitud-history-error button {
+        width: 100%;
+    }
+}

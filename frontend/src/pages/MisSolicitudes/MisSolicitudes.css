@@ -1,0 +1,266 @@
+.mis-solicitudes-page {
+    width: min(1180px, calc(100% - 40px));
+    min-height: 65vh;
+    margin: auto;
+    padding: 44px 0 70px;
+}
+
+.mis-solicitudes-header {
+    margin-bottom: 34px;
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 24px;
+}
+
+.mis-solicitudes-header h1 {
+    margin-bottom: 8px;
+    color: #2F6E4F;
+    font-size: clamp(2rem, 5vw, 3rem);
+}
+
+.mis-solicitudes-header > div > p:last-child,
+.mis-solicitudes-total {
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+.mis-solicitudes-eyebrow {
+    margin-bottom: 6px;
+    color: #2F6E4F;
+    font-size: .8rem;
+    font-weight: 700;
+    letter-spacing: .09em;
+    text-transform: uppercase;
+}
+
+.mis-solicitudes-total {
+    flex: 0 0 auto;
+    padding: 12px 18px;
+    border: 1px solid #dfe7e0;
+    border-radius: 999px;
+    background: var(--surface);
+}
+
+.mis-solicitudes-total strong {
+    color: #2F6E4F;
+}
+
+.mis-solicitudes-grid {
+    display: grid;
+    gap: 22px;
+}
+
+.mis-solicitudes-card {
+    min-width: 0;
+    display: grid;
+    grid-template-columns: 210px minmax(0, 1fr);
+    overflow: hidden;
+    border: 1px solid #dfe7e0;
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.mis-solicitudes-image {
+    min-height: 210px;
+    background: #e8efe9;
+}
+
+.mis-solicitudes-image img,
+.mis-solicitudes-image-placeholder {
+    width: 100%;
+    height: 100%;
+    min-height: 210px;
+}
+
+.mis-solicitudes-image img {
+    display: block;
+    object-fit: cover;
+}
+
+.mis-solicitudes-image-placeholder {
+    padding: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: var(--text-light);
+    font-weight: 700;
+    text-align: center;
+}
+
+.mis-solicitudes-card-body {
+    min-width: 0;
+    padding: 25px;
+    display: flex;
+    flex-direction: column;
+}
+
+.mis-solicitudes-card-heading {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 18px;
+}
+
+.mis-solicitudes-card-heading p {
+    margin-bottom: 5px;
+    color: var(--text-light);
+    font-size: .86rem;
+}
+
+.mis-solicitudes-card-heading h2 {
+    color: var(--text);
+    overflow-wrap: anywhere;
+}
+
+.solicitud-status {
+    flex: 0 0 auto;
+    padding: 7px 12px;
+    border: 1px solid transparent;
+    border-radius: 999px;
+    font-size: .82rem;
+    font-weight: 700;
+}
+
+.solicitud-status-pendiente {
+    border-color: #d6ad43;
+    background: #fff8df;
+    color: #795d12;
+}
+
+.solicitud-status-aprobada {
+    border-color: #78ae8b;
+    background: #e8f6ed;
+    color: #245c3d;
+}
+
+.solicitud-status-rechazada {
+    border-color: #d9928f;
+    background: #fceceb;
+    color: #8a2925;
+}
+
+.mis-solicitudes-data {
+    margin: 22px 0;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+.mis-solicitudes-data dt {
+    margin-bottom: 4px;
+    color: var(--text-light);
+    font-size: .82rem;
+    font-weight: 700;
+}
+
+.mis-solicitudes-data dd {
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+}
+
+.mis-solicitudes-detail-link,
+.mis-solicitudes-feedback a,
+.mis-solicitudes-feedback button {
+    min-height: 44px;
+    padding: 11px 18px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 10px;
+    background: #2F6E4F;
+    color: var(--surface);
+    font: inherit;
+    font-weight: 700;
+    text-align: center;
+}
+
+.mis-solicitudes-detail-link {
+    align-self: flex-start;
+    margin-top: auto;
+}
+
+.mis-solicitudes-detail-link:hover,
+.mis-solicitudes-feedback a:hover,
+.mis-solicitudes-feedback button:hover {
+    filter: brightness(.92);
+}
+
+.mis-solicitudes-detail-link:focus-visible,
+.mis-solicitudes-feedback a:focus-visible,
+.mis-solicitudes-feedback button:focus-visible {
+    outline: 3px solid rgba(76, 175, 80, .3);
+    outline-offset: 3px;
+}
+
+.mis-solicitudes-feedback {
+    min-height: 300px;
+    padding: 38px 24px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    border: 1px solid #dfe7e0;
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+    text-align: center;
+}
+
+.mis-solicitudes-feedback p {
+    max-width: 580px;
+    color: var(--text-light);
+    line-height: 1.6;
+}
+
+.mis-solicitudes-error {
+    border-color: rgba(229, 57, 53, .28);
+}
+
+@media (max-width: 720px) {
+    .mis-solicitudes-header {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+
+    .mis-solicitudes-card {
+        grid-template-columns: 1fr;
+    }
+
+    .mis-solicitudes-image,
+    .mis-solicitudes-image img,
+    .mis-solicitudes-image-placeholder {
+        min-height: 230px;
+        max-height: 320px;
+    }
+}
+
+@media (max-width: 480px) {
+    .mis-solicitudes-page {
+        width: min(100% - 28px, 1180px);
+        padding: 28px 0 48px;
+    }
+
+    .mis-solicitudes-card-body {
+        padding: 20px;
+    }
+
+    .mis-solicitudes-card-heading,
+    .mis-solicitudes-data {
+        grid-template-columns: 1fr;
+    }
+
+    .mis-solicitudes-card-heading {
+        flex-direction: column;
+    }
+
+    .mis-solicitudes-data {
+        display: grid;
+    }
+
+    .mis-solicitudes-detail-link {
+        width: 100%;
+    }
+}

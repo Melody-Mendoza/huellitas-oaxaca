@@ -54,6 +54,9 @@ function Navbar() {
     const isAdmin =
         userRole === USER_ROLES.ADMIN;
 
+    const isUser =
+        userRole === USER_ROLES.USUARIO;
+
     const userName = [
         user?.nombre,
         user?.apellidoPaterno
@@ -251,6 +254,18 @@ function Navbar() {
                                         />
 
                                         Panel administrativo
+                                    </Link>
+                                )}
+
+                                {isUser && (
+                                    <Link
+                                        to="/mis-solicitudes"
+                                        role="menuitem"
+                                        onClick={
+                                            closeUserMenu
+                                        }
+                                    >
+                                        Mis solicitudes
                                     </Link>
                                 )}
 
