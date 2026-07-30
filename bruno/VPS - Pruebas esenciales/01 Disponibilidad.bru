@@ -1,0 +1,10 @@
+meta {
+  name: Disponibilidad del backend VPS
+  type: http
+}
+
+get {
+  url: {{baseUrlVps}}/api/mascotas?page=0&size=1
+  body: none
+  auth: none
+}

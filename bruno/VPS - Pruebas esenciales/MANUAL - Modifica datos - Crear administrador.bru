@@ -1,0 +1,24 @@
+meta {
+  name: MANUAL - Modifica datos - Crear administrador
+  type: http
+}
+
+post {
+  url: {{baseUrlVps}}/api/admin/usuarios/administradores
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenAdmin}}
+}
+
+body:json {
+  {
+    "nombre": "Nombre autorizado",
+    "apellidoPaterno": "Administrador",
+    "correo": "capturar-en-entorno@huellitasoaxaca.mx",
+    "telefono": "9510000010",
+    "password": "Cambiar2026*"
+  }
+}

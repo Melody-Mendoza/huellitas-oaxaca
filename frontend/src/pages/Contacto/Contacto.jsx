@@ -16,7 +16,7 @@ function Contacto() {
                     <p><strong>Horario:</strong> Lunes a Viernes de 9:00 a 18:00 hrs.</p>
                     <p><strong>Ubicación:</strong> Oaxaca de Juárez, Oaxaca.</p>
                 </div>
-                <p role="status">El envío de mensajes desde la plataforma estará disponible cuando exista un endpoint de contacto en el backend.</p>
+                <p role="status">¿Necesitas ayuda? Puedes comunicarte con nosotros por correo electrónico o por teléfono. Próximamente también podrás enviarnos mensajes desde esta sección.</p>
             </section>
         </>
     );

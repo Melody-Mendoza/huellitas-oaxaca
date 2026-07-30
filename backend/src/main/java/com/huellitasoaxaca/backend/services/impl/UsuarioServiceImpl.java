@@ -18,6 +18,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.huellitasoaxaca.backend.dto.request.CambiarPasswordRequest;
 import com.huellitasoaxaca.backend.dto.request.UsuarioActualizarRequest;
+import com.huellitasoaxaca.backend.dto.request.UsuarioAdminCrearRequest;
 import com.huellitasoaxaca.backend.dto.response.PaginaResponse;
 import com.huellitasoaxaca.backend.dto.response.UsuarioResponse;
 import com.huellitasoaxaca.backend.entity.Usuario;
@@ -25,6 +26,7 @@ import com.huellitasoaxaca.backend.exception.ConflictoAdministrativoException;
 import com.huellitasoaxaca.backend.exception.ParametroInvalidoException;
 import com.huellitasoaxaca.backend.exception.ReglaNegocioException;
 import com.huellitasoaxaca.backend.exception.RecursoNoEncontradoException;
+import com.huellitasoaxaca.backend.exception.RecursoDuplicadoException;
 import com.huellitasoaxaca.backend.mapper.UsuarioMapper;
 import com.huellitasoaxaca.backend.repository.RefugioRepository;
 import com.huellitasoaxaca.backend.repository.RolRepository;
@@ -357,6 +359,50 @@ public class UsuarioServiceImpl implements UsuarioService
                 );
 
                 return usuarioMapper.toResponse(actualizado);
+        }
+
+        @Override
+        @Transactional
+        public UsuarioResponse crearAdministrador(
+                UsuarioAdminCrearRequest request,
+                String correoAdministrador
+        )
+        {
+                bloquearRolAdministrador();
+                Usuario administrador = bloquearAdministradorActivo(
+                        correoAdministrador
+                );
+                String correo = normalizarCorreo(request.correo());
+
+                if (usuarioRepository.existsByCorreo(correo))
+                {
+                        throw new RecursoDuplicadoException(
+                                "Ya existe un usuario con ese correo"
+                        );
+                }
+
+                var rol = rolRepository.findByNombre("ADMIN")
+                        .orElseThrow(this::accesoAdministrativoDenegado);
+                Usuario nuevo = Usuario.builder()
+                        .nombre(request.nombre().trim())
+                        .apellidoPaterno(request.apellidoPaterno().trim())
+                        .apellidoMaterno(limpiarTextoOpcional(
+                                request.apellidoMaterno()
+                        ))
+                        .correo(correo)
+                        .password(passwordEncoder.encode(request.password()))
+                        .telefono(limpiarTextoOpcional(request.telefono()))
+                        .activo(true)
+                        .fechaRegistro(java.time.LocalDateTime.now())
+                        .rol(rol)
+                        .build();
+                Usuario guardado = usuarioRepository.saveAndFlush(nuevo);
+                auditoriaService.registrarCreacionUsuario(
+                        administrador,
+                        guardado,
+                        "Alta de administrador desde el panel"
+                );
+                return usuarioMapper.toResponse(guardado);
         }
 
         private void validarAdministradorActivo(String correoAdministrador)

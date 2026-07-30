@@ -10,6 +10,7 @@ import { Link, useSearchParams } from "react-router-dom";
 
 import Loader from "../../components/Loader/Loader";
 import api from "../../services/api";
+import { resolveMediaUrl } from "../../utils/media";
 
 const MAX_COMMENTS_LENGTH = 1000;
 
@@ -72,7 +73,7 @@ function getSafeBackendMessage(error) {
 
 function getPetErrorMessage(error) {
     if (!error.response) {
-        return "No fue posible conectar con el backend.";
+        return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde.";
     }
 
     const backendMessage = getSafeBackendMessage(error);
@@ -92,7 +93,7 @@ function getPetErrorMessage(error) {
             return backendMessage
                 || "Existe un conflicto al consultar la mascota.";
         case 500:
-            return "Ocurrió un error interno en el servidor.";
+            return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde.";
         default:
             return backendMessage
                 || "No fue posible consultar la mascota seleccionada.";
@@ -101,7 +102,7 @@ function getPetErrorMessage(error) {
 
 function getSubmissionErrorMessage(error) {
     if (!error.response) {
-        return "No fue posible conectar con el backend.";
+        return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde.";
     }
 
     const backendMessage = getSafeBackendMessage(error);
@@ -122,7 +123,7 @@ function getSubmissionErrorMessage(error) {
             return backendMessage
                 || "Ya existe una solicitud activa para esta mascota.";
         case 500:
-            return "Ocurrió un error interno en el servidor.";
+            return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde.";
         default:
             return backendMessage
                 || "No fue posible crear la solicitud de adopción.";
@@ -182,7 +183,7 @@ function SolicitudAdopcion() {
 
                 if (!isValidPetResponse(response.data, petId)) {
                     setPetErrorMessage(
-                        "El backend devolvió una estructura de mascota no compatible."
+                        "Recibimos una respuesta inesperada. Intenta de nuevo."
                     );
                     return;
                 }
@@ -272,7 +273,7 @@ function SolicitudAdopcion() {
             ) {
                 if (mountedRef.current) {
                     setSubmissionError(
-                        "El backend devolvió una respuesta de creación no compatible."
+                        "Recibimos una respuesta inesperada. Intenta de nuevo."
                     );
                 }
                 return;
@@ -481,7 +482,7 @@ function SolicitudAdopcion() {
                     <div className="solicitud-pet-media">
                         {showPetImage ? (
                             <img
-                                src={pet.imagenPrincipal}
+                                src={resolveMediaUrl(pet.imagenPrincipal)}
                                 alt={`Fotografía de ${pet.nombre}`}
                                 onError={() => {
                                     setImageFailed(true);

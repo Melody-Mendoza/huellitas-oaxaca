@@ -12,6 +12,16 @@ body{
     color:var(--text);
 }
 
+.app-shell {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+}
+
+.app-content {
+    flex: 1;
+}
+
 a{
     text-decoration:none;
     color:inherit;

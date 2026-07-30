@@ -1,0 +1,19 @@
+meta {
+  name: Refugios administrativos VPS
+  type: http
+}
+
+get {
+  url: {{baseUrlVps}}/api/admin/refugios?page=0&size=50
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenAdmin}}
+}
+
+script:post-response {
+  const data = res.getBody();
+  if (data.totalElements !== 3) throw new Error("Se esperaban 3 refugios");
+}

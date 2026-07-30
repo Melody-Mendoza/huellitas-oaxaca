@@ -1,0 +1,14 @@
+meta {
+  name: Mascotas del refugio VPS
+  type: http
+}
+
+get {
+  url: {{baseUrlVps}}/api/refugios/{{refugioId}}/mascotas?page=0&size=20
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenRefugio}}
+}

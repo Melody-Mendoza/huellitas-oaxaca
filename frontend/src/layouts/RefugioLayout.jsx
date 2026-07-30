@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { NavLink, Outlet } from "react-router-dom";
 import Loader from "../components/Loader/Loader";
 import Navbar from "../components/Navbar/Navbar";
+import Footer from "../components/Footer/Footer";
 import api from "../services/api";
 import "./RefugioLayout.css";
 
@@ -32,7 +33,7 @@ function isValidRefugeList(data) {
 }
 
 function getErrorMessage(error) {
-    if (!error.response) { return "No fue posible conectar con el backend."; }
+    if (!error.response) { return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde."; }
     const backendMessage = error.response.data?.message;
     switch (error.response.status) {
         case 400:
@@ -46,7 +47,7 @@ function getErrorMessage(error) {
         case 422:
             return backendMessage || "No fue posible procesar la solicitud.";
         case 500:
-            return "Ocurrió un error interno en el servidor.";
+            return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde.";
         default:
             return "No fue posible cargar tus refugios.";
     }
@@ -69,7 +70,7 @@ function RefugioLayout() {
                 if (!isValidRefugeList(response.data)) {
                     setRefuges([]);
                     setSelectedId(null);
-                    setErrorMessage("El backend devolvió una lista de refugios no compatible.");
+                    setErrorMessage("Recibimos una respuesta inesperada. Intenta de nuevo.");
                     return;
                 }
                 setRefuges(response.data);
@@ -152,10 +153,11 @@ function RefugioLayout() {
     }
 
     return (
-        <>
+        <div className="app-shell">
             <Navbar />
             <main className="refuge-layout">{content}</main>
-        </>
+            <Footer />
+        </div>
     );
 }
 

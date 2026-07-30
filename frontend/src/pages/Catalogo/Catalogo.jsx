@@ -58,7 +58,7 @@ function getValidAge(value) {
 
 function getRequestErrorMessage(error) {
     if (!error.response) {
-        return "No fue posible conectar con el backend.";
+        return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde.";
     }
 
     const backendMessage = error.response.data?.message;
@@ -81,7 +81,7 @@ function getRequestErrorMessage(error) {
             return backendMessage
                 || "No fue posible procesar la consulta.";
         case 500:
-            return "Ocurrió un error interno en el servidor.";
+            return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde.";
         default:
             return backendMessage
                 || "No fue posible cargar el catálogo.";
@@ -152,7 +152,7 @@ function Catalogo() {
                 if (!isValidPageResponse(response.data)) {
                     setPageData(EMPTY_PAGE);
                     setErrorMessage(
-                        "El backend devolvió una estructura de paginación no compatible."
+                        "Recibimos una respuesta inesperada. Intenta de nuevo."
                     );
                     return;
                 }
@@ -273,10 +273,23 @@ function Catalogo() {
                             className="catalogo-feedback catalogo-empty"
                             role="status"
                         >
-                            <h2>No se encontraron mascotas</h2>
+                            <h2>
+                                {debouncedSearch
+                                || filters.especie
+                                || filters.sexo
+                                || filters.tamano
+                                || filters.edad
+                                    ? "Sin coincidencias"
+                                    : "Sin mascotas por ahora"}
+                            </h2>
                             <p>
-                                Prueba con otro nombre o cambia los
-                                filtros seleccionados.
+                                {debouncedSearch
+                                || filters.especie
+                                || filters.sexo
+                                || filters.tamano
+                                || filters.edad
+                                    ? "No encontramos mascotas que coincidan con los filtros seleccionados. Intenta cambiar tu búsqueda."
+                                    : "Por el momento no hay mascotas disponibles para adopción. Estamos preparando nuevos perfiles para ti."}
                             </p>
                         </div>
                     ) : (

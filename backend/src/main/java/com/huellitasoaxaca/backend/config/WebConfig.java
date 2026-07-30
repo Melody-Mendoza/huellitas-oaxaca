@@ -14,10 +14,12 @@ public class WebConfig implements WebMvcConfigurer
 {
     private final Path directorioFotos;
     private final Path directorioImagenesMascotas;
+    private final Path directorioRefugios;
 
     public WebConfig(
             @Value("${app.storage.perfil-fotos-dir}") String rutaDirectorio,
-            @Value("${app.storage.mascota-imagenes-dir:}") String rutaMascotas
+            @Value("${app.storage.mascota-imagenes-dir:}") String rutaMascotas,
+            @Value("${app.storage.refugio-fotos-dir:}") String rutaRefugios
     )
     {
         this.directorioFotos = Path.of(rutaDirectorio)
@@ -26,6 +28,7 @@ public class WebConfig implements WebMvcConfigurer
         this.directorioImagenesMascotas = resolverDirectorioMascotas(
                 rutaMascotas
         );
+        this.directorioRefugios = resolverDirectorioMascotas(rutaRefugios);
     }
 
     @Override
@@ -55,13 +58,33 @@ public class WebConfig implements WebMvcConfigurer
             ubicacionMascotas += "/";
         }
 
-        registry.addResourceHandler("/media/mascotas/**")
-                .addResourceLocations(ubicacionMascotas)
+        registry.addResourceHandler("/media/mascotas/demo/**")
+                .addResourceLocations("classpath:/demo-mascotas/")
                 .setCacheControl(
                         CacheControl.maxAge(Duration.ofDays(365))
                                 .cachePublic()
                                 .immutable()
                 );
+
+        registry.addResourceHandler("/media/mascotas/**")
+                .addResourceLocations(
+                        ubicacionMascotas,
+                        "classpath:/demo-mascotas/"
+                )
+                .setCacheControl(
+                        CacheControl.maxAge(Duration.ofDays(365))
+                                .cachePublic()
+                                .immutable()
+                );
+
+        registry.addResourceHandler("/media/refugios/**")
+                .addResourceLocations(ubicacion(directorioRefugios));
+    }
+
+    private String ubicacion(Path directorio)
+    {
+        String ubicacion = directorio.toUri().toString();
+        return ubicacion.endsWith("/") ? ubicacion : ubicacion + "/";
     }
 
     private Path resolverDirectorioMascotas(String ruta)

@@ -1,0 +1,30 @@
+meta {
+  name: MANUAL - Modifica datos - Crear refugio
+  type: http
+}
+
+post {
+  url: {{baseUrlVps}}/api/admin/refugios/completo
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenAdmin}}
+}
+
+body:json {
+  {
+    "responsableNombre": "Capturar",
+    "responsableApellidoPaterno": "Responsable",
+    "responsableCorreo": "capturar-en-entorno@huellitasoaxaca.mx",
+    "responsableTelefono": "9510000011",
+    "responsablePassword": "Cambiar2026*",
+    "nombre": "Refugio capturado",
+    "descripcion": "Registro manual autorizado",
+    "direccion": "Oaxaca de Juárez, Oaxaca",
+    "telefono": "9510000012",
+    "correo": "refugio-capturar@huellitasoaxaca.mx",
+    "motivo": "Registro manual autorizado"
+  }
+}

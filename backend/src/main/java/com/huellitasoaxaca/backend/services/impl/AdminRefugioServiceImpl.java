@@ -10,19 +10,23 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.jpa.domain.Specification;
 import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.huellitasoaxaca.backend.dto.request.RefugioAdminCrearRequest;
+import com.huellitasoaxaca.backend.dto.request.RefugioCompletoAdminCrearRequest;
 import com.huellitasoaxaca.backend.dto.response.PaginaResponse;
 import com.huellitasoaxaca.backend.dto.response.RefugioAdminDetalleResponse;
 import com.huellitasoaxaca.backend.dto.response.RefugioAdminResumenResponse;
 import com.huellitasoaxaca.backend.entity.Refugio;
 import com.huellitasoaxaca.backend.entity.Usuario;
+import com.huellitasoaxaca.backend.entity.Rol;
 import com.huellitasoaxaca.backend.entity.enums.TipoAccionAuditoria;
 import com.huellitasoaxaca.backend.exception.ConflictoAdministrativoException;
 import com.huellitasoaxaca.backend.exception.ParametroInvalidoException;
 import com.huellitasoaxaca.backend.exception.RecursoNoEncontradoException;
+import com.huellitasoaxaca.backend.exception.RecursoDuplicadoException;
 import com.huellitasoaxaca.backend.mapper.RefugioMapper;
 import com.huellitasoaxaca.backend.repository.RefugioRepository;
 import com.huellitasoaxaca.backend.repository.UsuarioRepository;
@@ -49,6 +53,8 @@ public class AdminRefugioServiceImpl implements AdminRefugioService
     private final UsuarioRepository usuarioRepository;
     private final RefugioMapper refugioMapper;
     private final AuditoriaAdministrativaService auditoriaService;
+    private final PasswordEncoder passwordEncoder;
+    private final com.huellitasoaxaca.backend.repository.RolRepository rolRepository;
 
     @Override
     public PaginaResponse<RefugioAdminResumenResponse> listar(
@@ -122,6 +128,77 @@ public class AdminRefugioServiceImpl implements AdminRefugioService
         );
 
         return refugioMapper.toAdminDetalle(guardado);
+    }
+
+    @Override
+    @Transactional
+    public RefugioAdminDetalleResponse crearCompleto(
+            RefugioCompletoAdminCrearRequest request,
+            String correoAdministrador
+    )
+    {
+        Usuario administrador = bloquearAdministradorActivo(
+                correoAdministrador
+        );
+        String correoResponsable = normalizarCorreo(
+                request.responsableCorreo()
+        );
+        String correoRefugio = normalizarCorreo(request.correo());
+
+        if (usuarioRepository.existsByCorreo(correoResponsable))
+        {
+            throw new RecursoDuplicadoException(
+                    "Ya existe un usuario con el correo del responsable"
+            );
+        }
+        if (refugioRepository.existsByNombre(request.nombre().trim()))
+        {
+            throw new RecursoDuplicadoException(
+                    "Ya existe un refugio con ese nombre"
+            );
+        }
+
+        Rol rolRefugio = rolRepository.findByNombre("REFUGIO")
+                .orElseThrow(() -> new RecursoNoEncontradoException(
+                        "No se encontró el rol REFUGIO"
+                ));
+        Usuario responsable = usuarioRepository.saveAndFlush(Usuario.builder()
+                .nombre(request.responsableNombre().trim())
+                .apellidoPaterno(request.responsableApellidoPaterno().trim())
+                .apellidoMaterno(limpiarTextoOpcional(
+                        request.responsableApellidoMaterno()
+                ))
+                .correo(correoResponsable)
+                .password(passwordEncoder.encode(request.responsablePassword()))
+                .telefono(request.responsableTelefono().trim())
+                .activo(true)
+                .fechaRegistro(LocalDateTime.now())
+                .rol(rolRefugio)
+                .build());
+
+        Refugio refugio = refugioRepository.saveAndFlush(Refugio.builder()
+                .nombre(request.nombre().trim())
+                .descripcion(request.descripcion().trim())
+                .direccion(request.direccion().trim())
+                .telefono(request.telefono().trim())
+                .correo(correoRefugio)
+                .activo(true)
+                .aprobado(true)
+                .fechaAprobacion(LocalDateTime.now())
+                .aprobadoPor(administrador)
+                .usuario(responsable)
+                .build());
+
+        auditoriaService.registrarAccionRefugio(
+                administrador,
+                refugio,
+                TipoAccionAuditoria.CREAR_REFUGIO,
+                request.motivo().trim(),
+                Map.of(),
+                estadoCompleto(refugio),
+                Map.of("responsableId", responsable.getId().toString())
+        );
+        return refugioMapper.toAdminDetalle(refugio);
     }
 
     @Override
@@ -550,6 +627,15 @@ public class AdminRefugioServiceImpl implements AdminRefugioService
             throw accesoAdministrativoDenegado();
         }
         return correo.trim().toLowerCase(Locale.ROOT);
+    }
+
+    private String limpiarTextoOpcional(String texto)
+    {
+        if (texto == null || texto.isBlank())
+        {
+            return null;
+        }
+        return texto.trim();
     }
 
     private AccessDeniedException accesoAdministrativoDenegado()

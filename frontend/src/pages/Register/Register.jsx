@@ -29,6 +29,8 @@ function Register() {
         }
     });
 
+    // React Hook Form's watch is needed to validate the confirmation field.
+    // eslint-disable-next-line react-hooks/incompatible-library
     const password = watch("password");
 
     const onSubmit = async (data) => {

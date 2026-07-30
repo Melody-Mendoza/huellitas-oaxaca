@@ -3,6 +3,7 @@ import { Link, useOutletContext, useParams } from "react-router-dom";
 import toast from "react-hot-toast";
 import Loader from "../../components/Loader/Loader";
 import api from "../../services/api";
+import { resolveMediaUrl } from "../../utils/media";
 import "./EditarMascota.css";
 
 const SPECIES = new Set(["PERRO", "GATO"]);
@@ -108,14 +109,14 @@ function createPatch(form, detail) {
 }
 
 function getErrorMessage(error, operation) {
-    if (!error.response) { return "No fue posible conectar con el backend."; }
+    if (!error.response) { return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde."; }
     const message = error.response.data?.message;
     if (error.response.status === 401) { return "La sesión ya no es válida. Inicia sesión nuevamente."; }
     if (error.response.status === 403) { return message || "No tienes permiso para administrar esta mascota."; }
     if (error.response.status === 404) { return message || "No se encontró la mascota en este refugio."; }
     if (error.response.status === 400) { return message || "Revisa los datos enviados."; }
     if (error.response.status === 422) { return message || "El cambio solicitado no está permitido."; }
-    if (error.response.status === 500) { return "Ocurrió un error interno en el servidor."; }
+    if (error.response.status === 500) { return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde."; }
     return `No fue posible ${operation}.`;
 }
 
@@ -162,7 +163,7 @@ function EditarMascota() {
                     { signal: controller.signal }
                 );
                 if (!isValidDetail(response.data, petId, selectedRefuge.id)) {
-                    setLoadError("El backend devolvió un detalle de mascota no compatible.");
+                    setLoadError("Recibimos una respuesta inesperada. Intenta de nuevo.");
                     return;
                 }
                 setDetail(response.data);
@@ -190,7 +191,7 @@ function EditarMascota() {
             try {
                 const response = await api.get(`/refugios/${selectedRefuge.id}/mascotas/${petId}/imagenes`, { signal: controller.signal });
                 if (!isValidImageList(response.data)) {
-                    setImagesError("El backend devolvió una lista de imágenes no compatible.");
+                    setImagesError("Recibimos una respuesta inesperada. Intenta de nuevo.");
                     return;
                 }
                 setImages(response.data);
@@ -249,7 +250,7 @@ function EditarMascota() {
                 { signal: controller.signal }
             );
             if (!isValidDetail(response.data, petId, selectedRefuge.id)) {
-                setOperationError("El backend devolvió un detalle de mascota no compatible.");
+                setOperationError("Recibimos una respuesta inesperada. Intenta de nuevo.");
                 return;
             }
             setDetail(response.data);
@@ -279,7 +280,7 @@ function EditarMascota() {
                 { signal: controller.signal }
             );
             if (!isValidDetail(response.data, petId, selectedRefuge.id)) {
-                setOperationError("El backend devolvió un detalle de mascota no compatible.");
+                setOperationError("Recibimos una respuesta inesperada. Intenta de nuevo.");
                 return;
             }
             setDetail(response.data);
@@ -306,7 +307,7 @@ function EditarMascota() {
         try {
             const response = await api.post(`/refugios/${selectedRefuge.id}/mascotas/${petId}/imagenes`, formData);
             if (!isValidImageList([response.data])) {
-                setImagesError("El backend devolvió una imagen no compatible.");
+                setImagesError("Recibimos una respuesta inesperada. Intenta de nuevo.");
                 return;
             }
             setImages((current) => [...current, response.data]);
@@ -322,7 +323,7 @@ function EditarMascota() {
     const handleSetPrincipal = async (imageId) => {
         try {
             const response = await api.patch(`/refugios/${selectedRefuge.id}/mascotas/${petId}/imagenes/${imageId}/principal`);
-            if (!isValidImageList([response.data])) { setImagesError("El backend devolvió una imagen no compatible."); return; }
+            if (!isValidImageList([response.data])) { setImagesError("Recibimos una respuesta inesperada. Intenta de nuevo."); return; }
             setImages((current) => current.map((image) => ({ ...image, principal: image.id === imageId })));
         } catch (error) { setImagesError(getErrorMessage(error, "seleccionar la imagen principal")); }
     };
@@ -442,7 +443,7 @@ function EditarMascota() {
                 {imagesError && <p role="alert">{imagesError}</p>}
                 {!imagesLoading && !imagesError && images.length === 0 && <p role="status">Esta mascota todavía no tiene imágenes.</p>}
                 <div className="edit-pet-image-list">
-                    {images.map((image) => <article key={image.id}><img src={image.url} alt={`Imagen de ${detail.nombre}`} /><div><span>{image.principal ? "Principal" : "Adicional"}</span>{!image.principal && <button type="button" onClick={() => handleSetPrincipal(image.id)}>Hacer principal</button>}<button type="button" onClick={() => handleDeleteImage(image.id)}>Eliminar</button></div></article>)}
+                    {images.map((image) => <article key={image.id}><img src={resolveMediaUrl(image.url)} alt={`Imagen de ${detail.nombre}`} /><div><span>{image.principal ? "Principal" : "Adicional"}</span>{!image.principal && <button type="button" onClick={() => handleSetPrincipal(image.id)}>Hacer principal</button>}<button type="button" onClick={() => handleDeleteImage(image.id)}>Eliminar</button></div></article>)}
                 </div>
                 {images.length < 8 && <form onSubmit={handleImageUpload}><label htmlFor="pet-image-upload">Agregar imagen</label><input id="pet-image-upload" type="file" accept="image/jpeg,image/png" onChange={(event) => setSelectedFile(event.target.files?.[0] ?? null)} /><button type="submit" disabled={!selectedFile || imageSaving}>{imageSaving ? "Subiendo..." : "Subir imagen"}</button></form>}
             </section>

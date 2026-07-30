@@ -1,0 +1,22 @@
+meta {
+  name: Login REFUGIO VPS
+  type: http
+}
+
+post {
+  url: {{baseUrlVps}}/api/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "correo": "{{refugioCorreo}}",
+    "password": "{{refugioPassword}}"
+  }
+}
+
+script:post-response {
+  const data = res.getBody();
+  bru.setEnvVar("tokenRefugio", data.token);
+}

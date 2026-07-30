@@ -1,0 +1,22 @@
+meta {
+  name: Login USUARIO VPS
+  type: http
+}
+
+post {
+  url: {{baseUrlVps}}/api/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "correo": "{{usuarioCorreo}}",
+    "password": "{{usuarioPassword}}"
+  }
+}
+
+script:post-response {
+  const data = res.getBody();
+  bru.setEnvVar("tokenUsuario", data.token);
+}

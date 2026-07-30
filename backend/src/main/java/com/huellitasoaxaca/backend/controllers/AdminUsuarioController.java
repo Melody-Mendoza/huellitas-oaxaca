@@ -5,6 +5,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.huellitasoaxaca.backend.dto.request.UsuarioEstadoAdminRequest;
+import com.huellitasoaxaca.backend.dto.request.UsuarioAdminCrearRequest;
 import com.huellitasoaxaca.backend.dto.response.PaginaResponse;
 import com.huellitasoaxaca.backend.dto.response.UsuarioResponse;
 import com.huellitasoaxaca.backend.services.UsuarioService;
@@ -26,6 +28,20 @@ import lombok.RequiredArgsConstructor;
 public class AdminUsuarioController
 {
     private final UsuarioService usuarioService;
+
+    @PostMapping("/administradores")
+    public ResponseEntity<UsuarioResponse> crearAdministrador(
+            @Valid @RequestBody UsuarioAdminCrearRequest request,
+            Authentication authentication
+    )
+    {
+        return ResponseEntity.status(201).body(
+                usuarioService.crearAdministrador(
+                        request,
+                        authentication.getName()
+                )
+        );
+    }
 
     @GetMapping
     public ResponseEntity<PaginaResponse<UsuarioResponse>> listar(

@@ -6,6 +6,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import com.huellitasoaxaca.backend.dto.request.CambiarPasswordRequest;
 import com.huellitasoaxaca.backend.dto.request.UsuarioActualizarRequest;
+import com.huellitasoaxaca.backend.dto.request.UsuarioAdminCrearRequest;
 import com.huellitasoaxaca.backend.dto.response.PaginaResponse;
 import com.huellitasoaxaca.backend.dto.response.UsuarioResponse;
 
@@ -57,6 +58,11 @@ public interface UsuarioService
                 Long id,
                 Boolean activo,
                 String motivo,
+                String correoAdministrador
+        );
+
+        UsuarioResponse crearAdministrador(
+                UsuarioAdminCrearRequest request,
                 String correoAdministrador
         );
 }

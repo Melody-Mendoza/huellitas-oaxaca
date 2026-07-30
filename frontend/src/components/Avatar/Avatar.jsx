@@ -1,4 +1,5 @@
 import "./Avatar.css";
+import { resolveMediaUrl } from "../../utils/media";
 
 function getDisplayName(user) {
     const fullName = [
@@ -31,7 +32,7 @@ function getInitials(user) {
 
 function Avatar({ user, size = 44, className = "" }) {
     const displayName = getDisplayName(user);
-    const photoUrl = user?.fotoPerfil?.trim();
+    const photoUrl = resolveMediaUrl(user?.fotoPerfil);
 
     return (
         <span

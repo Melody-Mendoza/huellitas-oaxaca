@@ -1,6 +1,7 @@
 package com.huellitasoaxaca.backend.services;
 
 import com.huellitasoaxaca.backend.dto.request.RefugioAdminCrearRequest;
+import com.huellitasoaxaca.backend.dto.request.RefugioCompletoAdminCrearRequest;
 import com.huellitasoaxaca.backend.dto.response.PaginaResponse;
 import com.huellitasoaxaca.backend.dto.response.RefugioAdminDetalleResponse;
 import com.huellitasoaxaca.backend.dto.response.RefugioAdminResumenResponse;
@@ -20,6 +21,11 @@ public interface AdminRefugioService
 
     RefugioAdminDetalleResponse crear(
             RefugioAdminCrearRequest request,
+            String correoAdministrador
+    );
+
+    RefugioAdminDetalleResponse crearCompleto(
+            RefugioCompletoAdminCrearRequest request,
             String correoAdministrador
     );
 

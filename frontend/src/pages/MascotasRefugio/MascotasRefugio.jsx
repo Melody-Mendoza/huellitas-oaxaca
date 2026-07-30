@@ -3,6 +3,7 @@ import { Link, useOutletContext } from "react-router-dom";
 import Loader from "../../components/Loader/Loader";
 import Pagination from "../../components/Pagination/Pagination";
 import api from "../../services/api";
+import { resolveMediaUrl } from "../../utils/media";
 import "./MascotasRefugio.css";
 
 const PAGE_SIZE = 10;
@@ -25,14 +26,14 @@ const LABELS = {
 };
 
 function getErrorMessage(error) {
-    if (!error.response) { return "No fue posible conectar con el backend."; }
+    if (!error.response) { return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde."; }
     const message = error.response.data?.message;
     if (error.response.status === 401) { return "La sesión ya no es válida. Inicia sesión nuevamente."; }
     if (error.response.status === 403) { return message || "No tienes permiso para consultar estas mascotas."; }
     if (error.response.status === 404) { return message || "No se encontró el refugio solicitado."; }
     if (error.response.status === 400) { return message || "Los filtros enviados no son válidos."; }
     return error.response.status === 500
-        ? "Ocurrió un error interno en el servidor."
+        ? "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde."
         : "No fue posible cargar las mascotas.";
 }
 
@@ -104,7 +105,7 @@ function MascotasRefugio() {
                     { params, signal: controller.signal }
                 );
                 if (!isValidPage(response.data)) {
-                    setErrorMessage("El backend devolvió una página de mascotas no compatible.");
+                    setErrorMessage("Recibimos una respuesta inesperada. Intenta de nuevo.");
                     return;
                 }
                 setResult(response.data);
@@ -189,7 +190,7 @@ function MascotasRefugio() {
                     <div className="shelter-pets-grid">
                         {result.content.map((pet) => (
                             <article className="shelter-pet-card" key={pet.id}>
-                                {pet.imagenPrincipal ? <img src={pet.imagenPrincipal} alt={`Imagen de ${pet.nombre}`} /> : <div className="shelter-pet-placeholder" aria-hidden="true">Sin imagen</div>}
+                                {resolveMediaUrl(pet.imagenPrincipal) ? <img src={resolveMediaUrl(pet.imagenPrincipal)} alt={`Imagen de ${pet.nombre}`} /> : <div className="shelter-pet-placeholder" aria-hidden="true">Sin imagen</div>}
                                 <div className="shelter-pet-content">
                                     <div>
                                         <span className={`shelter-pet-status status-${pet.estado.toLowerCase()}`}>{LABELS[pet.estado]}</span>

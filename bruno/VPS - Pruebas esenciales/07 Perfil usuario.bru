@@ -1,0 +1,14 @@
+meta {
+  name: Perfil del usuario VPS
+  type: http
+}
+
+get {
+  url: {{baseUrlVps}}/api/auth/me
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenUsuario}}
+}

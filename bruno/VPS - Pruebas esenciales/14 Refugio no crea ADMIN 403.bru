@@ -1,0 +1,27 @@
+meta {
+  name: Refugio intenta crear administrador VPS
+  type: http
+}
+
+post {
+  url: {{baseUrlVps}}/api/admin/usuarios/administradores
+  body: json
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenRefugio}}
+}
+
+body:json {
+  {
+    "nombre": "Solicitud no ejecutada",
+    "apellidoPaterno": "Control",
+    "correo": "no-ejecutar@huellitasoaxaca.mx",
+    "password": "Control2026*"
+  }
+}
+
+script:post-response {
+  if (res.getStatus() !== 403) throw new Error("Se esperaba HTTP 403");
+}

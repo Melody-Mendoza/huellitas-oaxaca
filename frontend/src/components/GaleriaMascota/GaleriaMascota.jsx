@@ -1,4 +1,5 @@
 import "./GaleriaMascota.css";
+import { resolveMediaUrl } from "../../utils/media";
 
 import { ImageOff } from "lucide-react";
 import { useState } from "react";
@@ -10,9 +11,9 @@ function normalizeImages(
     imagenesAdicionales
 ) {
     const candidates = [
-        imagenPrincipal,
+        resolveMediaUrl(imagenPrincipal),
         ...(Array.isArray(imagenesAdicionales)
-            ? imagenesAdicionales
+            ? imagenesAdicionales.map(resolveMediaUrl)
             : [])
     ];
 

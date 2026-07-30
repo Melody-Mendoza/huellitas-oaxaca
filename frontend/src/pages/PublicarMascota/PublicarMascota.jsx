@@ -48,7 +48,7 @@ function validateForm(form) {
 }
 
 function getErrorMessage(error) {
-    if (!error.response) { return "No fue posible conectar con el backend."; }
+    if (!error.response) { return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde."; }
     const message = error.response.data?.message;
     if (error.response.status === 401) { return "La sesión ya no es válida. Inicia sesión nuevamente."; }
     if (error.response.status === 403) { return message || "No tienes permiso para publicar mascotas en este refugio."; }
@@ -56,7 +56,7 @@ function getErrorMessage(error) {
     if (error.response.status === 400) { return message || "Revisa los datos ingresados."; }
     if (error.response.status === 422) { return message || "No fue posible publicar la mascota."; }
     return error.response.status === 500
-        ? "Ocurrió un error interno en el servidor."
+        ? "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde."
         : "No fue posible completar la operación.";
 }
 
@@ -109,7 +109,7 @@ function PublicarMascota() {
                 { signal: controller.signal }
             );
             if (!Number.isSafeInteger(response.data?.id) || response.data.id < 1) {
-                setSubmitError("El backend no devolvió el identificador de la mascota creada.");
+                setSubmitError("No pudimos obtener el identificador de la mascota creada. Intenta de nuevo.");
                 return;
             }
             toast.success("Mascota publicada correctamente.");

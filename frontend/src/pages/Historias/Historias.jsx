@@ -17,7 +17,7 @@ function Historias() {
 
             <section className="stories-container" role="status">
                 <h1>Historias de adopción</h1>
-                <p>Las historias publicadas por refugios estarán disponibles cuando exista un endpoint HTTP para este módulo.</p>
+                <p>Aún no hay historias de adopción publicadas. Muy pronto conocerás a las familias y mascotas que encontraron un nuevo hogar.</p>
             </section>
 
         </>

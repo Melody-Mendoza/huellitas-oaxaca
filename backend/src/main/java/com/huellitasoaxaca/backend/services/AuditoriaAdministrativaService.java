@@ -16,6 +16,12 @@ public interface AuditoriaAdministrativaService
             String motivo
     );
 
+    void registrarCreacionUsuario(
+            Usuario administrador,
+            Usuario usuario,
+            String motivo
+    );
+
     void registrarAccionRefugio(
             Usuario administrador,
             Refugio refugio,

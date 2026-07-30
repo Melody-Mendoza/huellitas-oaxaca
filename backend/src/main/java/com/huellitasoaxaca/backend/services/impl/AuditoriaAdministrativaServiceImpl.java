@@ -51,6 +51,30 @@ public class AuditoriaAdministrativaServiceImpl
     }
 
     @Override
+    public void registrarCreacionUsuario(
+            Usuario administrador,
+            Usuario usuario,
+            String motivo
+    )
+    {
+        auditoriaRepository.save(AuditoriaAdministrativa.builder()
+                .administrador(administrador)
+                .tipoAccion(TipoAccionAuditoria.CREAR_USUARIO)
+                .tipoRecurso(TipoRecursoAuditoria.USUARIO)
+                .recursoId(usuario.getId())
+                .motivo(motivo)
+                .estadoAnterior(Map.of())
+                .estadoNuevo(Map.of(
+                        "activo", true,
+                        "rol", usuario.getRol().getNombre()
+                ))
+                .resultado(ResultadoAuditoria.EXITOSA)
+                .fecha(LocalDateTime.now())
+                .metadatos(Map.of("correo", usuario.getCorreo()))
+                .build());
+    }
+
+    @Override
     public void registrarAccionRefugio(
             Usuario administrador,
             Refugio refugio,
