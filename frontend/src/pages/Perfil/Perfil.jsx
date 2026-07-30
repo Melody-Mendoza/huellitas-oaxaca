@@ -5,12 +5,60 @@ import {
     EyeOff,
     Trash2
 } from "lucide-react";
-import { useForm } from "react-hook-form";
+import { useForm, useWatch } from "react-hook-form";
 import toast from "react-hot-toast";
 import Avatar from "../../components/Avatar/Avatar";
+import Loader from "../../components/Loader/Loader";
+import Modal from "../../components/Modal/Modal";
 import api from "../../services/api";
 import { useAuth } from "../../context/AuthContext";
 import "./Perfil.css";
+
+const PASSWORD_BUSINESS_ERRORS = {
+    "La contraseña actual es incorrecta": "passwordActual",
+    "Las contraseñas nuevas no coinciden": "confirmarPassword",
+    "La nueva contraseña debe ser diferente a la actual":
+        "nuevaPassword"
+};
+
+function isValidPasswordResponse(response) {
+    return Boolean(
+        response.status === 200
+        && response.data
+        && typeof response.data === "object"
+        && typeof response.data.mensaje === "string"
+        && response.data.mensaje.trim()
+    );
+}
+
+function getPasswordErrorMessage(error) {
+    if (!error.response) {
+        return "No fue posible conectar con el backend.";
+    }
+
+    const backendMessage = error.response.data?.message;
+
+    switch (error.response.status) {
+        case 400:
+            return typeof backendMessage === "string"
+                ? backendMessage
+                : "Revisa los datos ingresados.";
+        case 401:
+            return "La sesión no es válida. Inicia sesión nuevamente.";
+        case 403:
+            return "No tienes permiso para cambiar la contraseña.";
+        case 404:
+            return "No se encontró el usuario autenticado.";
+        case 422:
+            return typeof backendMessage === "string"
+                ? backendMessage
+                : "No fue posible aplicar el cambio de contraseña.";
+        case 500:
+            return "Ocurrió un error interno en el servidor.";
+        default:
+            return "No fue posible cambiar la contraseña.";
+    }
+}
 
 function Perfil() {
     const { user, updateUser } = useAuth();
@@ -46,7 +94,7 @@ function Perfil() {
     const {
         register: registerPassword,
         handleSubmit: handlePasswordSubmit,
-        watch: watchPassword,
+        control: passwordControl,
         reset: resetPassword,
         setError: setPasswordError,
         formState: {
@@ -61,7 +109,10 @@ function Perfil() {
         }
     });
 
-    const nuevaPassword = watchPassword("nuevaPassword");
+    const nuevaPassword = useWatch({
+        control: passwordControl,
+        name: "nuevaPassword"
+    });
 
     useEffect(() => {
         let active = true;
@@ -176,18 +227,34 @@ function Perfil() {
     };
 
     const handleDeletePhoto = async () => {
-        const confirmed = window.confirm(
-            "¿Deseas eliminar tu fotografía de perfil?"
-        );
-
-        if (!confirmed) {
+        if (isUpdatingPhoto) {
             return;
         }
 
+        setIsUpdatingPhoto(true);
+
         try {
-            setIsUpdatingPhoto(true);
+            const confirmation = await Modal.confirm(
+                "Eliminar fotografía",
+                "¿Deseas eliminar tu fotografía de perfil?"
+            );
+
+            if (!confirmation.isConfirmed) {
+                return;
+            }
 
             const response = await api.delete("/perfil/foto");
+
+            if (
+                response.status !== 200
+                || !response.data
+                || typeof response.data !== "object"
+            ) {
+                toast.error(
+                    "El backend devolvió una respuesta de eliminación no compatible."
+                );
+                return;
+            }
 
             setProfile(response.data);
             updateUser(response.data);
@@ -243,6 +310,13 @@ function Perfil() {
     };
 
     const onPasswordSubmit = async (data) => {
+        if (
+            profile?.tienePasswordLocal !== true
+            || isSavingPassword
+        ) {
+            return;
+        }
+
         const payload = {
             passwordActual: data.passwordActual,
             nuevaPassword: data.nuevaPassword,
@@ -255,29 +329,23 @@ function Perfil() {
                 payload
             );
 
+            if (!isValidPasswordResponse(response)) {
+                toast.error(
+                    "El backend devolvió una respuesta de contraseña no compatible."
+                );
+                return;
+            }
+
             resetPassword();
-            toast.success(
-                response.data?.mensaje
-                ?? "Contraseña actualizada correctamente"
-            );
+            toast.success(response.data.mensaje);
         } catch (error) {
             const status = error.response?.status;
-            const responseData = error.response?.data;
-            const message = responseData?.message
-                ?? "No fue posible cambiar la contraseña";
+            const message = getPasswordErrorMessage(error);
 
             applyServerErrors(error, setPasswordError);
 
             if (status === 422) {
-                const passwordErrorFields = {
-                    "La contraseña actual es incorrecta":
-                        "passwordActual",
-                    "Las contraseñas nuevas no coinciden":
-                        "confirmarPassword",
-                    "La nueva contraseña debe ser diferente a la actual":
-                        "nuevaPassword"
-                };
-                const field = passwordErrorFields[message];
+                const field = PASSWORD_BUSINESS_ERRORS[message];
 
                 setPasswordError(field ?? "root.server", {
                     type: "server",
@@ -285,14 +353,12 @@ function Perfil() {
                 });
             }
 
-            if (status !== 401) {
-                toast.error(message);
-            }
+            toast.error(message);
         }
     };
 
     if (loadingProfile) {
-        return <p>Cargando perfil...</p>;
+        return <Loader />;
     }
 
     return (
@@ -485,15 +551,18 @@ function Perfil() {
                 </form>
             </section>
 
-            <section>
-                <h2>Cambiar contraseña</h2>
+            <section aria-labelledby="perfil-password-title">
+                <h2 id="perfil-password-title">
+                    Cambiar contraseña
+                </h2>
 
-                <form
-                    onSubmit={handlePasswordSubmit(
-                        onPasswordSubmit
-                    )}
-                    noValidate
-                >
+                {profile?.tienePasswordLocal === true ? (
+                    <form
+                        onSubmit={handlePasswordSubmit(
+                            onPasswordSubmit
+                        )}
+                        noValidate
+                    >
                     <label htmlFor="password-actual">
                         Contraseña actual
                     </label>
@@ -506,6 +575,15 @@ function Perfil() {
                                     : "password"
                             }
                             autoComplete="current-password"
+                            aria-invalid={Boolean(
+                                passwordErrors.passwordActual
+                            )}
+                            aria-describedby={
+                                passwordErrors.passwordActual
+                                    ? "password-actual-error"
+                                    : undefined
+                            }
+                            disabled={isSavingPassword}
                             {...registerPassword(
                                 "passwordActual",
                                 {
@@ -528,6 +606,7 @@ function Perfil() {
                                     : "Mostrar contraseña actual"
                             }
                             aria-pressed={showCurrentPassword}
+                            disabled={isSavingPassword}
                         >
                             {showCurrentPassword
                                 ? (
@@ -545,7 +624,11 @@ function Perfil() {
                         </button>
                     </div>
                     {passwordErrors.passwordActual && (
-                        <p className="error">
+                        <p
+                            id="password-actual-error"
+                            className="error"
+                            role="alert"
+                        >
                             {passwordErrors.passwordActual.message}
                         </p>
                     )}
@@ -562,6 +645,15 @@ function Perfil() {
                                     : "password"
                             }
                             autoComplete="new-password"
+                            aria-invalid={Boolean(
+                                passwordErrors.nuevaPassword
+                            )}
+                            aria-describedby={
+                                passwordErrors.nuevaPassword
+                                    ? "password-nueva-error"
+                                    : "password-nueva-help"
+                            }
+                            disabled={isSavingPassword}
                             {...registerPassword(
                                 "nuevaPassword",
                                 {
@@ -608,6 +700,7 @@ function Perfil() {
                                     : "Mostrar nueva contraseña"
                             }
                             aria-pressed={showNewPassword}
+                            disabled={isSavingPassword}
                         >
                             {showNewPassword
                                 ? (
@@ -624,8 +717,19 @@ function Perfil() {
                                 )}
                         </button>
                     </div>
+                    <p
+                        id="password-nueva-help"
+                        className="perfil-password-help"
+                    >
+                        Entre 8 y 14 caracteres, con una mayúscula,
+                        un número y un carácter especial.
+                    </p>
                     {passwordErrors.nuevaPassword && (
-                        <p className="error">
+                        <p
+                            id="password-nueva-error"
+                            className="error"
+                            role="alert"
+                        >
                             {passwordErrors.nuevaPassword.message}
                         </p>
                     )}
@@ -642,6 +746,15 @@ function Perfil() {
                                     : "password"
                             }
                             autoComplete="new-password"
+                            aria-invalid={Boolean(
+                                passwordErrors.confirmarPassword
+                            )}
+                            aria-describedby={
+                                passwordErrors.confirmarPassword
+                                    ? "password-confirmar-error"
+                                    : undefined
+                            }
+                            disabled={isSavingPassword}
                             {...registerPassword(
                                 "confirmarPassword",
                                 {
@@ -668,6 +781,7 @@ function Perfil() {
                                     : "Mostrar confirmación de contraseña"
                             }
                             aria-pressed={showConfirmPassword}
+                            disabled={isSavingPassword}
                         >
                             {showConfirmPassword
                                 ? (
@@ -685,7 +799,11 @@ function Perfil() {
                         </button>
                     </div>
                     {passwordErrors.confirmarPassword && (
-                        <p className="error">
+                        <p
+                            id="password-confirmar-error"
+                            className="error"
+                            role="alert"
+                        >
                             {passwordErrors.confirmarPassword.message}
                         </p>
                     )}
@@ -706,7 +824,44 @@ function Perfil() {
                             ? "Actualizando..."
                             : "Cambiar contraseña"}
                     </button>
-                </form>
+                    </form>
+                ) : (
+                    <div
+                        className={
+                            profile?.tienePasswordLocal === false
+                                ? "perfil-password-notice"
+                                : "perfil-password-notice perfil-password-notice-warning"
+                        }
+                        role="status"
+                        aria-live="polite"
+                    >
+                        {profile?.tienePasswordLocal === false ? (
+                            <>
+                                <strong>
+                                    Cuenta vinculada con Google
+                                </strong>
+                                <p>
+                                    Esta cuenta inicia sesión mediante
+                                    Google. Actualmente no tiene una
+                                    contraseña local que pueda cambiarse
+                                    desde este perfil.
+                                </p>
+                            </>
+                        ) : (
+                            <>
+                                <strong>
+                                    Información no disponible
+                                </strong>
+                                <p>
+                                    No pudimos confirmar si esta cuenta
+                                    tiene una contraseña local. Por
+                                    seguridad, el cambio de contraseña no
+                                    está disponible en este momento.
+                                </p>
+                            </>
+                        )}
+                    </div>
+                )}
             </section>
         </main>
     );

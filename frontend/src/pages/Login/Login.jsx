@@ -324,6 +324,12 @@ function Login() {
                         </p>
                     )}
 
+                    <p className="forgot">
+                        <Link to="/recuperar-password">
+                            ¿Olvidaste tu contraseña?
+                        </Link>
+                    </p>
+
                     <button
                         type="submit"
                         className="login-button"

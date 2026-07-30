@@ -19,7 +19,7 @@
 
 .admin-eyebrow {
     margin: 0 0 6px;
-    color: var(--primary);
+    color:#2F6E4F;
     font-size: 0.85rem;
     font-weight: 700;
     letter-spacing: 0.08em;
@@ -125,7 +125,7 @@
 }
 
 .admin-primary-button {
-    background: var(--primary);
+    background:#2F6E4F;
     color: #ffffff;
 }
 
@@ -141,7 +141,7 @@
 }
 
 .admin-action-success {
-    background: var(--primary);
+    background:#2F6E4F;
     color: #ffffff;
 }
 
