@@ -216,15 +216,34 @@ public class GlobalExceptionHandler
                         .body(respuesta);
         }
 
+        @ExceptionHandler(ImagenMascotaException.class)
+        public ResponseEntity<ErrorResponse> manejarImagenMascota(
+                ImagenMascotaException exception,
+                HttpServletRequest request
+        )
+        {
+                ErrorResponse respuesta = crearError(
+                        exception.getStatus(),
+                        exception.getMessage(),
+                        request.getRequestURI()
+                );
+
+                return ResponseEntity
+                        .status(exception.getStatus())
+                        .body(respuesta);
+        }
+
         @ExceptionHandler(MissingServletRequestPartException.class)
         public ResponseEntity<ErrorResponse> manejarParteMultipartAusente(
                 MissingServletRequestPartException exception,
                 HttpServletRequest request
         )
         {
+                String nombreParte = exception.getRequestPartName();
                 ErrorResponse respuesta = crearError(
                         HttpStatus.BAD_REQUEST,
-                        "Debe enviar el archivo en el campo 'foto'",
+                        "Debe enviar el archivo en el campo '"
+                                + nombreParte + "'",
                         request.getRequestURI()
                 );
 
@@ -237,9 +256,13 @@ public class GlobalExceptionHandler
                 HttpServletRequest request
         )
         {
+                boolean imagenMascota = request.getRequestURI()
+                        .contains("/imagenes");
                 ErrorResponse respuesta = crearError(
                         HttpStatus.PAYLOAD_TOO_LARGE,
-                        "La foto no debe superar 5 MiB",
+                        imagenMascota
+                                ? "La imagen no debe superar 5 MiB"
+                                : "La foto no debe superar 5 MiB",
                         request.getRequestURI()
                 );
 

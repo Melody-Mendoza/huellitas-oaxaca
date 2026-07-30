@@ -2,7 +2,6 @@ package com.huellitasoaxaca.backend.mapper;
 
 import com.huellitasoaxaca.backend.dto.response.ImagenMascotaResponse;
 import com.huellitasoaxaca.backend.entity.ImagenMascota;
-import com.huellitasoaxaca.backend.entity.Mascota;
 
 import org.springframework.stereotype.Component;
 
@@ -16,13 +15,10 @@ public class ImagenMascotaMapper
             return null;
         }
 
-        Mascota mascota = imagen.getMascota();
-
         return new ImagenMascotaResponse(
                 imagen.getId(),
                 imagen.getUrl(),
-                mascota != null ? mascota.getId() : null,
-                mascota != null ? mascota.getNombre() : null
+                Boolean.TRUE.equals(imagen.getPrincipal())
         );
     }
 }

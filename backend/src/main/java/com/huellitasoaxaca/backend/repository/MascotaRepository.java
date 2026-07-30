@@ -37,6 +37,22 @@ public interface MascotaRepository extends
             EstadoMascota estado
     );
 
+    @EntityGraph(attributePaths = "refugio")
+    Optional<Mascota> findByIdAndRefugioId(Long id, Long refugioId);
+
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    @EntityGraph(attributePaths = "refugio")
+    @Query("""
+            SELECT mascota
+            FROM Mascota mascota
+            WHERE mascota.id = :mascotaId
+              AND mascota.refugio.id = :refugioId
+            """)
+    Optional<Mascota> findPropiaParaActualizar(
+            @Param("mascotaId") Long mascotaId,
+            @Param("refugioId") Long refugioId
+    );
+
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @EntityGraph(attributePaths = "refugio")
     @Query("SELECT mascota FROM Mascota mascota WHERE mascota.id = :id")

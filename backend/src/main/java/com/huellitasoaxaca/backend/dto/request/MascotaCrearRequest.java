@@ -7,11 +7,12 @@ import com.huellitasoaxaca.backend.entity.enums.SexoMascota;
 import com.huellitasoaxaca.backend.entity.enums.TamanoMascota;
 
 import jakarta.validation.constraints.DecimalMin;
+import jakarta.validation.constraints.DecimalMax;
+import jakarta.validation.constraints.Digits;
 import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
-import jakarta.validation.constraints.Positive;
 import jakarta.validation.constraints.Size;
 
 public record MascotaCrearRequest(
@@ -50,6 +51,15 @@ public record MascotaCrearRequest(
                 value = "0.1",
                 message = "El peso debe ser mayor que cero"
         )
+        @DecimalMax(
+                value = "999.99",
+                message = "El peso no puede superar 999.99"
+        )
+        @Digits(
+                integer = 3,
+                fraction = 2,
+                message = "El peso debe tener hasta 3 enteros y 2 decimales"
+        )
         BigDecimal peso,
 
         @NotNull(message = "El tamaño es obligatorio")
@@ -60,10 +70,6 @@ public record MascotaCrearRequest(
                 max = 2000,
                 message = "La descripción no puede superar los 2000 caracteres"
         )
-        String descripcion,
-
-        @NotNull(message = "El refugio es obligatorio")
-        @Positive(message = "El identificador del refugio debe ser válido")
-        Long refugioId
+        String descripcion
 ) 
 {}
