@@ -39,3 +39,5 @@ src/main/resources/application.properties
 ### Archivos de error de la JVM ###
 hs_err_pid*.log
 replay_pid*.log
+
+bruno/Local/

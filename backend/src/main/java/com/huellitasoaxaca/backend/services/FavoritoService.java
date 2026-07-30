@@ -1,16 +1,17 @@
 package com.huellitasoaxaca.backend.services;
 
 import com.huellitasoaxaca.backend.dto.response.FavoritoResponse;
-
-import java.util.List;
+import org.springframework.data.domain.Page;
 
 public interface FavoritoService 
 {
-    List<FavoritoResponse> listarPorUsuario(Long usuarioId);
+    FavoritoResponse agregar(Long mascotaId, String correoAutenticado);
 
-    List<FavoritoResponse> listarPorMascota(Long mascotaId);
+    Page<FavoritoResponse> listar(
+            String correoAutenticado,
+            int page,
+            int size
+    );
 
-    boolean existe(Long usuarioId, Long mascotaId);
-
-    void eliminar(Long usuarioId, Long mascotaId);
+    void eliminar(Long mascotaId, String correoAutenticado);
 }

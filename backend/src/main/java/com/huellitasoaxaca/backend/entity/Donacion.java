@@ -52,6 +52,12 @@ public class Donacion
     @Column(name = "mensaje", columnDefinition = "TEXT")
     private String mensaje;
 
+    @Column(name = "clave_idempotencia", nullable = false, length = 64)
+    private String claveIdempotencia;
+
+    @Column(name = "fecha_actualizacion", nullable = false)
+    private LocalDateTime fechaActualizacion;
+
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
     @JoinColumn(name = "usuario_id", nullable = false)
     private Usuario usuario;

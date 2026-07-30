@@ -9,12 +9,12 @@ import com.huellitasoaxaca.backend.entity.enums.MetodoPago;
 public record DonacionResponse(
     Long id,
     BigDecimal monto,
+    String moneda,
     MetodoPago metodoPago,
     LocalDateTime fecha,
+    LocalDateTime fechaActualizacion,
     EstatusDonacion estatus,
     String mensaje,
-    Long usuarioId,
-    String nombreUsuario,
     Long refugioId,
     String nombreRefugio
 ) 
