@@ -1,272 +1,398 @@
 import "./DetalleMascota.css";
 
-import { Heart, MapPin } from "lucide-react";
+import { CalendarDays, Mail, MapPin, Phone } from "lucide-react";
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-import { useState } from "react";
 
 import GaleriaMascota from "../../components/GaleriaMascota/GaleriaMascota";
 import InfoCard from "../../components/InfoCard/InfoCard";
+import Loader from "../../components/Loader/Loader";
+import api from "../../services/api";
 
-function DetalleMascota() {
+const MAX_JAVA_LONG = 9223372036854775807n;
 
-    const { id } = useParams();
+const ENUM_LABELS = {
+    ADOPTADO: "Adoptado",
+    DISPONIBLE: "Disponible",
+    EN_PROCESO: "En proceso",
+    GATO: "Gato",
+    GRANDE: "Grande",
+    HEMBRA: "Hembra",
+    MACHO: "Macho",
+    MEDIANO: "Mediano",
+    PEQUENO: "Pequeño",
+    PERRO: "Perro"
+};
 
-    const mascotas = [
+const dateFormatter = new Intl.DateTimeFormat("es-MX", {
+    dateStyle: "long",
+    timeZone: "UTC"
+});
 
-        {
-            id: 1,
-            nombre: "Luna",
-            raza: "Mestiza",
-            edad: "2 años",
-            sexo: "Hembra",
-            tamano: "Tamaño Mediano",
-            vacunas: "Completas",
-            esterilizada: "Sí",
-            refugio: "Refugio Central, Oaxaca",
-            personalidad: ["Juguetona", "Cariñosa", "Sociable"],
-            descripcion: "Luna fue rescatada de las calles y actualmente busca una familia responsable. Es una perrita muy cariñosa y le encanta convivir con personas.",
-            imagenes: [
-                "https://images.unsplash.com/photo-1517849845537-4d257902454a?w=900",
-                "https://images.unsplash.com/photo-1517849845537-4d257902454a?w=900",
-                "https://images.unsplash.com/photo-1517849845537-4d257902454a?w=900"
-            ]
-        },
-
-        {
-            id: 2,
-            nombre: "Pixy",
-            raza: "Chihuahua",
-            edad: "4 meses",
-            sexo: "Hembra",
-            tamano: "Tamaño Pequeño",
-            vacunas: "Primera vacuna",
-            esterilizada: "No",
-            refugio: "Hogar Temporal, Centro",
-            personalidad: ["Tierna", "Curiosa", "Juguetona"],
-            descripcion: "Pixy es una cachorrita llena de energía que disfruta explorar y jugar todo el día.",
-            imagenes: [
-                "https://images.unsplash.com/photo-1519052537078-e6302a4968d4?w=900",
-                "https://images.unsplash.com/photo-1519052537078-e6302a4968d4?w=900",
-                "https://images.unsplash.com/photo-1519052537078-e6302a4968d4?w=900"
-            ]
-        },
-
-        {
-            id: 3,
-            nombre: "Max",
-            raza: "Labrador",
-            edad: "5 años",
-            sexo: "Macho",
-            tamano: "Tamaño Grande",
-            vacunas: "Completas",
-            esterilizada: "Sí",
-            refugio: "Refugio Central, Oaxaca",
-            personalidad: ["Leal", "Protector", "Activo"],
-            descripcion: "Max disfruta correr, jugar y convivir con niños. Es un perro muy noble y obediente.",
-            imagenes: [
-                "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=900",
-                "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=900",
-                "https://images.unsplash.com/photo-1587300003388-59208cc962cb?w=900"
-            ]
-        },
-
-        {
-            id: 4,
-            nombre: "Mila",
-            raza: "Golden Retriever",
-            edad: "2 años",
-            sexo: "Hembra",
-            tamano: "Tamaño Mediano",
-            vacunas: "Completas",
-            esterilizada: "Sí",
-            refugio: "Hogar Temporal, Xoxo",
-            personalidad: ["Dócil", "Amorosa", "Paciente"],
-            descripcion: "Mila es muy tranquila y disfruta pasar tiempo con personas y otras mascotas.",
-            imagenes: [
-                "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=900",
-                "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=900",
-                "https://images.unsplash.com/photo-1548199973-03cce0bbc87b?w=900"
-            ]
-        },
-
-        {
-            id: 5,
-            nombre: "Toby",
-            raza: "Beagle",
-            edad: "1 año",
-            sexo: "Macho",
-            tamano: "Tamaño Pequeño",
-            vacunas: "Completas",
-            esterilizada: "No",
-            refugio: "Refugio Central, Oaxaca",
-            personalidad: ["Inteligente", "Curioso", "Amigable"],
-            descripcion: "Toby es un perro muy sociable que disfruta caminar y convivir con otros perros.",
-            imagenes: [
-                "https://images.unsplash.com/photo-1591160690555-5debfba289f0?w=900",
-                "https://images.unsplash.com/photo-1591160690555-5debfba289f0?w=900",
-                "https://images.unsplash.com/photo-1591160690555-5debfba289f0?w=900"
-            ]
-        }
-
-    ];
-
-    const mascota = mascotas.find((m) => m.id === Number(id));
-
-    const [favorito, setFavorito] = useState(false);
-
-    if (!mascota) {
-
-        return (
-
-            <section className="detalle">
-
-                <h2>Mascota no encontrada.</h2>
-
-            </section>
-
-            
-
-        );
-
+function isValidRouteId(value) {
+    if (typeof value !== "string" || !/^[1-9]\d*$/.test(value)) {
+        return false;
     }
 
-    return (
+    try {
+        return BigInt(value) <= MAX_JAVA_LONG;
+    } catch {
+        return false;
+    }
+}
 
-        <section className="detalle">
+function isValidDetailResponse(data) {
+    return Boolean(
+        data
+        && typeof data === "object"
+        && !Array.isArray(data)
+        && Number.isInteger(data.id)
+        && data.id > 0
+        && typeof data.nombre === "string"
+        && data.nombre.trim()
+        && Array.isArray(data.imagenesAdicionales)
+        && data.refugio
+        && typeof data.refugio === "object"
+        && Number.isInteger(data.refugio.id)
+        && data.refugio.id > 0
+        && typeof data.refugio.nombre === "string"
+        && data.refugio.nombre.trim()
+    );
+}
 
-            <Link
+function getRequestErrorMessage(error) {
+    if (!error.response) {
+        return "No fue posible conectar con el backend.";
+    }
 
-                to="/catalogo"
+    switch (error.response.status) {
+        case 400:
+            return "El identificador de la mascota no es válido.";
+        case 401:
+            return "La sesión no es válida.";
+        case 403:
+            return "No tienes permiso para consultar este recurso.";
+        case 404:
+            return "La mascota no está disponible o no fue encontrada.";
+        case 409:
+            return "Existe un conflicto al consultar la mascota.";
+        case 422:
+            return "No fue posible procesar la información de la mascota.";
+        case 500:
+            return "Ocurrió un error interno en el servidor.";
+        default:
+            return "No fue posible consultar la información de la mascota.";
+    }
+}
 
-                className="back-link"
+function formatEnum(value) {
+    return ENUM_LABELS[value] || null;
+}
 
+function formatAge(value) {
+    if (!Number.isInteger(value)) {
+        return null;
+    }
+
+    return `${value} ${value === 1 ? "año" : "años"}`;
+}
+
+function formatWeight(value) {
+    return typeof value === "number"
+        ? `${value} kg`
+        : null;
+}
+
+function formatDate(value) {
+    if (typeof value !== "string" || !value) {
+        return null;
+    }
+
+    const date = new Date(`${value}T00:00:00Z`);
+
+    return Number.isNaN(date.getTime())
+        ? null
+        : dateFormatter.format(date);
+}
+
+function DetalleMascota() {
+    const { id } = useParams();
+    const validId = isValidRouteId(id);
+
+    const [mascota, setMascota] = useState(null);
+    const [loading, setLoading] = useState(validId);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [retryVersion, setRetryVersion] = useState(0);
+
+    useEffect(() => {
+        if (!validId) {
+            return undefined;
+        }
+
+        const controller = new AbortController();
+
+        const loadPet = async () => {
+            setLoading(true);
+            setErrorMessage("");
+            setMascota(null);
+
+            try {
+                const response = await api.get(
+                    `/mascotas/${id}`,
+                    {
+                        signal: controller.signal
+                    }
+                );
+
+                if (!isValidDetailResponse(response.data)) {
+                    setErrorMessage(
+                        "El backend devolvió una estructura de detalle no compatible."
+                    );
+                    return;
+                }
+
+                setMascota(response.data);
+            } catch (error) {
+                if (
+                    error.code === "ERR_CANCELED"
+                    || controller.signal.aborted
+                ) {
+                    return;
+                }
+
+                setErrorMessage(getRequestErrorMessage(error));
+            } finally {
+                if (!controller.signal.aborted) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        loadPet();
+
+        return () => {
+            controller.abort();
+        };
+    }, [id, retryVersion, validId]);
+
+    if (!validId) {
+        return (
+            <section
+                className="detalle detalle-feedback"
+                aria-labelledby="detalle-error-title"
+                role="alert"
             >
+                <h1 id="detalle-error-title">
+                    Identificador no válido
+                </h1>
 
-                ← Volver al catálogo
+                <p>
+                    El identificador de la mascota no es válido.
+                </p>
 
+                <Link to="/catalogo" className="back-link">
+                    Volver al catálogo
+                </Link>
+            </section>
+        );
+    }
+
+    if (loading) {
+        return (
+            <section
+                className="detalle detalle-loading"
+                aria-labelledby="detalle-loading-title"
+            >
+                <h1
+                    id="detalle-loading-title"
+                    className="detalle-visually-hidden"
+                >
+                    Detalle de mascota
+                </h1>
+
+                <Loader />
+            </section>
+        );
+    }
+
+    if (errorMessage || !mascota) {
+        return (
+            <section
+                className="detalle detalle-feedback"
+                aria-labelledby="detalle-error-title"
+                role="alert"
+            >
+                <h1 id="detalle-error-title">
+                    No fue posible cargar la mascota
+                </h1>
+
+                <p>
+                    {errorMessage
+                        || "No fue posible consultar la información de la mascota."}
+                </p>
+
+                <div className="detalle-feedback-actions">
+                    <button
+                        type="button"
+                        className="detalle-retry-button"
+                        onClick={() => {
+                            setRetryVersion(
+                                (currentVersion) =>
+                                    currentVersion + 1
+                            );
+                        }}
+                    >
+                        Reintentar
+                    </button>
+
+                    <Link to="/catalogo" className="back-link">
+                        Volver al catálogo
+                    </Link>
+                </div>
+            </section>
+        );
+    }
+
+    const age = formatAge(mascota.edad);
+    const weight = formatWeight(mascota.peso);
+    const entryDate = formatDate(mascota.fechaIngreso);
+    const species = formatEnum(mascota.especie);
+    const sex = formatEnum(mascota.sexo);
+    const size = formatEnum(mascota.tamano);
+    const status = formatEnum(mascota.estado);
+
+    return (
+        <section
+            className="detalle"
+            aria-labelledby="detalle-title"
+        >
+            <Link to="/catalogo" className="back-link">
+                Volver al catálogo
             </Link>
 
             <div className="detalle-grid">
-
                 <GaleriaMascota
-
-                    imagenes={mascota.imagenes}
-
+                    key={mascota.id}
+                    nombreMascota={mascota.nombre}
+                    imagenPrincipal={mascota.imagenPrincipal}
+                    imagenesAdicionales={
+                        mascota.imagenesAdicionales
+                    }
                 />
 
                 <div className="detalle-info">
-
-                    <div className="title-row">
-
+                    <div className="detalle-heading">
                         <div>
+                            <p className="detalle-eyebrow">
+                                {species || "Mascota"}
+                            </p>
 
-                            <h1>{mascota.nombre}</h1>
+                            <h1 id="detalle-title">
+                                {mascota.nombre}
+                            </h1>
 
-                            <p>{mascota.raza}</p>
-
+                            {mascota.raza && (
+                                <p className="detalle-raza">
+                                    {mascota.raza}
+                                </p>
+                            )}
                         </div>
 
-                        <button
-
-                            type="button"
-                            className={`favorite ${favorito ? "active" : ""}`}
-
-                            aria-label={
-                                favorito
-                                    ? "Quitar de favoritos"
-                                    : "Agregar a favoritos"
-                            }
-
-                            onClick={() => setFavorito(!favorito)}
-
-                        >
-
-                            <Heart
-
-                                size={22}
-
-                                fill={favorito ? "#E63946" : "none"}
-
-                            />
-
-                        </button>
-
+                        {status && (
+                            <span className="detalle-status">
+                                {status}
+                            </span>
+                        )}
                     </div>
-
-                    <p className="location">
-
-                        <MapPin size={18} />
-
-                        {mascota.refugio}
-
-                    </p>
 
                     <div className="cards-info">
+                        {age && (
+                            <InfoCard titulo="Edad" valor={age} />
+                        )}
 
-                        <InfoCard titulo="Edad" valor={mascota.edad} />
+                        {sex && (
+                            <InfoCard titulo="Sexo" valor={sex} />
+                        )}
 
-                        <InfoCard titulo="Sexo" valor={mascota.sexo} />
+                        {size && (
+                            <InfoCard titulo="Tamaño" valor={size} />
+                        )}
 
-                        <InfoCard titulo="Tamaño" valor={mascota.tamano} />
-
-                        <InfoCard titulo="Vacunas" valor={mascota.vacunas} />
-
-                        <InfoCard titulo="Esterilizada" valor={mascota.esterilizada} />
-
+                        {weight && (
+                            <InfoCard titulo="Peso" valor={weight} />
+                        )}
                     </div>
 
-                    <div className="description">
-
-                        <h2>Historia</h2>
-
-                        <p>{mascota.descripcion}</p>
-
-                    </div>
-
-                    <div className="personality">
-
-                        <h2>Personalidad</h2>
-
-                        <div className="tags">
-
-                            {
-
-                                mascota.personalidad.map((tag, index) => (
-
-                                    <span key={index}>
-
-                                        {tag}
-
-                                    </span>
-
-                                ))
-
-                            }
-
+                    {mascota.descripcion && (
+                        <div className="description">
+                            <h2>Descripción</h2>
+                            <p>{mascota.descripcion}</p>
                         </div>
+                    )}
 
-                    </div>
+                    {entryDate && (
+                        <p className="detalle-entry-date">
+                            <CalendarDays
+                                size={18}
+                                aria-hidden="true"
+                            />
+                            Fecha de ingreso: {entryDate}
+                        </p>
+                    )}
+
+                    <section
+                        className="detalle-refugio"
+                        aria-labelledby="refugio-title"
+                    >
+                        <h2 id="refugio-title">
+                            Refugio responsable
+                        </h2>
+
+                        <h3>{mascota.refugio.nombre}</h3>
+
+                        <div className="detalle-refugio-datos">
+                            {mascota.refugio.direccion && (
+                                <p>
+                                    <MapPin
+                                        size={18}
+                                        aria-hidden="true"
+                                    />
+                                    {mascota.refugio.direccion}
+                                </p>
+                            )}
+
+                            {mascota.refugio.telefono && (
+                                <p>
+                                    <Phone
+                                        size={18}
+                                        aria-hidden="true"
+                                    />
+                                    {mascota.refugio.telefono}
+                                </p>
+                            )}
+
+                            {mascota.refugio.correo && (
+                                <p>
+                                    <Mail
+                                        size={18}
+                                        aria-hidden="true"
+                                    />
+                                    {mascota.refugio.correo}
+                                </p>
+                            )}
+                        </div>
+                    </section>
 
                     <Link
-
-                        to="/solicitud"
-
+                        to={`/solicitud?mascotaId=${mascota.id}`}
                         className="adopt-btn"
-
                     >
-
-                        Solicitar adopción
-
+                        Iniciar solicitud de adopción
                     </Link>
-
                 </div>
-
             </div>
-
         </section>
-
     );
-
 }
 
 export default DetalleMascota;
