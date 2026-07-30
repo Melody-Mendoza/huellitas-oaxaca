@@ -1,0 +1,16 @@
+meta {
+  name: Catálogo público VPS
+  type: http
+}
+
+get {
+  url: {{baseUrlVps}}/api/mascotas?page=0&size=20
+  body: none
+  auth: none
+}
+
+script:post-response {
+  const data = res.getBody();
+  if (data.totalElements !== 12) throw new Error("Se esperaban 12 mascotas");
+  bru.setEnvVar("mascotaId", data.content[0].id);
+}

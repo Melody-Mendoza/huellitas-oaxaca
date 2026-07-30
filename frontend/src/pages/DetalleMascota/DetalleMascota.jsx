@@ -62,7 +62,7 @@ function isValidDetailResponse(data) {
 
 function getRequestErrorMessage(error) {
     if (!error.response) {
-        return "No fue posible conectar con el backend.";
+        return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde.";
     }
 
     switch (error.response.status) {
@@ -79,7 +79,7 @@ function getRequestErrorMessage(error) {
         case 422:
             return "No fue posible procesar la información de la mascota.";
         case 500:
-            return "Ocurrió un error interno en el servidor.";
+            return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde.";
         default:
             return "No fue posible consultar la información de la mascota.";
     }
@@ -146,7 +146,7 @@ function DetalleMascota() {
 
                 if (!isValidDetailResponse(response.data)) {
                     setErrorMessage(
-                        "El backend devolvió una estructura de detalle no compatible."
+                        "Recibimos una respuesta inesperada. Intenta de nuevo."
                     );
                     return;
                 }

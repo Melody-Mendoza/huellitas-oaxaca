@@ -3,6 +3,7 @@ import { Link } from "react-router-dom";
 import Loader from "../../components/Loader/Loader";
 import Pagination from "../../components/Pagination/Pagination";
 import api from "../../services/api";
+import { resolveMediaUrl } from "../../utils/media";
 import "./MisSolicitudes.css";
 
 const PAGE_SIZE = 10;
@@ -64,7 +65,7 @@ function formatDate(value) {
 }
 
 function getRequestErrorMessage(error) {
-    if (!error.response) { return "No fue posible conectar con el backend."; }
+    if (!error.response) { return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde."; }
     const backendMessage = error.response.data?.message;
     switch (error.response.status) {
         case 400:
@@ -76,7 +77,7 @@ function getRequestErrorMessage(error) {
         case 404:
             return backendMessage || "No se encontró el recurso solicitado.";
         case 500:
-            return "Ocurrió un error interno en el servidor.";
+            return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde.";
         default:
             return backendMessage || "No fue posible cargar tus solicitudes.";
     }
@@ -84,7 +85,7 @@ function getRequestErrorMessage(error) {
 
 function RequestImage({ request }) {
     const [imageFailed, setImageFailed] = useState(false);
-    const imageUrl = typeof request.imagenPrincipal === "string" ? request.imagenPrincipal.trim() : "";
+    const imageUrl = resolveMediaUrl(request.imagenPrincipal);
     const petName = request.nombreMascota?.trim() || "la mascota";
 
     if (!imageUrl || imageFailed) {
@@ -117,7 +118,7 @@ function MisSolicitudes() {
 
                 if (!isValidPageResponse(response.data)) {
                     setPageData(EMPTY_PAGE);
-                    setErrorMessage("El backend devolvió una estructura de paginación no compatible.");
+                    setErrorMessage("Recibimos una respuesta inesperada. Intenta de nuevo.");
                     return;
                 }
 

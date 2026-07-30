@@ -21,7 +21,7 @@ function isValidSuccessResponse(response) {
 
 function getRecoveryErrorMessage(error) {
     if (!error.response) {
-        return "No fue posible conectar con el backend.";
+        return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde.";
     }
 
     switch (error.response.status) {
@@ -113,7 +113,7 @@ function RecuperarPassword() {
             if (!isValidSuccessResponse(response)) {
                 if (mountedRef.current) {
                     setGeneralError(
-                        "El backend devolvió una respuesta de recuperación no compatible."
+                        "Recibimos una respuesta inesperada. Intenta de nuevo."
                     );
                 }
                 return;

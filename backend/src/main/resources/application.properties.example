@@ -5,13 +5,16 @@ server.port=1929
 spring.servlet.multipart.max-file-size=5MB
 spring.servlet.multipart.max-request-size=6MB
 
-app.storage.perfil-fotos-dir=${HUELLITAS_PERFIL_FOTOS_DIR:C:/xampp/huellitas-data/perfil-fotos}
-# Opcional. Si se omite, usa el directorio temporal seguro del sistema.
-app.storage.mascota-imagenes-dir=${HUELLITAS_MASCOTA_IMAGENES_DIR:}
+app.upload-root=${UPLOAD_ROOT:./uploads}
+app.storage.perfil-fotos-dir=${UPLOAD_ROOT:./uploads}/perfiles
+app.storage.mascota-imagenes-dir=${UPLOAD_ROOT:./uploads}/mascotas
+app.storage.refugio-fotos-dir=${UPLOAD_ROOT:./uploads}/refugios
 
-spring.datasource.url=jdbc:mysql://localhost:3306/huellitas_oaxaca?useSSL=false&serverTimezone=America/Mexico_City
-spring.datasource.username=TU_USUARIO_MYSQL
-spring.datasource.password=TU_CONTRASEÑA_MYSQL
+# Desarrollo local: allowPublicKeyRetrieval=true evita "Public Key Retrieval is not allowed"
+# con MySQL 8 caching_sha2_password. No usar en producción expuesta a redes no confiables.
+spring.datasource.url=jdbc:mysql://localhost:3306/huellitas_oaxaca?useSSL=false&allowPublicKeyRetrieval=true&serverTimezone=America/Mexico_City
+spring.datasource.username=${MYSQL_USER:TU_USUARIO_MYSQL}
+spring.datasource.password=${MYSQL_PASSWORD:TU_CONTRASEÑA_MYSQL}
 spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
 
 spring.jpa.hibernate.ddl-auto=validate

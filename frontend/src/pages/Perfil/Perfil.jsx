@@ -33,7 +33,7 @@ function isValidPasswordResponse(response) {
 
 function getPasswordErrorMessage(error) {
     if (!error.response) {
-        return "No fue posible conectar con el backend.";
+        return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde.";
     }
 
     const backendMessage = error.response.data?.message;
@@ -54,7 +54,7 @@ function getPasswordErrorMessage(error) {
                 ? backendMessage
                 : "No fue posible aplicar el cambio de contraseña.";
         case 500:
-            return "Ocurrió un error interno en el servidor.";
+            return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde.";
         default:
             return "No fue posible cambiar la contraseña.";
     }
@@ -251,7 +251,7 @@ function Perfil() {
                 || typeof response.data !== "object"
             ) {
                 toast.error(
-                    "El backend devolvió una respuesta de eliminación no compatible."
+                    "Recibimos una respuesta inesperada. Intenta de nuevo."
                 );
                 return;
             }
@@ -331,7 +331,7 @@ function Perfil() {
 
             if (!isValidPasswordResponse(response)) {
                 toast.error(
-                    "El backend devolvió una respuesta de contraseña no compatible."
+                    "Recibimos una respuesta inesperada. Intenta de nuevo."
                 );
                 return;
             }

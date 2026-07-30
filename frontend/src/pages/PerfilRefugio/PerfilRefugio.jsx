@@ -33,7 +33,7 @@ function toFormData(profile) {
 }
 
 function getErrorMessage(error) {
-    if (!error.response) { return "No fue posible conectar con el backend."; }
+    if (!error.response) { return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde."; }
     const backendMessage = error.response.data?.message;
     switch (error.response.status) {
         case 400:
@@ -47,7 +47,7 @@ function getErrorMessage(error) {
         case 422:
             return backendMessage || "No fue posible actualizar el perfil.";
         case 500:
-            return "Ocurrió un error interno en el servidor.";
+            return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde.";
         default:
             return "No fue posible completar la operación.";
     }
@@ -98,7 +98,7 @@ function PerfilRefugio() {
             try {
                 const response = await api.get(`/refugios/${selectedRefuge.id}/perfil`, { signal: controller.signal });
                 if (!isValidProfile(response.data, selectedRefuge.id)) {
-                    setErrorMessage("El backend devolvió un perfil de refugio no compatible.");
+                    setErrorMessage("Recibimos una respuesta inesperada. Intenta de nuevo.");
                     return;
                 }
                 const nextFormData = toFormData(response.data);
@@ -146,7 +146,7 @@ function PerfilRefugio() {
         try {
             const response = await api.patch(`/refugios/${selectedRefuge.id}/perfil`, payload);
             if (!isValidProfile(response.data, selectedRefuge.id)) {
-                setSubmitError("El backend devolvió un perfil actualizado no compatible.");
+                setSubmitError("Recibimos una respuesta inesperada. Intenta de nuevo.");
                 return;
             }
             const nextFormData = toFormData(response.data);

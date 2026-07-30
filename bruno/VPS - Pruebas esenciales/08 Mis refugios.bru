@@ -1,0 +1,20 @@
+meta {
+  name: Mis refugios VPS
+  type: http
+}
+
+get {
+  url: {{baseUrlVps}}/api/refugios/mis-refugios
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenRefugio}}
+}
+
+script:post-response {
+  const data = res.getBody();
+  if (!Array.isArray(data) || data.length !== 1) throw new Error("La cuenta debe tener un refugio");
+  bru.setEnvVar("refugioId", data[0].id);
+}

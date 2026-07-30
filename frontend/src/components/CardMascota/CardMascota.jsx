@@ -4,6 +4,7 @@ import { MapPin, Ruler } from "lucide-react";
 import { Link } from "react-router-dom";
 
 import fallbackImage from "../../assets/logo/logo.png";
+import { resolveMediaUrl } from "../../utils/media";
 
 const LABELS = {
     DISPONIBLE: "Disponible",
@@ -59,7 +60,7 @@ function CardMascota({ mascota }) {
         <article className="card-mascota">
             <div className="card-image">
                 <img
-                    src={mascota.imagenPrincipal || fallbackImage}
+                    src={resolveMediaUrl(mascota.imagenPrincipal) || fallbackImage}
                     alt={`Fotografía de ${mascota.nombre}`}
                     onError={handleImageError}
                 />

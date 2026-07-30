@@ -2,6 +2,7 @@ import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import Loader from "../../components/Loader/Loader";
 import api from "../../services/api";
+import { resolveMediaUrl } from "../../utils/media";
 import "./DetalleSolicitud.css";
 const VALID_STATUSES = new Set(["PENDIENTE", "APROBADA", "RECHAZADA"]);
 const STATUS_LABELS = {PENDIENTE: "Pendiente",APROBADA: "Aprobada",RECHAZADA: "Rechazada"};
@@ -33,7 +34,7 @@ function isValidDetail(data, requestId) {
 function isValidHistory(data) {return Array.isArray(data) && data.every((item) => ( item && typeof item === "object" && !Array.isArray(item) && VALID_STATUSES.has(item.estado) && typeof item.fecha === "string" && item.fecha.trim() )); }
 function formatDate(value) { const date = new Date(value);  return Number.isNaN(date.getTime()) ? "Fecha no disponible" : dateFormatter.format(date); }
 function getRequestErrorMessage(error) {
-    if (!error.response) { return "No fue posible conectar con el backend."; }
+    if (!error.response) { return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde."; }
     const backendMessage = error.response.data?.message;
     switch (error.response.status) {
         case 400:
@@ -45,14 +46,14 @@ function getRequestErrorMessage(error) {
         case 404:
             return "La solicitud no fue encontrada o no te pertenece.";
         case 500:
-            return "Ocurrió un error interno en el servidor.";
+            return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde.";
         default:
             return backendMessage || "No fue posible consultar la solicitud.";
     }
 }
 function DetailImage({ detail }) {
     const [imageFailed, setImageFailed] = useState(false);
-    const imageUrl = typeof detail.imagenPrincipal === "string" ? detail.imagenPrincipal.trim() : "";
+    const imageUrl = resolveMediaUrl(detail.imagenPrincipal);
     const petName = detail.nombreMascota?.trim() || "la mascota";
     if (!imageUrl || imageFailed) {
         return (
@@ -88,14 +89,14 @@ function DetalleSolicitud() {
                 if (isValidDetail(detailResult.value.data, requestId)) {
                     setDetail(detailResult.value.data);
                 } else {
-                    setDetailError( "El backend devolvió un detalle de solicitud no compatible." );
+                    setDetailError( "Recibimos una respuesta inesperada. Intenta de nuevo." );
                 }
             } else if (detailResult.reason?.code !== "ERR_CANCELED") { setDetailError( getRequestErrorMessage(detailResult.reason) ); }
             if (historyResult.status === "fulfilled") {
                 if (isValidHistory(historyResult.value.data)) {
                     setHistory(historyResult.value.data);
                 } else {
-                    setHistoryError( "El backend devolvió un historial no compatible." );
+                    setHistoryError( "Recibimos una respuesta inesperada. Intenta de nuevo." );
                 }
             } else if (historyResult.reason?.code !== "ERR_CANCELED") { setHistoryError( getRequestErrorMessage(historyResult.reason) ); }
             setLoading(false);

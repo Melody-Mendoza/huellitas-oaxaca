@@ -1,0 +1,19 @@
+meta {
+  name: Usuarios administrativos VPS
+  type: http
+}
+
+get {
+  url: {{baseUrlVps}}/api/admin/usuarios?page=0&size=50
+  body: none
+  auth: bearer
+}
+
+auth:bearer {
+  token: {{tokenAdmin}}
+}
+
+script:post-response {
+  const data = res.getBody();
+  if (data.totalElements < 9) throw new Error("No están las cuentas iniciales");
+}

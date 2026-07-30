@@ -352,3 +352,83 @@
 .admin-page > .pagination {
     margin-top: 24px;
 }
+
+.admin-management-section {
+    margin-top: 48px;
+    padding-top: 32px;
+    border-top: 1px solid #dfe7e0;
+}
+
+.admin-section-heading {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 20px;
+    margin-bottom: 20px;
+}
+
+.admin-section-heading h2 {
+    margin: 0;
+    color: var(--text);
+}
+
+.admin-management-form {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 14px;
+    margin-bottom: 24px;
+    padding: 22px;
+    border: 1px solid #dfe7e0;
+    border-radius: var(--radius);
+    background: var(--surface);
+    box-shadow: var(--shadow);
+}
+
+.admin-management-form h3,
+.admin-management-form button,
+.admin-form-wide {
+    grid-column: 1 / -1;
+}
+
+.admin-management-form label {
+    display: grid;
+    gap: 6px;
+    color: var(--text);
+    font-weight: 700;
+}
+
+.admin-management-form input,
+.admin-management-form textarea {
+    width: 100%;
+    min-height: 42px;
+    padding: 9px 10px;
+    border: 1px solid #b9c9bc;
+    border-radius: 8px;
+    background: var(--surface);
+    color: var(--text);
+    font: inherit;
+}
+
+.admin-management-form textarea {
+    resize: vertical;
+}
+
+.admin-refuge-form h3 {
+    margin: 0;
+    color: #2f6e4f;
+}
+
+.admin-users-table td .admin-action-button + .admin-action-button {
+    margin-left: 8px;
+}
+
+@media (max-width: 760px) {
+    .admin-management-form {
+        grid-template-columns: 1fr;
+    }
+
+    .admin-section-heading {
+        align-items: flex-start;
+        flex-direction: column;
+    }
+}

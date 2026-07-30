@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.huellitasoaxaca.backend.dto.request.RefugioAdminCrearRequest;
+import com.huellitasoaxaca.backend.dto.request.RefugioCompletoAdminCrearRequest;
 import com.huellitasoaxaca.backend.dto.request.RefugioAprobacionAdminRequest;
 import com.huellitasoaxaca.backend.dto.request.RefugioEstadoAdminRequest;
 import com.huellitasoaxaca.backend.dto.request.RefugioResponsableAdminRequest;
@@ -65,6 +66,21 @@ public class AdminRefugioController
     )
     {
         RefugioAdminDetalleResponse creado = adminRefugioService.crear(
+                request,
+                authentication.getName()
+        );
+        return ResponseEntity
+                .created(URI.create("/api/admin/refugios/" + creado.id()))
+                .body(creado);
+    }
+
+    @PostMapping("/completo")
+    public ResponseEntity<RefugioAdminDetalleResponse> crearCompleto(
+            @Valid @RequestBody RefugioCompletoAdminCrearRequest request,
+            Authentication authentication
+    )
+    {
+        RefugioAdminDetalleResponse creado = adminRefugioService.crearCompleto(
                 request,
                 authentication.getName()
         );

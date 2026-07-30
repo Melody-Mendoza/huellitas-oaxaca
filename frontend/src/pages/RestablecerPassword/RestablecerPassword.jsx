@@ -33,7 +33,7 @@ function getSafeBackendMessage(error) {
 
 function getResetErrorMessage(error) {
     if (!error.response) {
-        return "No fue posible conectar con el backend.";
+        return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde.";
     }
 
     const backendMessage = getSafeBackendMessage(error);
@@ -50,7 +50,7 @@ function getResetErrorMessage(error) {
             return backendMessage
                 || "El enlace de recuperación no es válido.";
         case 500:
-            return "Ocurrió un error interno en el servidor.";
+            return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde.";
         default:
             return backendMessage
                 || "No fue posible restablecer la contraseña.";
@@ -171,7 +171,7 @@ function RestablecerPassword() {
             if (!isValidSuccessResponse(response)) {
                 if (mountedRef.current) {
                     setGeneralError(
-                        "El backend devolvió una respuesta de restablecimiento no compatible."
+                        "Recibimos una respuesta inesperada. Intenta de nuevo."
                     );
                 }
                 return;

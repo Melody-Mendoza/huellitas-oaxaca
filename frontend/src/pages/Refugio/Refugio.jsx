@@ -30,7 +30,7 @@ function isValidPanel(data) {
 
 function getErrorMessage(error) {
     if (!error.response) {
-        return "No fue posible conectar con el backend.";
+        return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde.";
     }
     const backendMessage = error.response.data?.message;
     switch (error.response.status) {
@@ -43,7 +43,7 @@ function getErrorMessage(error) {
         case 404:
             return backendMessage || "No se encontró el refugio solicitado.";
         case 500:
-            return "Ocurrió un error interno en el servidor.";
+            return "No fue posible cargar la información en este momento. Inténtalo nuevamente más tarde.";
         default:
             return "No fue posible cargar el panel del refugio.";
     }
@@ -69,7 +69,7 @@ function Refugio() {
                 );
                 if (!isValidPanel(response.data)) {
                     setErrorMessage(
-                        "El backend devolvió métricas de refugio no compatibles."
+                        "Recibimos una respuesta inesperada. Intenta de nuevo."
                     );
                     return;
                 }

@@ -1,0 +1,22 @@
+meta {
+  name: Login ADMIN VPS
+  type: http
+}
+
+post {
+  url: {{baseUrlVps}}/api/auth/login
+  body: json
+  auth: none
+}
+
+body:json {
+  {
+    "correo": "{{adminCorreo}}",
+    "password": "{{adminPassword}}"
+  }
+}
+
+script:post-response {
+  const data = res.getBody();
+  bru.setEnvVar("tokenAdmin", data.token);
+}
