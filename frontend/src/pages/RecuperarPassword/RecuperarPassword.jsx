@@ -1,137 +1,269 @@
 import "./RecuperarPassword.css";
-import { Link } from "react-router-dom";
+
 import { Mail } from "lucide-react";
-import { useForm } from "react-hook-form";
-import toast from "react-hot-toast";
+import { useEffect, useRef, useState } from "react";
+import { Link } from "react-router-dom";
+
+import api from "../../services/api";
+
+const GENERIC_SUCCESS_MESSAGE =
+    "Si el correo está registrado, recibirás instrucciones para restablecer tu contraseña";
+
+function isValidSuccessResponse(response) {
+    return Boolean(
+        response.status === 200
+        && response.data
+        && typeof response.data === "object"
+        && typeof response.data.mensaje === "string"
+        && response.data.mensaje.trim()
+    );
+}
+
+function getRecoveryErrorMessage(error) {
+    if (!error.response) {
+        return "No fue posible conectar con el backend.";
+    }
+
+    switch (error.response.status) {
+        case 400:
+            return "Revisa el correo ingresado.";
+        case 401:
+            return "La sesión no es válida.";
+        case 403:
+            return "No tienes permiso para realizar esta operación.";
+        case 500:
+            return "No fue posible procesar la solicitud en el servidor.";
+        default:
+            return "No fue posible solicitar la recuperación de contraseña.";
+    }
+}
 
 function RecuperarPassword() {
+    const [correo, setCorreo] = useState("");
+    const [correoError, setCorreoError] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [success, setSuccess] = useState(false);
+    const [generalError, setGeneralError] = useState("");
+    const submissionLockRef = useRef(false);
+    const mountedRef = useRef(false);
 
-    const {
+    useEffect(() => {
+        mountedRef.current = true;
 
-        register,
+        return () => {
+            mountedRef.current = false;
+        };
+    }, []);
 
-        handleSubmit,
-
-        formState: { errors, isSubmitting }
-
-    } = useForm();
-
-    const onSubmit = async (data) => {
-
-        await new Promise(resolve => setTimeout(resolve, 1500));
-
-        console.log(data);
-
-        toast.success("Si el correo existe, recibirás instrucciones para recuperar tu contraseña.");
-
-
-        // await api.post("/auth/forgot-password", data);
-
+    const handleCorreoChange = (event) => {
+        setCorreo(event.target.value);
+        setCorreoError("");
+        setGeneralError("");
     };
 
-    return (
+    const handleSubmit = async (event) => {
+        event.preventDefault();
 
-        <section className="forgot-page">
+        if (
+            submissionLockRef.current
+            || isSubmitting
+            || success
+        ) {
+            return;
+        }
 
-            <div className="forgot-card">
+        const normalizedCorreo = correo.trim();
 
-                <div className="forgot-header">
+        if (!normalizedCorreo) {
+            setCorreoError("El correo es obligatorio");
+            return;
+        }
 
-                    <h1>Huellitas Oaxaca</h1>
+        if (normalizedCorreo.length > 150) {
+            setCorreoError(
+                "El correo no puede superar los 150 caracteres"
+            );
+            return;
+        }
 
-                    <p>Recuperar contraseña</p>
+        if (
+            !/^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i.test(
+                normalizedCorreo
+            )
+        ) {
+            setCorreoError(
+                "El correo no tiene un formato válido"
+            );
+            return;
+        }
 
+        submissionLockRef.current = true;
+        setIsSubmitting(true);
+        setGeneralError("");
+        setCorreoError("");
+
+        try {
+            const response = await api.post(
+                "/auth/recuperar-password",
+                {
+                    correo: normalizedCorreo
+                }
+            );
+
+            if (!isValidSuccessResponse(response)) {
+                if (mountedRef.current) {
+                    setGeneralError(
+                        "El backend devolvió una respuesta de recuperación no compatible."
+                    );
+                }
+                return;
+            }
+
+            if (mountedRef.current) {
+                setSuccess(true);
+            }
+        } catch (error) {
+            if (!mountedRef.current) {
+                return;
+            }
+
+            const validationErrors =
+                error.response?.data?.validationErrors;
+
+            if (
+                error.response?.status === 400
+                && typeof validationErrors?.correo === "string"
+            ) {
+                setCorreoError(validationErrors.correo);
+            } else {
+                setGeneralError(getRecoveryErrorMessage(error));
+            }
+        } finally {
+            submissionLockRef.current = false;
+
+            if (mountedRef.current) {
+                setIsSubmitting(false);
+            }
+        }
+    };
+
+    if (success) {
+        return (
+            <section
+                className="recovery-page"
+                aria-labelledby="recovery-success-title"
+            >
+                <div
+                    className="recovery-card recovery-status"
+                    role="status"
+                >
+                    <h1 id="recovery-success-title">
+                        Revisa tu correo
+                    </h1>
+
+                    <p>{GENERIC_SUCCESS_MESSAGE}.</p>
+
+                    <Link
+                        to="/login"
+                        className="recovery-link"
+                    >
+                        Volver al inicio de sesión
+                    </Link>
                 </div>
+            </section>
+        );
+    }
 
-                <h2>¿Olvidaste tu contraseña?</h2>
-
-                <p className="forgot-description">
-
-                    Ingresa tu correo electrónico y te enviaremos las instrucciones para restablecer tu contraseña.
-
+    return (
+        <section
+            className="recovery-page"
+            aria-labelledby="recovery-title"
+        >
+            <div className="recovery-card">
+                <p className="recovery-eyebrow">
+                    Huellitas Oaxaca
                 </p>
 
-                <form onSubmit={handleSubmit(onSubmit)} noValidate>
+                <h1 id="recovery-title">
+                    Recuperar contraseña
+                </h1>
 
-                    <label>Correo electrónico</label>
+                <p className="recovery-description">
+                    Ingresa tu correo electrónico. Si está registrado,
+                    recibirás un enlace válido durante 30 minutos.
+                </p>
 
-                    <div className={`input-group ${errors.email ? "input-error" : ""}`}>
+                <form
+                    className="recovery-form"
+                    onSubmit={handleSubmit}
+                    noValidate
+                >
+                    <label htmlFor="recovery-correo">
+                        Correo electrónico
+                    </label>
 
-                        <Mail size={18} />
+                    <div
+                        className={
+                            correoError
+                                ? "recovery-input-group has-error"
+                                : "recovery-input-group"
+                        }
+                    >
+                        <Mail size={18} aria-hidden="true" />
 
                         <input
-
+                            id="recovery-correo"
                             type="email"
-
-                            placeholder="correo@ejemplo.com"
-
-                            {...register("email", {
-
-                                required: "El correo es obligatorio.",
-
-                                pattern: {
-                                    value: /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i,
-                                    message: "Ingresa un correo electrónico válido."
-                                }
-
-                            })}
-
+                            autoComplete="email"
+                            value={correo}
+                            maxLength="150"
+                            aria-invalid={Boolean(correoError)}
+                            aria-describedby={
+                                correoError
+                                    ? "recovery-correo-error"
+                                    : undefined
+                            }
+                            disabled={isSubmitting}
+                            onChange={handleCorreoChange}
                         />
-
                     </div>
 
-                    {
-
-                        errors.email &&
-
-                        <p className="error">
-
-                            {errors.email.message}
-
+                    {correoError && (
+                        <p
+                            id="recovery-correo-error"
+                            className="recovery-field-error"
+                            role="alert"
+                        >
+                            {correoError}
                         </p>
+                    )}
 
-                    }
+                    {generalError && (
+                        <p
+                            className="recovery-general-error"
+                            role="alert"
+                        >
+                            {generalError}
+                        </p>
+                    )}
 
                     <button
-
                         type="submit"
-
-                        className="forgot-button"
-
+                        className="recovery-submit"
                         disabled={isSubmitting}
-
                     >
-
-                        {
-
-                            isSubmitting
-
-                                ? "Enviando..."
-
-                                : "Enviar instrucciones"
-
-                        }
-
+                        {isSubmitting
+                            ? "Enviando..."
+                            : "Enviar instrucciones"}
                     </button>
-
                 </form>
 
-                <p className="back-login">
-
-                    <Link to="/login">
-
-                        ← Volver al inicio de sesión
-
-                    </Link>
-
-                </p>
-
+                <Link to="/login" className="recovery-link">
+                    Volver al inicio de sesión
+                </Link>
             </div>
-
         </section>
-
     );
-
 }
 
 export default RecuperarPassword;

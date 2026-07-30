@@ -21,6 +21,8 @@ import Privacidad from "../pages/Privacidad/Privacidad";
 import Terminos from "../pages/Terminos/Terminos";
 import Contacto from "../pages/Contacto/Contacto";
 import Admin from "../pages/Admin/Admin";
+import RecuperarPassword from "../pages/RecuperarPassword/RecuperarPassword";
+import RestablecerPassword from "../pages/RestablecerPassword/RestablecerPassword";
 
 import { USER_ROLES } from "../utils/constants";
 
@@ -31,6 +33,14 @@ function AppRouter() {
                 <Route path="/" element={<Home />} />
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+                <Route
+                    path="/recuperar-password"
+                    element={<RecuperarPassword />}
+                />
+                <Route
+                    path="/restablecer-password"
+                    element={<RestablecerPassword />}
+                />
                 <Route path="/catalogo" element={<Catalogo />} />
                 <Route
                     path="/mascota/:id"

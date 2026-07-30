@@ -26,7 +26,7 @@
 }
 
 .search-bar:focus-visible {
-    border-color: var(--primary);
+    border-color:#2F6E4F;
     box-shadow: 0 0 0 3px rgba(76, 175, 80, .18);
 }
 

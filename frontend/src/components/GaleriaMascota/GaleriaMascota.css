@@ -61,7 +61,7 @@
 }
 
 .miniatura.active {
-    border-color: var(--primary);
+    border-color:#2F6E4F;
 }
 
 .miniatura.active::after {
@@ -92,7 +92,7 @@
 }
 
 .galeria-empty svg {
-    color: var(--primary);
+    color:#2F6E4F;
 }
 
 .galeria-empty p {

@@ -38,7 +38,7 @@
     padding: 5px 12px;
     border-radius: 30px;
     background: #eaf7ee;
-    color: var(--primary);
+    color:#2F6E4F;
     font-size: .75rem;
     font-weight: 700;
 }
@@ -59,7 +59,7 @@
 }
 
 .card-header h2 {
-    color: var(--primary);
+    color:#2F6E4F;
     font-size: 1.2rem;
 }
 
@@ -82,7 +82,7 @@
     padding: 4px 10px;
     border-radius: 15px;
     background: #ddefd8;
-    color: var(--primary);
+    color:#2F6E4F;
     font-size: .75rem;
     font-weight: 600;
 }
@@ -108,7 +108,7 @@
     padding: 12px;
     display: block;
     border-radius: 8px;
-    background: var(--primary);
+    background:#2F6E4F;
     color: var(--surface);
     text-align: center;
     text-decoration: none;
