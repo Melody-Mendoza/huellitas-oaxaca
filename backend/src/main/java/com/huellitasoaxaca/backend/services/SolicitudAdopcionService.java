@@ -1,15 +1,36 @@
 package com.huellitasoaxaca.backend.services;
 
 import com.huellitasoaxaca.backend.dto.request.SolicitudAdopcionCrearRequest;
+import com.huellitasoaxaca.backend.dto.response.HistorialSolicitudPropiaResponse;
 import com.huellitasoaxaca.backend.dto.response.SolicitudAdopcionResponse;
+import com.huellitasoaxaca.backend.dto.response.SolicitudPropiaDetalleResponse;
+import com.huellitasoaxaca.backend.dto.response.SolicitudPropiaResumenResponse;
 import com.huellitasoaxaca.backend.entity.enums.EstadoSolicitud;
 
 import java.util.List;
+
+import org.springframework.data.domain.Page;
 
 public interface SolicitudAdopcionService 
 {
     SolicitudAdopcionResponse crear(
             SolicitudAdopcionCrearRequest request,
+            String correoAutenticado
+    );
+
+    Page<SolicitudPropiaResumenResponse> listarPropias(
+            String correoAutenticado,
+            int page,
+            int size
+    );
+
+    SolicitudPropiaDetalleResponse obtenerPropia(
+            Long solicitudId,
+            String correoAutenticado
+    );
+
+    List<HistorialSolicitudPropiaResponse> listarHistorialPropio(
+            Long solicitudId,
             String correoAutenticado
     );
 

@@ -20,4 +20,13 @@ public interface RefugioRepository extends JpaRepository<Refugio, Long>
     List<Refugio> findByActivoTrue();
 
     List<Refugio> findByUsuarioId(Long usuarioId);
+
+    List<Refugio> findByUsuarioIdAndActivoTrueOrderByNombreAscIdAsc(
+            Long usuarioId
+    );
+
+    Optional<Refugio> findByIdAndUsuarioId(
+            Long id,
+            Long usuarioId
+    );
 }

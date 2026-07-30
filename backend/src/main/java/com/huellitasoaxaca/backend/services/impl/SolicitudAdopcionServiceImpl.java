@@ -4,12 +4,18 @@ import java.time.LocalDateTime;
 import java.util.List;
 import java.util.Locale;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.huellitasoaxaca.backend.dto.request.SolicitudAdopcionCrearRequest;
+import com.huellitasoaxaca.backend.dto.response.HistorialSolicitudPropiaResponse;
 import com.huellitasoaxaca.backend.dto.response.SolicitudAdopcionResponse;
+import com.huellitasoaxaca.backend.dto.response.SolicitudPropiaDetalleResponse;
+import com.huellitasoaxaca.backend.dto.response.SolicitudPropiaResumenResponse;
 import com.huellitasoaxaca.backend.entity.HistorialEstado;
 import com.huellitasoaxaca.backend.entity.Mascota;
 import com.huellitasoaxaca.backend.entity.Refugio;
@@ -17,8 +23,10 @@ import com.huellitasoaxaca.backend.entity.SolicitudAdopcion;
 import com.huellitasoaxaca.backend.entity.Usuario;
 import com.huellitasoaxaca.backend.entity.enums.EstadoMascota;
 import com.huellitasoaxaca.backend.entity.enums.EstadoSolicitud;
+import com.huellitasoaxaca.backend.exception.ParametroInvalidoException;
 import com.huellitasoaxaca.backend.exception.RecursoNoEncontradoException;
 import com.huellitasoaxaca.backend.exception.SolicitudDuplicadaException;
+import com.huellitasoaxaca.backend.mapper.HistorialEstadoMapper;
 import com.huellitasoaxaca.backend.mapper.SolicitudAdopcionMapper;
 import com.huellitasoaxaca.backend.repository.HistorialEstadoRepository;
 import com.huellitasoaxaca.backend.repository.MascotaRepository;
@@ -33,11 +41,14 @@ import lombok.RequiredArgsConstructor;
 @Transactional(readOnly = true)
 public class SolicitudAdopcionServiceImpl implements SolicitudAdopcionService
 {
+    private static final int TAMANO_MAXIMO_PAGINA = 50;
+
     private final SolicitudAdopcionRepository solicitudRepository;
     private final HistorialEstadoRepository historialRepository;
     private final UsuarioRepository usuarioRepository;
     private final MascotaRepository mascotaRepository;
     private final SolicitudAdopcionMapper solicitudMapper;
+    private final HistorialEstadoMapper historialMapper;
 
     @Override
     @Transactional
@@ -103,6 +114,79 @@ public class SolicitudAdopcionServiceImpl implements SolicitudAdopcionService
                 .build());
 
         return solicitudMapper.toResponse(guardada);
+    }
+
+    @Override
+    public Page<SolicitudPropiaResumenResponse> listarPropias(
+            String correoAutenticado,
+            int page,
+            int size
+    )
+    {
+        validarPaginacion(page, size);
+
+        Usuario usuario = obtenerUsuarioParaConsulta(
+                correoAutenticado
+        );
+
+        Sort orden = Sort.by(
+                Sort.Order.desc("fechaSolicitud"),
+                Sort.Order.desc("id")
+        );
+
+        return solicitudRepository
+                .findByUsuarioId(
+                        usuario.getId(),
+                        PageRequest.of(page, size, orden)
+                )
+                .map(solicitudMapper::toResumenPropio);
+    }
+
+    @Override
+    public SolicitudPropiaDetalleResponse obtenerPropia(
+            Long solicitudId,
+            String correoAutenticado
+    )
+    {
+        Usuario usuario = obtenerUsuarioParaConsulta(
+                correoAutenticado
+        );
+
+        SolicitudAdopcion solicitud = solicitudRepository
+                .findByIdAndUsuarioId(
+                        solicitudId,
+                        usuario.getId()
+                )
+                .orElseThrow(this::solicitudPropiaNoEncontrada);
+
+        return solicitudMapper.toDetallePropio(solicitud);
+    }
+
+    @Override
+    public List<HistorialSolicitudPropiaResponse> listarHistorialPropio(
+            Long solicitudId,
+            String correoAutenticado
+    )
+    {
+        Usuario usuario = obtenerUsuarioParaConsulta(
+                correoAutenticado
+        );
+
+        solicitudRepository
+                .findByIdAndUsuarioId(
+                        solicitudId,
+                        usuario.getId()
+                )
+                .orElseThrow(this::solicitudPropiaNoEncontrada);
+
+        return historialRepository
+                .findHistorialPropioOrdenado(
+                        solicitudId,
+                        usuario.getId()
+                )
+                .stream()
+                .map(historialMapper::toRespuestaPropia)
+                .toList();
     }
 
     @Override
@@ -191,5 +275,54 @@ public class SolicitudAdopcionServiceImpl implements SolicitudAdopcionService
             return null;
         }
         return comentario.trim();
+    }
+
+    private Usuario obtenerUsuarioParaConsulta(
+            String correoAutenticado
+    )
+    {
+        Usuario usuario = usuarioRepository
+                .findByCorreoAndActivoTrue(
+                        correoAutenticado
+                                .trim()
+                                .toLowerCase(Locale.ROOT)
+                )
+                .orElseThrow(() -> new AccessDeniedException(
+                        "El usuario no puede consultar solicitudes"
+                ));
+
+        if (!"USUARIO".equals(usuario.getRol().getNombre()))
+        {
+            throw new AccessDeniedException(
+                    "El rol no puede consultar solicitudes"
+            );
+        }
+
+        return usuario;
+    }
+
+    private void validarPaginacion(int page, int size)
+    {
+        if (page < 0)
+        {
+            throw new ParametroInvalidoException(
+                    "page no puede ser negativo"
+            );
+        }
+
+        if (size < 1 || size > TAMANO_MAXIMO_PAGINA)
+        {
+            throw new ParametroInvalidoException(
+                    "size debe estar entre 1 y "
+                            + TAMANO_MAXIMO_PAGINA
+            );
+        }
+    }
+
+    private RecursoNoEncontradoException solicitudPropiaNoEncontrada()
+    {
+        return new RecursoNoEncontradoException(
+                "No se encontró la solicitud solicitada"
+        );
     }
 }

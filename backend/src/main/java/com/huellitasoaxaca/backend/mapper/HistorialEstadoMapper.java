@@ -3,6 +3,7 @@ package com.huellitasoaxaca.backend.mapper;
 import org.springframework.stereotype.Component;
 
 import com.huellitasoaxaca.backend.dto.response.HistorialEstadoResponse;
+import com.huellitasoaxaca.backend.dto.response.HistorialSolicitudPropiaResponse;
 import com.huellitasoaxaca.backend.entity.HistorialEstado;
 import com.huellitasoaxaca.backend.entity.SolicitudAdopcion;
 
@@ -24,6 +25,16 @@ public class HistorialEstadoMapper
                 historial.getEstado(),
                 historial.getFecha(),
                 historial.getObservaciones()
+        );
+    }
+
+    public HistorialSolicitudPropiaResponse toRespuestaPropia(
+            HistorialEstado historial
+    )
+    {
+        return new HistorialSolicitudPropiaResponse(
+                historial.getEstado(),
+                historial.getFecha()
         );
     }
 }
