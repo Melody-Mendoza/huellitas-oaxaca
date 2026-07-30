@@ -261,15 +261,10 @@ function Navbar() {
                                 )}
 
                                 {isUser && (
-                                    <Link
-                                        to="/mis-solicitudes"
-                                        role="menuitem"
-                                        onClick={
-                                            closeUserMenu
-                                        }
-                                    >
-                                        Mis solicitudes
-                                    </Link>
+                                    <>
+                                        <Link to="/mis-solicitudes" role="menuitem" onClick={closeUserMenu}>Mis solicitudes</Link>
+                                        <Link to="/favoritos" role="menuitem" onClick={closeUserMenu}>Mis favoritos</Link>
+                                    </>
                                 )}
 
                                 {isRefuge && (
