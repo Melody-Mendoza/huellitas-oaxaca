@@ -140,6 +140,8 @@ function RefugioLayout() {
                     <nav className="refuge-navigation" aria-label="Navegación del refugio">
                         <NavLink to="/refugio" end className={({ isActive }) => isActive ? "active" : undefined}>Panel</NavLink>
                         <NavLink to="/refugio/perfil" className={({ isActive }) => isActive ? "active" : undefined}>Perfil del refugio</NavLink>
+                        <NavLink to="/refugio/mascotas" end className={({ isActive }) => isActive ? "active" : undefined}>Mis mascotas</NavLink>
+                        <NavLink to="/refugio/mascotas/nueva" className={({ isActive }) => isActive ? "active" : undefined}>Publicar mascota</NavLink>
                     </nav>
                 </div>
                 <div key={selectedRefuge.id}>

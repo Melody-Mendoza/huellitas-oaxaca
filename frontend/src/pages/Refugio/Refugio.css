@@ -40,6 +40,19 @@
     text-align: center;
 }
 
+.refuge-panel-actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: 10px;
+}
+
+.refuge-panel-header a.secondary {
+    border: 1px solid #78ae8b;
+    background: var(--surface);
+    color: #2F6E4F;
+}
+
 .refuge-panel-header a:focus-visible,
 .refuge-panel-feedback button:focus-visible {
     outline: 3px solid rgba(76, 175, 80, .3);
@@ -121,6 +134,7 @@
         flex-direction: column;
     }
 
+    .refuge-panel-actions,
     .refuge-panel-header a {
         width: 100%;
     }

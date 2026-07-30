@@ -126,7 +126,10 @@ function Refugio() {
                     <h1 id="refuge-panel-title">{selectedRefuge.nombre}</h1>
                     <p>Métricas actuales de mascotas y solicitudes de adopción.</p>
                 </div>
-                <Link to="/refugio/perfil">Editar perfil del refugio</Link>
+                <div className="refuge-panel-actions">
+                    <Link to="/refugio/mascotas">Gestionar mascotas</Link>
+                    <Link to="/refugio/perfil" className="secondary">Editar perfil</Link>
+                </div>
             </header>
             <div className="refuge-metrics">
                 {METRICS.map(([property, label]) => (

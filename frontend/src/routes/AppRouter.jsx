@@ -28,6 +28,9 @@ import RecuperarPassword from "../pages/RecuperarPassword/RecuperarPassword";
 import RestablecerPassword from "../pages/RestablecerPassword/RestablecerPassword";
 import Refugio from "../pages/Refugio/Refugio";
 import PerfilRefugio from "../pages/PerfilRefugio/PerfilRefugio";
+import MascotasRefugio from "../pages/MascotasRefugio/MascotasRefugio";
+import PublicarMascota from "../pages/PublicarMascota/PublicarMascota";
+import EditarMascota from "../pages/EditarMascota/EditarMascota";
 
 import { USER_ROLES } from "../utils/constants";
 
@@ -133,6 +136,12 @@ function AppRouter() {
             >
                 <Route index element={<Refugio />} />
                 <Route path="perfil" element={<PerfilRefugio />} />
+                <Route path="mascotas" element={<MascotasRefugio />} />
+                <Route path="mascotas/nueva" element={<PublicarMascota />} />
+                <Route
+                    path="mascotas/:mascotaId/editar"
+                    element={<EditarMascota />}
+                />
             </Route>
 
             <Route path="*" element={<NotFound />} />
