@@ -47,7 +47,9 @@ function AppRouter() {
                 <Route
                     path="/solicitud"
                     element={
-                        <ProtectedRoute>
+                        <ProtectedRoute
+                            allowedRoles={[USER_ROLES.USUARIO]}
+                        >
                             <SolicitudAdopcion />
                         </ProtectedRoute>
                     }
